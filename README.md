@@ -1,2 +1,3 @@
-# lifebuddy-backend
-Spring Boot backend and Python AI service for LifeBuddy
+# lifebuddy
+
+LifeBuddy: Flutter app, Spring Boot backend and Python AI service
