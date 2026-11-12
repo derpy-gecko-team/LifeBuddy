@@ -28,3 +28,20 @@ The database structure is managed by Flyway migrations in
 If your local database gets out of sync, reset it:
 `docker compose down -v` then `docker compose up -d`
 (this deletes all local data).
+
+
+## Frontend setup
+
+1. Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and run `flutter doctor` until it is happy
+2. Open the `frontend` folder (or the repo root)
+3. Get dependencies: `flutter pub get` (inside `frontend`)
+4. Start an emulator or connect a device, then run: `flutter run`
+
+### Troubleshooting
+
+- **Gradle fails with only a Java version as the error:** Gradle does not support your newest JDK. Point Flutter at JDK 21 (the same one the backend uses):
+  `flutter config --jdk-dir "<path to your JDK 21>"`
+  Then check that `flutter doctor -v` shows that path under "Java binary at". If you installed the JDK through IntelliJ, it is usually in `C:\Users\<you>\.jdks\`.
+
+> [!NOTE]
+> iOS builds need a Mac with Xcode. On Windows, develop and test on Android.
