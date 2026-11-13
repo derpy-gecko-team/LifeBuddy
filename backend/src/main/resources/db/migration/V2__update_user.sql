@@ -1,3 +1,3 @@
 ALTER TABLE users
     ADD COLUMN email VARCHAR(255) NOT NULL UNIQUE,
-    ADD COLUMN password_hash VARCHAR(255);
+    ADD COLUMN password_hash VARCHAR(255) NOT NULL;
