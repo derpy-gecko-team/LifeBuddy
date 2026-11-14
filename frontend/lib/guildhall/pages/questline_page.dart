@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+
+import '../state/guild_hall_controller.dart';
+import '../theme/guild_theme.dart';
+import '../widgets/guild_scaffold.dart';
+import '../widgets/notice_route.dart';
+import '../widgets/ornaments.dart';
+import '../widgets/quest_cards.dart';
+import '../widgets/questline_banner.dart';
+import '../widgets/stone_wall.dart';
+import 'guild_board_page.dart';
+
+class QuestlinePage extends StatefulWidget {
+  const QuestlinePage({
+    super.key,
+    required this.controller,
+    required this.questlineId,
+    required this.onOpenQuest,
+  });
+
+  final GuildHallController controller;
+  final String questlineId;
+  final OpenQuest onOpenQuest;
+
+  @override
+  State<QuestlinePage> createState() => _QuestlinePageState();
+}
+
+class _QuestlinePageState extends State<QuestlinePage> {
+  final _collapsed = ValueNotifier<bool>(false);
+  final _bannerKey = GlobalKey();
+
+  @override
+  void dispose() {
+    _collapsed.dispose();
+    super.dispose();
+  }
+
+  bool _onScroll(ScrollNotification n) {
+    if (n.depth != 0 || n.metrics.axis != Axis.vertical) return false;
+    final bannerHeight = _bannerKey.currentContext?.size?.height ?? 320;
+    _collapsed.value = n.metrics.pixels > bannerHeight - 40;
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GuildScaffold(
+      wall: WallVariant.questline,
+      body: ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) {
+          final line = widget.controller.questlineById(widget.questlineId);
+          if (line == null) return const SizedBox.shrink();
+          final now = DateTime.now();
+          final quests = [...line.quests]..sort(compareForQuestline);
+
+          return Column(
+            children: [
+              ValueListenableBuilder<bool>(
+                valueListenable: _collapsed,
+                builder: (context, collapsed, _) => AnimatedContainer(
+                  duration: GuildMotion.quick,
+                  curve: Curves.easeOut,
+                  margin: EdgeInsets.fromLTRB(collapsed ? 12 : 0, 4, collapsed ? 12 : 0, 0),
+                  padding: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: collapsed ? GuildColors.crimsonDeep : GuildColors.crimsonDeep.withValues(alpha: 0),
+                    border: Border.all(
+                      color: collapsed ? GuildColors.ink : GuildColors.ink.withValues(alpha: 0),
+                      width: 2.5,
+                    ),
+                    boxShadow: [
+                      if (collapsed) const BoxShadow(color: GuildColors.shadow, offset: Offset(3, 4)),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      GuildBackLink(
+                        label: 'Guildhall',
+                        showLabel: !collapsed,
+                        onTap: () => Navigator.of(context).pop(),
+                      ),
+                      if (collapsed) ...[
+                        Expanded(
+                          child: Text(
+                            line.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GuildText.title(GuildType.lg, color: GuildColors.cream),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        SealProgress(total: line.quests.length, done: line.fulfilledCount, size: 16),
+                      ] else
+                        const Spacer(),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: _onScroll,
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        sliver: SliverToBoxAdapter(
+                          child: RepaintBoundary(
+                            key: _bannerKey,
+                            child: QuestlineBanner(questline: line),
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(22, 22, 22, 0),
+                        sliver: SliverToBoxAdapter(
+                          child: Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            spacing: 12,
+                            children: [
+                              Semantics(
+                                header: true,
+                                child: Text('Quests', style: GuildText.label(GuildType.md, color: GuildColors.goldBright)),
+                              ),
+                              Text('Open quests first, soonest deadline on top', style: GuildText.aside(GuildType.sm)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverList.builder(
+                        itemCount: quests.length,
+                        itemBuilder: (context, i) => Padding(
+                          key: ValueKey(quests[i].id),
+                          padding: const EdgeInsets.fromLTRB(16, 28, 16, 0),
+                          child: QuestRow(quest: quests[i], now: now, onOpen: widget.onOpenQuest),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
