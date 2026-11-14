@@ -7,17 +7,28 @@ import '../data/models.dart';
 import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
 import 'guild_icons.dart';
+import 'sketch.dart';
 
 void drawDashedPath(Canvas canvas, Path path, Paint paint, {double dash = 6, double gap = 5}) {
+  final pen = Random(41);
   final dashed = Path();
   for (final PathMetric metric in path.computeMetrics()) {
     var d = 0.0;
     while (d < metric.length) {
-      dashed.addPath(metric.extractPath(d, d + dash), Offset.zero);
-      d += dash + gap;
+      final length = dash * (0.7 + pen.nextDouble() * 0.6);
+      dashed.addPath(
+        metric.extractPath(d, min(d + length, metric.length)),
+        Offset((pen.nextDouble() - 0.5) * 1.2, (pen.nextDouble() - 0.5) * 1.2),
+      );
+      d += length + gap * (0.7 + pen.nextDouble() * 0.6);
     }
   }
-  canvas.drawPath(dashed, Paint.from(paint)..style = PaintingStyle.stroke);
+  canvas.drawPath(
+    dashed,
+    Paint.from(paint)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round,
+  );
 }
 
 class DashedLine extends StatelessWidget {
@@ -91,10 +102,11 @@ class _DashedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = (Offset.zero & size).deflate(strokeWidth / 2);
-    final path = circle
+    final rect = (Offset.zero & size).deflate(strokeWidth / 2 + 1);
+    final outline = circle
         ? (Path()..addOval(rect))
         : (Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius))));
+    final path = traceByHand(outline, Random(size.width.round() * 31 + size.height.round()), wobble: 0.8, step: 9);
     drawDashedPath(
       canvas,
       path,

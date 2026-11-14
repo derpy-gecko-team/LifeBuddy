@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../theme/guild_theme.dart';
 import 'guild_icons.dart';
 import 'pressable.dart';
+import 'sketch.dart';
 import 'torn_paper.dart';
 
 enum GuildButtonKind {
@@ -51,34 +52,31 @@ class GuildButton extends StatelessWidget {
       child: GuildPressable(
         onTap: onPressed,
         haptic: true,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 56),
-          width: expand ? double.infinity : null,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-          decoration: BoxDecoration(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 56, minWidth: expand ? double.infinity : 0),
+          child: SketchBox(
             color: fill,
-            border: Border.all(color: border, width: 2.5),
-            borderRadius: BorderRadius.circular(3),
-            boxShadow: [
-              if (enabled) const BoxShadow(color: GuildColors.shadow, offset: Offset(3, 4)),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (glyph != null) ...[
-                GuildIcon(glyph!, size: 20, color: text),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: GuildText.label(GuildType.md, color: text, spacing: 1),
+            borderColor: border,
+            shadow: enabled ? const Offset(3, 4) : null,
+            seed: stableSeed(label),
+            padding: const EdgeInsets.symmetric(horizontal: 20.5, vertical: 12.5),
+            child: Row(
+              mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (glyph != null) ...[
+                  GuildIcon(glyph!, size: 20, color: text),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: GuildText.label(GuildType.md, color: text, spacing: 1),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

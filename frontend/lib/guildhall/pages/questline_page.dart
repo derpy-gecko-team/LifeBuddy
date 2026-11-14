@@ -7,6 +7,7 @@ import '../widgets/notice_route.dart';
 import '../widgets/ornaments.dart';
 import '../widgets/quest_cards.dart';
 import '../widgets/questline_banner.dart';
+import '../widgets/sketch.dart';
 import '../widgets/stone_wall.dart';
 import 'guild_board_page.dart';
 
@@ -63,37 +64,40 @@ class _QuestlinePageState extends State<QuestlinePage> {
                   duration: GuildMotion.quick,
                   curve: Curves.easeOut,
                   margin: EdgeInsets.fromLTRB(collapsed ? 12 : 0, 4, collapsed ? 12 : 0, 0),
-                  padding: const EdgeInsets.only(right: 14),
-                  decoration: BoxDecoration(
-                    color: collapsed ? GuildColors.crimsonDeep : GuildColors.crimsonDeep.withValues(alpha: 0),
-                    border: Border.all(
-                      color: collapsed ? GuildColors.ink : GuildColors.ink.withValues(alpha: 0),
-                      width: 2.5,
-                    ),
-                    boxShadow: [
-                      if (collapsed) const BoxShadow(color: GuildColors.shadow, offset: Offset(3, 4)),
-                    ],
-                  ),
-                  child: Row(
+                  child: Stack(
                     children: [
-                      GuildBackLink(
-                        label: 'Guildhall',
-                        showLabel: !collapsed,
-                        onTap: () => Navigator.of(context).pop(),
-                      ),
-                      if (collapsed) ...[
-                        Expanded(
-                          child: Text(
-                            line.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GuildText.title(GuildType.lg, color: GuildColors.cream),
-                          ),
+                      Positioned.fill(
+                        child: AnimatedOpacity(
+                          opacity: collapsed ? 1 : 0,
+                          duration: GuildMotion.quick,
+                          child: SketchBox(color: GuildColors.crimsonDeep, seed: stableSeed(line.id)),
                         ),
-                        const SizedBox(width: 10),
-                        SealProgress(total: line.quests.length, done: line.fulfilledCount, size: 16),
-                      ] else
-                        const Spacer(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(2.5, 2.5, 16.5, 2.5),
+                        child: Row(
+                          children: [
+                            GuildBackLink(
+                              label: 'Guildhall',
+                              showLabel: !collapsed,
+                              onTap: () => Navigator.of(context).pop(),
+                            ),
+                            if (collapsed) ...[
+                              Expanded(
+                                child: Text(
+                                  line.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GuildText.title(GuildType.lg, color: GuildColors.cream),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              SealProgress(total: line.quests.length, done: line.fulfilledCount, size: 16),
+                            ] else
+                              const Spacer(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

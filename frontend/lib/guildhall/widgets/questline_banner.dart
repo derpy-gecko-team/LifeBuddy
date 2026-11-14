@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../data/models.dart';
 import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
 import 'ornaments.dart';
+import 'sketch.dart';
 
 class QuestlineBanner extends StatelessWidget {
   const QuestlineBanner({super.key, required this.questline});
@@ -24,7 +27,7 @@ class QuestlineBanner extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: CustomPaint(
-            painter: _BannerPainter(notch: _notch),
+            painter: _BannerPainter(notch: _notch, seed: stableSeed(questline.id)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(26, 22, 26, _notch + 22),
               child: Column(
@@ -142,36 +145,87 @@ class _CordPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+typedef _Cloth = ({Path folds, Path sheen, Path rodShade, Path stitch});
+
 class _BannerPainter extends CustomPainter {
-  _BannerPainter({required this.notch});
+  _BannerPainter({required this.notch, required this.seed});
 
   final double notch;
+  final int seed;
 
-  Path _shape(Rect r, double notch) => Path()
-    ..moveTo(r.left, r.top)
-    ..lineTo(r.right, r.top)
-    ..lineTo(r.right, r.bottom)
-    ..lineTo(r.center.dx, r.bottom - notch)
-    ..lineTo(r.left, r.bottom)
-    ..close();
+  static final _cloths = <(int, Size, double), _Cloth>{};
+
+  static List<Offset> _outline(Rect r, double notch) => [
+        r.topLeft,
+        r.topRight,
+        r.bottomRight,
+        Offset(r.center.dx, r.bottom - notch),
+        r.bottomLeft,
+      ];
+
+  _Cloth _cloth(Size size) {
+    final key = (seed, size, notch);
+    final cached = _cloths[key];
+    if (cached != null) return cached;
+    if (_cloths.length > 16) _cloths.remove(_cloths.keys.first);
+
+    final pen = Random(seed * 71 + 5);
+    final folds = Path();
+    final sheen = Path();
+    final count = max(2, (size.width / 120).round());
+    for (var i = 0; i < count; i++) {
+      final x = size.width * (i + 0.65 + (pen.nextDouble() - 0.5) * 0.4) / (count + 0.3);
+      final bottom = size.height * (0.5 + pen.nextDouble() * 0.35);
+      var y = 4 + pen.nextDouble() * 8;
+      var drift = 0.0;
+      folds.moveTo(x, y);
+      sheen.moveTo(x + 4, y);
+      while (y < bottom) {
+        y += 24 + pen.nextDouble() * 14;
+        final next = (pen.nextDouble() - 0.5) * 7;
+        folds.quadraticBezierTo(x + drift, y - 14, x + next / 2, y);
+        sheen.quadraticBezierTo(x + 4 + drift, y - 14, x + 4 + next / 2, y);
+        drift = next;
+      }
+    }
+
+    final rodShade = Path();
+    for (var x = 5.0; x < size.width - 4; x += 4 + pen.nextDouble() * 3) {
+      final length = 4 + pen.nextDouble() * (pen.nextDouble() < 0.2 ? 16 : 8);
+      rodShade
+        ..moveTo(x, 2)
+        ..lineTo(x + (pen.nextDouble() - 0.5) * 2, 2 + length);
+    }
+
+    final inner = Path()..addPolygon(_outline((Offset.zero & size).deflate(11), notch - 4), true);
+    return _cloths[key] = (
+      folds: folds,
+      sheen: sheen,
+      rodShade: rodShade,
+      stitch: traceByHand(inner, pen, wobble: 0.8, step: 16),
+    );
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    final shape = _shape(rect, notch);
+    final sketch = Sketch.of(_outline(Offset.zero & size, notch), seed);
+    final cloth = _cloth(size);
 
-    canvas.drawPath(shape.shift(const Offset(5, 7)), Paint()..color = GuildColors.shadow);
-    canvas.drawPath(shape, Paint()..color = GuildColors.crimsonDeep);
-    canvas.drawPath(
-      shape,
-      Paint()
-        ..color = GuildColors.ink
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3,
-    );
+    sketch.paintFill(canvas, GuildColors.crimsonDeep, shadow: const Offset(5, 7));
+
+    canvas.save();
+    canvas.clipPath(sketch.shape);
+    canvas.drawPath(cloth.folds, Sketch.pen(GuildColors.ink.withValues(alpha: 0.2), 2.6));
+    canvas.drawPath(cloth.sheen, Sketch.pen(GuildColors.cream.withValues(alpha: 0.1), 1.8));
+    canvas.drawPath(cloth.rodShade, Sketch.pen(GuildColors.ink.withValues(alpha: 0.4), 1.3));
+    canvas.restore();
+
+    sketch.paintShading(canvas, strength: 1.8);
+    sketch.paintBorder(canvas, width: 3);
+
     drawDashedPath(
       canvas,
-      _shape(rect.deflate(11), notch - 4),
+      cloth.stitch,
       Paint()
         ..color = GuildColors.cream.withValues(alpha: 0.7)
         ..strokeWidth = 2,
@@ -181,5 +235,5 @@ class _BannerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_BannerPainter old) => old.notch != notch;
+  bool shouldRepaint(_BannerPainter old) => old.notch != notch || old.seed != seed;
 }

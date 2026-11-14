@@ -8,6 +8,7 @@ import 'deadline_format.dart';
 import 'guild_icons.dart';
 import 'ornaments.dart';
 import 'pressable.dart';
+import 'sketch.dart';
 import 'torn_paper.dart';
 import 'wood_sign.dart';
 
@@ -213,7 +214,7 @@ class _Tag extends StatelessWidget {
           children: [
             Container(width: 2.5, height: 12, margin: const EdgeInsets.only(top: 6), color: const Color(0xFF9A8B6A)),
             CustomPaint(
-              painter: _TagPainter(selected: selected),
+              painter: _TagPainter(selected: selected, seed: stableSeed(label)),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 42),
                 child: Padding(
@@ -251,35 +252,33 @@ class _Tag extends StatelessWidget {
 }
 
 class _TagPainter extends CustomPainter {
-  _TagPainter({required this.selected});
+  _TagPainter({required this.selected, required this.seed});
   final bool selected;
+  final int seed;
 
   @override
   void paint(Canvas canvas, Size size) {
     const cut = 9.0;
-    final path = Path()
-      ..moveTo(cut, 0)
-      ..lineTo(size.width - cut, 0)
-      ..lineTo(size.width, cut)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..lineTo(0, cut)
-      ..close();
-    canvas.drawPath(path.shift(const Offset(2, 3)), Paint()..color = GuildColors.shadow);
-    canvas.drawPath(path, Paint()..color = selected ? GuildColors.cream : GuildColors.leather);
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = selected ? GuildColors.ink : GuildColors.panelBorder
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
-        ..strokeJoin = StrokeJoin.round,
+    final sketch = Sketch.of([
+      const Offset(cut, 0),
+      Offset(size.width - cut, 0),
+      Offset(size.width, cut),
+      Offset(size.width, size.height),
+      Offset(0, size.height),
+      const Offset(0, cut),
+    ], seed);
+    sketch.paintFill(canvas, selected ? GuildColors.cream : GuildColors.leather, shadow: const Offset(2, 3));
+    sketch.paintShading(
+      canvas,
+      ink: selected ? GuildColors.ink : GuildColors.cream,
+      strength: selected ? 1 : 0.55,
     );
+    sketch.paintBorder(canvas, color: selected ? GuildColors.ink : GuildColors.panelBorder, width: 2);
     canvas.drawCircle(Offset(size.width / 2, 5), 2.5, Paint()..color = GuildColors.shadow);
   }
 
   @override
-  bool shouldRepaint(_TagPainter old) => old.selected != selected;
+  bool shouldRepaint(_TagPainter old) => old.selected != selected || old.seed != seed;
 }
 
 class QuestlinePlaque extends StatelessWidget {
@@ -298,16 +297,14 @@ class QuestlinePlaque extends StatelessWidget {
       child: GuildPressable(
         onTap: onTap,
         pressedScale: 0.98,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-          decoration: const ShapeDecoration(
-            color: GuildColors.panel,
-            shape: BeveledRectangleBorder(
-              side: BorderSide(color: GuildColors.panelBorder, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            shadows: [BoxShadow(color: GuildColors.shadow, offset: Offset(3, 5))],
-          ),
+        child: SketchBox(
+          color: GuildColors.panel,
+          borderColor: GuildColors.panelBorder,
+          borderWidth: 2,
+          bevel: 10,
+          shadow: const Offset(3, 5),
+          seed: stableSeed(questline.id),
+          padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
