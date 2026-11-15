@@ -17,3 +17,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: MySoul
+      fonts: 
+      - asset: assets/fonts/MySoul-Regular.ttf
+        weight: 400
+    - family: NorthEternal
+      fonts: 
+      - asset: assets/fonts/NorthEternal-yYl4V.otf
