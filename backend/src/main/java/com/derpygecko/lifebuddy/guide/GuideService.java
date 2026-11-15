@@ -10,7 +10,7 @@ import com.derpygecko.lifebuddy.ai.dto.UserContext;
 import com.derpygecko.lifebuddy.guide.dto.InteractionResponse;
 import com.derpygecko.lifebuddy.user.PreferenceType;
 import com.derpygecko.lifebuddy.user.UserPreference;
-import com.derpygecko.lifebuddy.user.UserPreferenceRepository;
+import com.derpygecko.lifebuddy.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,14 +29,14 @@ public class GuideService {
     private static final Logger log = LoggerFactory.getLogger(GuideService.class);
 
     private final AiClientService aiClientService;
-    private final UserPreferenceRepository preferenceRepository;
+    private final UserService userService;
     private final boolean mockMode;
 
     public GuideService(AiClientService aiClientService,
-                        UserPreferenceRepository preferenceRepository,
+                        UserService userService,
                         @Value("${ai.mock:false}") boolean mockMode) {
         this.aiClientService = aiClientService;
-        this.preferenceRepository = preferenceRepository;
+        this.userService = userService;
         this.mockMode = mockMode;
     }
 
@@ -68,7 +68,7 @@ public class GuideService {
     }
 
     private UserContext loadUserContext(Long userId) {
-        List<UserPreference> preferences = preferenceRepository.findAllByUserId(userId);
+        List<UserPreference> preferences = userService.getUserPreferencesByUserId(userId);
         return new UserContext(
                 valuesOf(preferences, PreferenceType.LIKE),
                 valuesOf(preferences, PreferenceType.DISLIKE),
