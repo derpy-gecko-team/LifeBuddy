@@ -11,7 +11,8 @@ import 'ornaments.dart';
 import 'pressable.dart';
 import 'sketch.dart';
 import 'torn_paper.dart';
-import 'wood_sign.dart';
+import 'hanging_slip.dart';
+import 'motion.dart';
 
 String toRoman(int n) {
   const map = {
@@ -30,9 +31,13 @@ String toRoman(int n) {
 }
 
 class BoardHeader extends StatelessWidget {
-  const BoardHeader({super.key, required this.newToday});
+  const BoardHeader({super.key, required this.newToday, this.drawTitle = false, this.onTitleDrawn});
 
   final int newToday;
+
+  /// Draws the stroke under the title in, the first time the hall is shown.
+  final bool drawTitle;
+  final VoidCallback? onTitleDrawn;
 
   @override
   Widget build(BuildContext context) {
@@ -63,16 +68,18 @@ class BoardHeader extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Semantics(
                         header: true,
-                        child: Text(
+                        child: LetteredTitle(
                           'The Guildhall',
-                          style: GuildText.title(GuildType.display, color: GuildColors.cream),
+                          size: GuildType.display,
+                          drawIn: drawTitle,
+                          onDrawn: onTitleDrawn,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(subtitle, style: GuildText.aside(GuildType.md)),
             ],
           ),
@@ -94,7 +101,7 @@ class RankSign extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
-          child: WoodSign(
+          child: HangingSlip(
             child: Row(
               children: [
                 ExcludeSemantics(child: Image.asset(GuildAssets.rankShield, height: 34)),
@@ -110,16 +117,24 @@ class RankSign extends StatelessWidget {
                         children: [
                           Text(
                             '${hero.rankTitle} ${toRoman(hero.level)}',
-                            style: GuildText.label(GuildType.md),
+                            style: GuildText.title(GuildType.lg),
                           ),
                           Text(
                             '${hero.xp} / ${hero.xpToNext} XP',
-                            style: GuildText.label(GuildType.xs, color: GuildColors.goldBright),
+                            style: GuildText.label(GuildType.xs, color: GuildColors.inkSoft),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      ExcludeSemantics(child: GuildProgressBar(value: hero.progress, height: 8)),
+                      ExcludeSemantics(
+                        child: GuildProgressBar(
+                          value: hero.progress,
+                          height: 8,
+                          track: GuildColors.parchmentDark,
+                          fill: GuildColors.brick,
+                          edge: GuildColors.pencil,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -159,13 +174,7 @@ class QuestTagRail extends StatelessWidget {
           left: 0,
           right: 0,
           top: 4,
-          child: Container(
-            height: 5,
-            decoration: const BoxDecoration(
-              color: GuildColors.ink,
-              boxShadow: [BoxShadow(color: Colors.black45, offset: Offset(0, 2))],
-            ),
-          ),
+          child: Container(height: 2, color: GuildColors.chalkLine),
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -201,7 +210,7 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? GuildColors.ink : GuildColors.cream;
+    final fg = selected ? GuildColors.brickDeep : GuildColors.cream;
     return Semantics(
       button: true,
       selected: selected,
@@ -210,42 +219,45 @@ class _Tag extends StatelessWidget {
       child: GuildPressable(
         onTap: onTap,
         haptic: true,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(width: 2.5, height: 12, margin: const EdgeInsets.only(top: 6), color: const Color(0xFF9A8B6A)),
-            CustomPaint(
-              painter: _TagPainter(selected: selected, seed: stableSeed(label)),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 42),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(label, style: GuildText.label(GuildType.sm, color: fg)),
-                      if (count != null) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          constraints: const BoxConstraints(minWidth: 22),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: selected ? GuildColors.ink : GuildColors.shadow,
-                            borderRadius: BorderRadius.circular(11),
+        child: HangingSway(
+          nudged: selected,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 2, height: 12, margin: const EdgeInsets.only(top: 6), color: GuildColors.chalkLine),
+              CustomPaint(
+                painter: _TagPainter(selected: selected, seed: stableSeed(label)),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 42),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(label, style: GuildText.label(GuildType.sm, color: fg)),
+                        if (count != null) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            constraints: const BoxConstraints(minWidth: 22),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: selected ? GuildColors.brickDeep : GuildColors.shadow,
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: Text(
+                              '$count',
+                              textAlign: TextAlign.center,
+                              style: GuildText.label(GuildType.xs, color: GuildColors.cream, spacing: 0),
+                            ),
                           ),
-                          child: Text(
-                            '$count',
-                            textAlign: TextAlign.center,
-                            style: GuildText.label(GuildType.xs, color: GuildColors.cream, spacing: 0),
-                          ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -268,14 +280,18 @@ class _TagPainter extends CustomPainter {
       Offset(0, size.height),
       const Offset(0, cut),
     ], seed);
-    sketch.paintFill(canvas, selected ? GuildColors.cream : GuildColors.leather, shadow: const Offset(2, 3));
+    sketch.paintFill(canvas, selected ? GuildColors.parchment : GuildColors.indigoDeep, shadow: const Offset(2, 3));
     sketch.paintShading(
       canvas,
-      ink: selected ? GuildColors.ink : GuildColors.cream,
-      strength: selected ? 1 : 0.55,
+      ink: selected ? GuildColors.pencil : GuildColors.cream,
+      strength: selected ? 1.2 : 0.45,
     );
-    sketch.paintBorder(canvas, color: selected ? GuildColors.ink : GuildColors.panelBorder, width: 2);
-    canvas.drawCircle(Offset(size.width / 2, 5), 2.5, Paint()..color = GuildColors.shadow);
+    sketch.paintBorder(canvas, color: selected ? GuildColors.pencil : GuildColors.chalkLine, width: 1.5);
+    canvas.drawCircle(
+      Offset(size.width / 2, 5),
+      2.2,
+      Paint()..color = selected ? GuildColors.indigoDeep : GuildColors.chalk,
+    );
   }
 
   @override
@@ -299,20 +315,20 @@ class QuestlinePlaque extends StatelessWidget {
         onTap: () => onTap(globalRectOf(context)),
         pressedScale: 0.98,
         child: SketchBox(
-          color: GuildColors.panel,
-          borderColor: GuildColors.panelBorder,
-          borderWidth: 2,
+          color: GuildColors.indigoDeep,
+          borderColor: GuildColors.chalkLine,
+          borderWidth: 1.6,
           bevel: 10,
-          shadow: const Offset(3, 5),
+          shadow: const Offset(2, 4),
           seed: stableSeed(questline.id),
           padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              const Positioned(left: -4, top: -2, child: _Rivet()),
-              const Positioned(right: 0, top: -2, child: _Rivet()),
-              const Positioned(left: -4, bottom: -2, child: _Rivet()),
-              const Positioned(right: 0, bottom: -2, child: _Rivet()),
+              const Positioned(left: -7, top: -5, child: ChalkStar(seed: 1)),
+              const Positioned(right: -3, top: -5, child: ChalkStar(seed: 2)),
+              const Positioned(left: -7, bottom: -5, child: ChalkStar(seed: 3)),
+              const Positioned(right: -3, bottom: -5, child: ChalkStar(seed: 4)),
               Row(
                 children: [
                   Container(
@@ -320,9 +336,9 @@ class QuestlinePlaque extends StatelessWidget {
                     height: 56,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: GuildColors.leather,
+                      color: GuildColors.indigo,
                       shape: BoxShape.circle,
-                      border: Border.all(color: GuildColors.gold, width: 2.5),
+                      border: Border.all(color: GuildColors.chalk, width: 1.8),
                     ),
                     child: QuestlineEmblem(questline: questline, size: 35),
                   ),
@@ -331,7 +347,7 @@ class QuestlinePlaque extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(questline.name, style: GuildText.label(GuildType.lg, spacing: 0.6)),
+                        Text(questline.name, style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
                         const SizedBox(height: 2),
                         Text(
                           '${questline.fulfilledCount} of ${questline.quests.length} quests fulfilled',
@@ -354,21 +370,6 @@ class QuestlinePlaque extends StatelessWidget {
   }
 }
 
-class _Rivet extends StatelessWidget {
-  const _Rivet();
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: 8,
-        height: 8,
-        decoration: BoxDecoration(
-          color: GuildColors.ink,
-          shape: BoxShape.circle,
-          border: Border.all(color: GuildColors.cream.withValues(alpha: 0.4), width: 1.2),
-        ),
-      );
-}
-
 class DueTodayStrip extends StatelessWidget {
   const DueTodayStrip({super.key, required this.quests, required this.now, required this.onOpenQuest});
 
@@ -389,7 +390,7 @@ class DueTodayStrip extends StatelessWidget {
         children: [
           Row(
             children: [
-              const GuildIcon(GuildGlyph.flame, size: 20, color: GuildColors.crimsonDeep),
+              const GuildIcon(GuildGlyph.flame, size: 20, color: GuildColors.brickDeep),
               const SizedBox(width: 8),
               Semantics(
                 header: true,
@@ -415,13 +416,13 @@ class DueTodayStrip extends StatelessWidget {
                         Expanded(
                           child: Text(
                             quest.title,
-                            style: GuildText.title(GuildType.lg),
+                            style: GuildText.title(GuildType.md),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Text(
                           deadlineLabel(quest.deadline!, now),
-                          style: GuildText.aside(GuildType.sm, color: GuildColors.crimsonDeep),
+                          style: GuildText.aside(GuildType.sm, color: GuildColors.inkSoft),
                         ),
                         const SizedBox(width: 6),
                         const GuildIcon(GuildGlyph.chevronRight, size: 18, color: GuildColors.ink),

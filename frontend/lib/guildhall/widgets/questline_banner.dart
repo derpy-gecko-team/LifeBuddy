@@ -43,11 +43,11 @@ class QuestlineBanner extends StatelessWidget {
                       ),
                       const SizedBox(width: 14),
                       Expanded(
-                        child: Semantics(
-                          header: true,
-                          child: Text(
-                            questline.name,
-                            style: GuildText.title(GuildType.xxl, color: GuildColors.cream),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Semantics(
+                            header: true,
+                            child: LetteredTitle(questline.name, size: GuildType.xl),
                           ),
                         ),
                       ),
@@ -101,7 +101,7 @@ class _Rod extends StatelessWidget {
           decoration: BoxDecoration(
             color: GuildColors.gold,
             shape: BoxShape.circle,
-            border: Border.all(color: GuildColors.ink, width: 3),
+            border: Border.all(color: GuildColors.bronze, width: 1.5),
           ),
         );
 
@@ -117,7 +117,7 @@ class _Rod extends StatelessWidget {
             bottom: 5,
             child: Container(
               height: 12,
-              decoration: BoxDecoration(color: GuildColors.ink, borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: GuildColors.shadow, borderRadius: BorderRadius.circular(3)),
             ),
           ),
           Positioned(left: 0, bottom: 0, child: knob()),
@@ -133,12 +133,12 @@ class _CordPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final nail = Offset(size.width / 2, 7);
     final cord = Paint()
-      ..color = const Color(0xFF9BAA90)
-      ..strokeWidth = 3;
+      ..color = GuildColors.chalk
+      ..strokeWidth = 2;
     canvas.drawLine(nail, Offset(size.width * 0.24, size.height - 12), cord);
     canvas.drawLine(nail, Offset(size.width * 0.76, size.height - 12), cord);
-    canvas.drawCircle(nail, 7, Paint()..color = GuildColors.ink);
-    canvas.drawCircle(nail, 4, Paint()..color = GuildColors.stoneLight);
+    canvas.drawCircle(nail, 6, Paint()..color = GuildColors.chalk);
+    canvas.drawCircle(nail, 3, Paint()..color = GuildColors.indigoDeep);
   }
 
   @override
@@ -211,17 +211,17 @@ class _BannerPainter extends CustomPainter {
     final sketch = Sketch.of(_outline(Offset.zero & size, notch), seed);
     final cloth = _cloth(size);
 
-    sketch.paintFill(canvas, GuildColors.crimsonDeep, shadow: const Offset(5, 7));
+    sketch.paintFill(canvas, GuildColors.brick, shadow: const Offset(3, 5));
 
     canvas.save();
     canvas.clipPath(sketch.shape);
-    canvas.drawPath(cloth.folds, Sketch.pen(GuildColors.ink.withValues(alpha: 0.2), 2.6));
-    canvas.drawPath(cloth.sheen, Sketch.pen(GuildColors.cream.withValues(alpha: 0.1), 1.8));
-    canvas.drawPath(cloth.rodShade, Sketch.pen(GuildColors.ink.withValues(alpha: 0.4), 1.3));
+    canvas.drawPath(cloth.folds, Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.55), 2.6));
+    canvas.drawPath(cloth.sheen, Sketch.pen(GuildColors.cream.withValues(alpha: 0.12), 1.8));
+    canvas.drawPath(cloth.rodShade, Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.7), 1.3));
     canvas.restore();
 
-    sketch.paintShading(canvas, strength: 1.8);
-    sketch.paintBorder(canvas, width: 3);
+    sketch.paintShading(canvas, ink: GuildColors.brickDeep, strength: 2.2);
+    sketch.paintBorder(canvas, color: GuildColors.brickDeep, width: 1.8);
 
     drawDashedPath(
       canvas,

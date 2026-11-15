@@ -185,11 +185,11 @@ class Sketch {
     ..strokeCap = StrokeCap.round
     ..strokeJoin = StrokeJoin.round;
 
-  static bool isDark(Color color) => color.computeLuminance() < 0.05;
+  static bool isDark(Color color) => color.computeLuminance() < 0.12;
 
   void paintFill(Canvas canvas, Color color, {Offset? shadow}) {
     if (shadow != null) {
-      canvas.drawPath(shape.shift(shadow), Paint()..color = GuildColors.shadow.withValues(alpha: color.a));
+      canvas.drawPath(shape.shift(shadow), Paint()..color = GuildColors.shadow.withValues(alpha: color.a * 0.5));
     }
     canvas.drawPath(shape, Paint()..color = color);
   }
@@ -203,7 +203,7 @@ class Sketch {
     canvas.restore();
   }
 
-  void paintBorder(Canvas canvas, {Color color = GuildColors.ink, double width = 2.5}) {
+  void paintBorder(Canvas canvas, {Color color = GuildColors.pencil, double width = 1.8}) {
     canvas.drawPath(border, pen(color, width));
     canvas.drawPath(echo, pen(color.withValues(alpha: color.a * 0.75), 1.1));
   }
@@ -214,10 +214,10 @@ class SketchBox extends StatelessWidget {
     super.key,
     required this.color,
     this.child,
-    this.borderColor = GuildColors.ink,
-    this.borderWidth = 2.5,
+    this.borderColor = GuildColors.pencil,
+    this.borderWidth = 1.8,
     this.bevel = 0,
-    this.shadow = const Offset(3, 4),
+    this.shadow = const Offset(2, 3),
     this.seed = 1,
     this.padding = EdgeInsets.zero,
   });

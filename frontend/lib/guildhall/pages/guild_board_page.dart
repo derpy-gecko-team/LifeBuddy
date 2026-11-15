@@ -65,6 +65,8 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
 
   final _railPinned = ValueNotifier<bool>(false);
 
+  bool _titleDrawn = false;
+
   static const _glowSize = 480.0;
 
   @override
@@ -124,6 +126,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
           final railExtent = 62 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 1.6;
 
           return Stack(
+            clipBehavior: Clip.none,
             children: [
               Positioned(
                 right: -_glowSize / 2 + 54,
@@ -140,7 +143,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                 onNotification: _onScroll,
                 child: RefreshIndicator(
                   color: GuildColors.gold,
-                  backgroundColor: GuildColors.panel,
+                  backgroundColor: GuildColors.indigoDeep,
                   onRefresh: controller.load,
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -151,7 +154,13 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                           padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
                           child: Column(
                             children: [
-                              RepaintBoundary(child: BoardHeader(newToday: data.newToday)),
+                              RepaintBoundary(
+                                child: BoardHeader(
+                                  newToday: data.newToday,
+                                  drawTitle: !_titleDrawn,
+                                  onTitleDrawn: () => _titleDrawn = true,
+                                ),
+                              ),
                               const SizedBox(height: 10),
                               RepaintBoundary(
                                 child: RankSign(hero: data.hero, onOpenBuddy: widget.onOpenBuddy),
@@ -240,8 +249,8 @@ class _TagRailDelegate extends SliverPersistentHeaderDelegate {
           ),
           child: const DecoratedBox(
             decoration: BoxDecoration(
-              color: GuildColors.mortar,
-              border: Border(bottom: BorderSide(color: GuildColors.shadow, width: 3)),
+              color: GuildColors.indigo,
+              border: Border(bottom: BorderSide(color: GuildColors.chalkLine, width: 1.5)),
             ),
           ),
         ),
@@ -286,6 +295,12 @@ class _QuestlineSection extends StatelessWidget {
             clipBehavior: Clip.none,
             padding: const EdgeInsets.fromLTRB(26, 34, 26, 18),
             itemCount: quests.length,
+            // Keeps each card's state with its quest when the order changes,
+            // so a seal that breaks is seen breaking.
+            findItemIndexCallback: (key) {
+              final index = quests.indexWhere((q) => ValueKey(q.id) == key);
+              return index < 0 ? null : index;
+            },
             separatorBuilder: (_, _) => const SizedBox(width: 22),
             itemBuilder: (context, i) => QuestCard(
               key: ValueKey(quests[i].id),

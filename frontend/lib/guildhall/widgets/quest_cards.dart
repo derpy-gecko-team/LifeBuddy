@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import '../data/models.dart';
 import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
 import 'deadline_format.dart';
+import 'motion.dart';
 import 'notice_route.dart';
 import 'ornaments.dart';
 import 'pressable.dart';
@@ -46,7 +45,7 @@ class _DeadlineOrPeril extends StatelessWidget {
     if (deadline == null || quest.status == QuestStatus.fulfilled) {
       return PerilSkulls(peril: quest.peril);
     }
-    final color = quest.isUrgent(now) ? GuildColors.crimsonDeep : GuildColors.inkSoft;
+    final color = quest.isUrgent(now) ? GuildColors.brickDeep : GuildColors.inkSoft;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -58,7 +57,7 @@ class _DeadlineOrPeril extends StatelessWidget {
   }
 }
 
-class QuestCard extends StatelessWidget {
+class QuestCard extends StatefulWidget {
   const QuestCard({
     super.key,
     required this.quest,
@@ -82,7 +81,23 @@ class QuestCard extends StatelessWidget {
   static double heightFor(BuildContext context) => 296.0 * _textFactor(context);
 
   @override
+  State<QuestCard> createState() => _QuestCardState();
+}
+
+class _QuestCardState extends State<QuestCard> {
+  /// Counts the times this notice has been put back on the board.
+  int _pinnedBack = 0;
+
+  Future<void> _open() async {
+    await widget.onOpen(widget.quest.id, origin: globalRectOf(context), tilt: widget.tilt);
+    if (mounted) setState(() => _pinnedBack++);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final quest = widget.quest;
+    final now = widget.now;
+    final tilt = widget.tilt;
     final seed = stableSeed(quest.id);
     final badge = questBadgeAsset(quest, now);
     final sealed = quest.status == QuestStatus.sealed;
@@ -97,7 +112,7 @@ class QuestCard extends StatelessWidget {
           if (quest.isBoss)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text('Wanted', style: GuildText.label(GuildType.xs, color: GuildColors.crimsonDeep, spacing: 2)),
+              child: Text('Wanted', style: GuildText.label(GuildType.xs, color: GuildColors.brickDeep, spacing: 2)),
             ),
           ExcludeSemantics(
             child: Image.asset(quest.iconAsset, height: quest.isBoss ? 84 : 58, fit: BoxFit.contain),
@@ -141,26 +156,34 @@ class QuestCard extends StatelessWidget {
       label: _semanticsFor(quest, now),
       excludeSemantics: true,
       child: GuildPressable(
-        onTap: () => onOpen(quest.id, origin: globalRectOf(context), tilt: tilt),
+        onTap: _open,
         pressedScale: 1.04,
         haptic: true,
-        builder: (context, pressed) => AnimatedRotation(
-          turns: pressed ? 0 : tilt / (2 * pi),
-          duration: GuildMotion.press,
-          curve: Curves.easeOut,
+        builder: (context, pressed) => PinnedSwing(
+          rest: tilt,
+          held: pressed,
+          nudges: _pinnedBack,
           child: SizedBox(
-            width: widthFor(context, quest),
-            height: heightFor(context),
+            width: QuestCard.widthFor(context, quest),
+            height: QuestCard.heightFor(context),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 Positioned.fill(child: paper),
-                if (sealed) ...[
-                  const Positioned(left: 2, right: 2, bottom: 50, child: SealRibbon()),
-                  const Positioned(left: 0, right: 0, bottom: 35, child: Center(child: WaxSeal(size: 44))),
-                ],
+                SealBreak(
+                  sealed: sealed,
+                  builder: (breaking) => [
+                    Positioned(left: 2, right: 2, bottom: 50, child: PartingRibbon(breaking: breaking)),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 35,
+                      child: Center(child: FallingSeal(breaking: breaking, size: 44)),
+                    ),
+                  ],
+                ),
                 if (quest.status == QuestStatus.fulfilled)
-                  const Positioned(top: 22, right: 8, child: FulfilledStamp()),
+                  const Positioned(top: 22, right: 8, child: InkStamp('Fulfilled')),
                 Positioned(
                   top: -9,
                   left: 0,
@@ -221,7 +244,7 @@ class QuestRow extends StatelessWidget {
                 Text(quest.flavor, style: GuildText.body(GuildType.sm)),
                 if (sealed && quest.sealedReason != null) ...[
                   const SizedBox(height: 4),
-                  Text(quest.sealedReason!, style: GuildText.aside(GuildType.sm, color: GuildColors.verdigrisDark)),
+                  Text(quest.sealedReason!, style: GuildText.aside(GuildType.sm, color: GuildColors.indigoDeep)),
                 ],
                 if (quest.status == QuestStatus.sworn) ...[
                   const SizedBox(height: 4),
@@ -239,7 +262,7 @@ class QuestRow extends StatelessWidget {
             children: [
               Text('+${quest.xp} XP', style: GuildText.label(GuildType.sm, color: GuildColors.bronze)),
               const SizedBox(height: 8),
-              if (fulfilled) const FulfilledStamp() else _DeadlineOrPeril(quest: quest, now: now),
+              if (fulfilled) const InkStamp('Fulfilled') else _DeadlineOrPeril(quest: quest, now: now),
             ],
           ),
         ],
@@ -258,20 +281,23 @@ class QuestRow extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             paper,
-            if (sealed) ...[
-              const Positioned(
-                left: 18 + _medallion / 2 - 7,
-                top: 4,
-                bottom: 12,
-                child: SealRibbon(axis: Axis.vertical),
-              ),
-              const Positioned(
-                left: 18 + (_medallion - 52) / 2,
-                top: 0,
-                bottom: 6,
-                child: Center(child: WaxSeal(size: 52)),
-              ),
-            ],
+            SealBreak(
+              sealed: sealed,
+              builder: (breaking) => [
+                Positioned(
+                  left: 18 + _medallion / 2 - 7,
+                  top: 4,
+                  bottom: 12,
+                  child: PartingRibbon(breaking: breaking, axis: Axis.vertical),
+                ),
+                Positioned(
+                  left: 18 + (_medallion - 52) / 2,
+                  top: 0,
+                  bottom: 6,
+                  child: Center(child: FallingSeal(breaking: breaking, size: 52)),
+                ),
+              ],
+            ),
             if (badge != null) Positioned(top: -20, left: 70, child: RoundBadge(asset: badge, size: 44)),
             if (quest.paper == PaperTone.sage && !sealed)
               const Positioned(top: 10, left: 12, child: Fastener(kind: FastenerKind.pin)),
@@ -299,8 +325,8 @@ class Fastener extends StatelessWidget {
             width: 62,
             height: 18,
             decoration: BoxDecoration(
-              color: const Color(0xFF5A6A70),
-              border: Border.all(color: GuildColors.ink, width: 2),
+              color: GuildColors.chalk.withValues(alpha: 0.82),
+              border: Border.all(color: GuildColors.tan, width: 1),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -309,29 +335,28 @@ class Fastener extends StatelessWidget {
         return Container(
           width: 16,
           height: 16,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: GuildColors.ink,
-            boxShadow: [BoxShadow(color: Colors.black38, offset: Offset(1, 2))],
+            color: GuildColors.brick,
+            border: Border.all(color: GuildColors.brickDeep, width: 1),
+            boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.45), offset: const Offset(1, 2))],
           ),
           alignment: const Alignment(-0.3, -0.3),
           child: Container(
             width: 4,
             height: 4,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white38),
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white54),
           ),
         );
       case FastenerKind.nail:
-        return Transform.rotate(
-          angle: 0.5,
-          child: Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              color: const Color(0xFF3A3F42),
-              border: Border.all(color: GuildColors.ink, width: 2),
-              boxShadow: const [BoxShadow(color: Colors.black38, offset: Offset(1, 2))],
-            ),
+        return Container(
+          width: 15,
+          height: 15,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: GuildColors.gold,
+            border: Border.all(color: GuildColors.bronze, width: 1),
+            boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.45), offset: const Offset(1, 2))],
           ),
         );
     }

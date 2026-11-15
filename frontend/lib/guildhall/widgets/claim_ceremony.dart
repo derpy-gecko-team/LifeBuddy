@@ -6,7 +6,8 @@ import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
 import 'board_header.dart' show toRoman;
 import 'ornaments.dart';
-import 'wood_sign.dart';
+import 'hanging_slip.dart';
+import 'motion.dart';
 
 void playClaimCeremony(
   BuildContext context, {
@@ -156,7 +157,7 @@ class _ClaimCeremonyState extends State<_ClaimCeremony> with SingleTickerProvide
                         alignment: Alignment.topCenter,
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 420),
-                          child: WoodSign(
+                          child: HangingSlip(
                             hanging: false,
                             child: _SignContent(
                               hero: hero,
@@ -227,7 +228,7 @@ class _SignContent extends StatelessWidget {
             child: Text(
               'Rank up!',
               textAlign: TextAlign.center,
-              style: GuildText.title(GuildType.xl, color: GuildColors.goldBright),
+              style: GuildText.title(GuildType.xl),
             ),
           ),
         Row(
@@ -243,10 +244,10 @@ class _SignContent extends StatelessWidget {
                       Expanded(
                         child: Text(
                           '${hero.rankTitle} ${toRoman(hero.level)}',
-                          style: GuildText.label(GuildType.md),
+                          style: GuildText.title(GuildType.lg),
                         ),
                       ),
-                      Text('+$xpGained XP', style: GuildText.label(GuildType.md, color: GuildColors.goldBright)),
+                      Text('+$xpGained XP', style: GuildText.label(GuildType.md, color: GuildColors.bronze)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -262,7 +263,7 @@ class _SignContent extends StatelessWidget {
             child: Text(
               'Title earned: “$titleEarned”',
               textAlign: TextAlign.center,
-              style: GuildText.aside(GuildType.md),
+              style: GuildText.aside(GuildType.md, color: GuildColors.inkSoft),
             ),
           ),
       ],
@@ -278,68 +279,35 @@ class _Bar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 9,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: GuildColors.ink,
-        border: Border.all(color: GuildColors.shadow),
-        borderRadius: BorderRadius.circular(2),
+        color: GuildColors.parchmentDark,
+        border: Border.all(color: GuildColors.pencil),
+        borderRadius: BorderRadius.circular(4.5),
       ),
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: value.clamp(0, 1),
         heightFactor: 1,
-        child: const ColoredBox(color: GuildColors.goldBright),
+        child: const ColoredBox(color: GuildColors.brick),
       ),
     );
   }
 }
 
-class StampedSeal extends StatefulWidget {
+class StampedSeal extends StatelessWidget {
   const StampedSeal({super.key, required this.animate, this.size = 64});
 
   final bool animate;
   final double size;
 
   @override
-  State<StampedSeal> createState() => _StampedSealState();
-}
-
-class _StampedSealState extends State<StampedSeal> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 420), value: 1);
-
-  static final _scale = TweenSequence<double>([
-    TweenSequenceItem(tween: Tween(begin: 2.6, end: 0.9).chain(CurveTween(curve: Curves.easeInCubic)), weight: 68),
-    TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0).chain(CurveTween(curve: Curves.easeOut)), weight: 32),
-  ]);
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.animate) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || MediaQuery.disableAnimationsOf(context)) return;
-        _c.forward(from: 0);
-        Future<void>.delayed(const Duration(milliseconds: 285), HapticFeedback.mediumImpact);
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _c.drive(CurveTween(curve: const Interval(0, 0.3))),
-      child: ScaleTransition(
-        scale: _c.drive(_scale),
-        child: Transform.rotate(
-          angle: -0.18,
-          child: WaxSeal(size: widget.size, kind: SealKind.claimed),
-        ),
+    return StampIn(
+      animate: animate,
+      child: Transform.rotate(
+        angle: -0.18,
+        child: WaxSeal(size: size, kind: SealKind.claimed),
       ),
     );
   }

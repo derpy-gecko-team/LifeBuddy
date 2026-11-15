@@ -8,7 +8,7 @@ import '../widgets/ornaments.dart';
 import '../widgets/quest_cards.dart';
 import '../widgets/questline_banner.dart';
 import '../widgets/sketch.dart';
-import '../widgets/stone_wall.dart';
+import '../widgets/painted_wall.dart';
 import 'guild_board_page.dart';
 
 class QuestlinePage extends StatefulWidget {
@@ -70,7 +70,11 @@ class _QuestlinePageState extends State<QuestlinePage> {
                         child: AnimatedOpacity(
                           opacity: collapsed ? 1 : 0,
                           duration: GuildMotion.quick,
-                          child: SketchBox(color: GuildColors.crimsonDeep, seed: stableSeed(line.id)),
+                          child: SketchBox(
+                            color: GuildColors.brick,
+                            borderColor: GuildColors.brickDeep,
+                            seed: stableSeed(line.id),
+                          ),
                         ),
                       ),
                       Padding(
@@ -126,7 +130,7 @@ class _QuestlinePageState extends State<QuestlinePage> {
                             children: [
                               Semantics(
                                 header: true,
-                                child: Text('Quests', style: GuildText.label(GuildType.md, color: GuildColors.goldBright)),
+                                child: Text('Quests', style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
                               ),
                               Text('Open quests first, soonest deadline on top', style: GuildText.aside(GuildType.sm)),
                             ],
@@ -135,6 +139,10 @@ class _QuestlinePageState extends State<QuestlinePage> {
                       ),
                       SliverList.builder(
                         itemCount: quests.length,
+                        findChildIndexCallback: (key) {
+                          final index = quests.indexWhere((q) => ValueKey(q.id) == key);
+                          return index < 0 ? null : index;
+                        },
                         itemBuilder: (context, i) => Padding(
                           key: ValueKey(quests[i].id),
                           padding: const EdgeInsets.fromLTRB(16, 28, 16, 0),

@@ -32,7 +32,7 @@ void drawDashedPath(Canvas canvas, Path path, Paint paint, {double dash = 6, dou
 }
 
 class DashedLine extends StatelessWidget {
-  const DashedLine({super.key, this.color = GuildColors.inkSoft, this.height = 1.5});
+  const DashedLine({super.key, this.color = GuildColors.pencil, this.height = 1.5});
 
   final Color color;
   final double height;
@@ -59,7 +59,7 @@ class _DashedLinePainter extends CustomPainter {
       canvas,
       path,
       Paint()
-        ..color = color.withValues(alpha: 0.7)
+        ..color = color.withValues(alpha: 0.85)
         ..strokeWidth = thickness,
     );
   }
@@ -72,7 +72,7 @@ class DashedBorder extends StatelessWidget {
   const DashedBorder({
     super.key,
     required this.child,
-    this.color = GuildColors.inkSoft,
+    this.color = GuildColors.pencil,
     this.circle = false,
     this.radius = 4,
     this.strokeWidth = 1.5,
@@ -121,19 +121,30 @@ class _DashedBorderPainter extends CustomPainter {
 }
 
 class GuildProgressBar extends StatelessWidget {
-  const GuildProgressBar({super.key, required this.value, this.height = 8});
+  const GuildProgressBar({
+    super.key,
+    required this.value,
+    this.height = 8,
+    this.track = GuildColors.shadow,
+    this.fill = GuildColors.gold,
+    this.edge = GuildColors.chalkLine,
+  });
 
   final double value;
   final double height;
+  final Color track;
+  final Color fill;
+  final Color edge;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: height,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: GuildColors.ink,
-        border: Border.all(color: GuildColors.shadow, width: 1),
-        borderRadius: BorderRadius.circular(2),
+        color: track,
+        border: Border.all(color: edge, width: 1),
+        borderRadius: BorderRadius.circular(height / 2),
       ),
       child: Align(
         alignment: Alignment.centerLeft,
@@ -144,7 +155,7 @@ class GuildProgressBar extends StatelessWidget {
           builder: (context, v, _) => FractionallySizedBox(
             widthFactor: v,
             heightFactor: 1,
-            child: const ColoredBox(color: GuildColors.gold),
+            child: ColoredBox(color: fill),
           ),
         ),
       ),
@@ -174,7 +185,15 @@ class SealProgress extends StatelessWidget {
             for (var i = 0; i < total; i++)
               SizedBox.square(
                 dimension: size,
-                child: CustomPaint(painter: _SealDotPainter(filled: i < done)),
+                // A dot that turns from open to fulfilled while on screen
+                // rises once: the disc fills, then the rays reach out.
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(end: i < done ? 1 : 0),
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 1100),
+                  builder: (context, t, _) => CustomPaint(painter: _SealDotPainter(t)),
+                ),
               ),
           ],
         ),
@@ -184,52 +203,47 @@ class SealProgress extends StatelessWidget {
 }
 
 class _SealDotPainter extends CustomPainter {
-  _SealDotPainter({required this.filled});
-  final bool filled;
+  _SealDotPainter(this.risen);
+
+  /// 0 is a quest still to do, 1 one fulfilled; between, the sun is rising.
+  final double risen;
+
+  // Held back a moment so it plays after the page it sits on has come back
+  // into view.
+  static const _disc = Interval(0.35, 0.68, curve: Curves.easeOutCubic);
+  static const _rays = Interval(0.6, 1, curve: Curves.easeOutCubic);
 
   @override
   void paint(Canvas canvas, Size size) {
+    // A quest fulfilled is a sun that has risen: a full disc with rays.
+    // One still to do is only its outline.
     final c = size.center(Offset.zero);
-    final r = size.width / 2 - 1.5;
-    if (filled) {
-      canvas.drawCircle(c + const Offset(1, 1.5), r, Paint()..color = GuildColors.shadow);
-      canvas.drawCircle(c, r, Paint()..color = GuildColors.gold);
-      canvas.drawCircle(
-        c,
-        r,
-        Paint()
-          ..color = GuildColors.ink
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5,
-      );
-      final inset = size.width * 0.26;
-      canvas.save();
-      canvas.translate(inset, inset);
-      canvas.drawPath(
-        checkPath(Size.square(size.width - inset * 2)),
-        Paint()
-          ..color = GuildColors.ink
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round,
-      );
-      canvas.restore();
-    } else {
-      canvas.drawCircle(c, r, Paint()..color = GuildColors.shadow.withValues(alpha: 0.45));
-      canvas.drawCircle(
-        c,
-        r,
-        Paint()
-          ..color = GuildColors.cream.withValues(alpha: 0.75)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5,
-      );
+    final r = size.width / 2;
+    final disc = _disc.transform(risen);
+    final rays = _rays.transform(risen);
+
+    if (disc < 1) {
+      canvas.drawCircle(c, r * 0.52, Sketch.pen(GuildColors.cream.withValues(alpha: 0.7 * (1 - disc)), 1.4));
+    }
+    if (disc > 0) {
+      canvas.drawCircle(c, r * 0.52 * disc, Paint()..color = GuildColors.goldBright);
+    }
+    if (rays > 0) {
+      final path = Path();
+      for (var i = 0; i < 8; i++) {
+        final a = i * pi / 4 + 0.2;
+        final dir = Offset(cos(a), sin(a));
+        final reach = r * (0.72 + 0.26 * rays);
+        path
+          ..moveTo(c.dx + dir.dx * r * 0.72, c.dy + dir.dy * r * 0.72)
+          ..lineTo(c.dx + dir.dx * reach, c.dy + dir.dy * reach);
+      }
+      canvas.drawPath(path, Sketch.pen(GuildColors.goldBright.withValues(alpha: rays.clamp(0.0, 1.0)), 1.5));
     }
   }
 
   @override
-  bool shouldRepaint(_SealDotPainter old) => old.filled != filled;
+  bool shouldRepaint(_SealDotPainter old) => old.risen != risen;
 }
 
 class RoundBadge extends StatelessWidget {
@@ -237,7 +251,7 @@ class RoundBadge extends StatelessWidget {
     super.key,
     required this.asset,
     this.size = 44,
-    this.color = GuildColors.crimsonLight,
+    this.color = GuildColors.brick,
   });
 
   final String asset;
@@ -253,8 +267,8 @@ class RoundBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: GuildColors.ink, width: size >= 56 ? 3 : 2.5),
-        boxShadow: const [BoxShadow(color: GuildColors.shadow, offset: Offset(2, 3))],
+        border: Border.all(color: GuildColors.cream, width: size >= 56 ? 2.2 : 1.8),
+        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
       ),
       child: Image.asset(asset, fit: BoxFit.contain),
     );
@@ -312,14 +326,15 @@ class PerilSkulls extends StatelessWidget {
 }
 
 enum SealKind {
-  locked(GuildColors.verdigrisLight, GuildColors.verdigrisDark, GuildGlyph.lock),
+  locked(GuildColors.indigoLight, GuildColors.indigoDeep, GuildGlyph.lock, GuildColors.cream),
 
-  claimed(GuildColors.goldBright, GuildColors.gold, GuildGlyph.check);
+  claimed(GuildColors.goldBright, GuildColors.gold, GuildGlyph.check, GuildColors.ink);
 
-  const SealKind(this.light, this.dark, this.glyph);
+  const SealKind(this.light, this.dark, this.glyph, this.mark);
   final Color light;
   final Color dark;
   final GuildGlyph glyph;
+  final Color mark;
 }
 
 class WaxSeal extends StatelessWidget {
@@ -335,7 +350,7 @@ class WaxSeal extends StatelessWidget {
       child: CustomPaint(
         painter: _WaxSealPainter(kind),
         child: Center(
-          child: GuildIcon(kind.glyph, size: size * 0.42, color: GuildColors.ink),
+          child: GuildIcon(kind.glyph, size: size * 0.42, color: kind.mark),
         ),
       ),
     );
@@ -360,7 +375,7 @@ class _WaxSealPainter extends CustomPainter {
     }
     path.close();
 
-    canvas.drawPath(path.shift(const Offset(2, 3)), Paint()..color = GuildColors.shadow);
+    canvas.drawPath(path.shift(const Offset(2, 3)), Paint()..color = GuildColors.shadow.withValues(alpha: 0.45));
     canvas.drawPath(
       path,
       Paint()
@@ -372,16 +387,16 @@ class _WaxSealPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = GuildColors.ink
+        ..color = GuildColors.shadow
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.2
+        ..strokeWidth = 1.5
         ..strokeJoin = StrokeJoin.round,
     );
     canvas.drawCircle(
       c,
       r * 0.66,
       Paint()
-        ..color = GuildColors.ink.withValues(alpha: 0.45)
+        ..color = kind.mark.withValues(alpha: 0.45)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.4,
     );
@@ -399,12 +414,12 @@ class SealRibbon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const edge = BorderSide(color: GuildColors.ink, width: 2);
+    const edge = BorderSide(color: GuildColors.shadow, width: 1.4);
     return Container(
       width: axis == Axis.vertical ? thickness : null,
       height: axis == Axis.horizontal ? thickness : null,
       decoration: BoxDecoration(
-        color: GuildColors.verdigris,
+        color: GuildColors.indigo,
         border: axis == Axis.horizontal
             ? const Border(top: edge, bottom: edge)
             : const Border(left: edge, right: edge),
@@ -413,9 +428,11 @@ class SealRibbon extends StatelessWidget {
   }
 }
 
-class FulfilledStamp extends StatelessWidget {
-  const FulfilledStamp({super.key, this.fontSize = GuildType.xs});
+/// A word stamped in red ink, a little askew.
+class InkStamp extends StatelessWidget {
+  const InkStamp(this.label, {super.key, this.fontSize = GuildType.xs});
 
+  final String label;
   final double fontSize;
 
   @override
@@ -425,10 +442,10 @@ class FulfilledStamp extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
         decoration: BoxDecoration(
-          border: Border.all(color: GuildColors.bronze, width: 2),
+          border: Border.all(color: GuildColors.brickDeep, width: 1.8),
           borderRadius: BorderRadius.circular(3),
         ),
-        child: Text('Fulfilled', style: GuildText.label(fontSize, color: GuildColors.bronze, spacing: 1.2)),
+        child: Text(label, style: GuildText.label(fontSize, color: GuildColors.brickDeep, spacing: 1.2)),
       ),
     );
   }
@@ -488,8 +505,8 @@ class _TorchGlowState extends State<TorchGlow> with SingleTickerProviderStateMix
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   colors: [
-                    GuildColors.torchlight.withValues(alpha: 0.26),
-                    GuildColors.torchlight.withValues(alpha: 0.10),
+                    GuildColors.torchlight.withValues(alpha: 0.18),
+                    GuildColors.torchlight.withValues(alpha: 0.07),
                     GuildColors.torchlight.withValues(alpha: 0),
                   ],
                   stops: const [0, 0.42, 1],
@@ -549,7 +566,7 @@ class _InkCheckPainter extends CustomPainter {
       Paint()
         ..color = enabled || t > 0 ? GuildColors.ink : GuildColors.inkSoft.withValues(alpha: 0.55)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+        ..strokeWidth = 1.7,
     );
     if (t <= 0) return;
 
@@ -560,9 +577,9 @@ class _InkCheckPainter extends CustomPainter {
     canvas.drawPath(
       metric.extractPath(0, metric.length * t),
       Paint()
-        ..color = GuildColors.ink
+        ..color = GuildColors.brickDeep
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.4
+        ..strokeWidth = 3.2
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );
@@ -571,4 +588,139 @@ class _InkCheckPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_InkCheckPainter old) => old.t != t || old.enabled != enabled;
+}
+
+/// A heading in the manner of the login title: an outsized first letter and
+/// a stroke of the brush under the words.
+class LetteredTitle extends StatelessWidget {
+  const LetteredTitle(
+    this.text, {
+    super.key,
+    required this.size,
+    this.color = GuildColors.cream,
+    this.textAlign = TextAlign.start,
+    this.drawIn = false,
+    this.onDrawn,
+  });
+
+  final String text;
+  final double size;
+  final Color color;
+  final TextAlign textAlign;
+
+  /// Draws the stroke under the words from left to right when first shown,
+  /// instead of showing it already there.
+  final bool drawIn;
+  final VoidCallback? onDrawn;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = GuildText.title(size, color: color);
+    final initial = text.characters.first;
+    // The hall is built behind the other tabs before it is ever looked at,
+    // so the stroke waits, undrawn, until the title is actually on screen.
+    final Widget swash;
+    if (!drawIn || MediaQuery.disableAnimationsOf(context)) {
+      swash = CustomPaint(painter: _SwashPainter(color, 1));
+    } else if (!Visibility.of(context)) {
+      swash = CustomPaint(painter: _SwashPainter(color, 0));
+    } else {
+      swash = TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 900),
+        curve: const Interval(0.3, 1, curve: Curves.easeInOutCubic),
+        onEnd: onDrawn,
+        builder: (context, t, _) => CustomPaint(painter: _SwashPainter(color, t)),
+      );
+    }
+    return IntrinsicWidth(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(text: initial, style: TextStyle(fontSize: style.fontSize! * 1.5, height: 0.95)),
+                TextSpan(text: text.substring(initial.length)),
+              ],
+            ),
+            textAlign: textAlign,
+            style: style,
+          ),
+          SizedBox(
+            height: size * 0.22,
+            child: ExcludeSemantics(child: swash),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SwashPainter extends CustomPainter {
+  _SwashPainter(this.color, this.drawn);
+  final Color color;
+
+  /// How much of the stroke has been laid down, from its left end.
+  final double drawn;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (drawn <= 0) return;
+    if (drawn < 1) canvas.clipRect(Rect.fromLTWH(0, -size.height, size.width * drawn, size.height * 3));
+    // One stroke, pressed harder in the middle, rising a little to the right.
+    final from = Offset(size.width * 0.02, size.height * 0.85);
+    final to = Offset(size.width * 0.99, size.height * 0.2);
+    final bow = Offset(size.width * 0.45, size.height * 0.95);
+    final weight = (size.height * 0.34).clamp(1.6, 3.4);
+    final stroke = Path()
+      ..moveTo(from.dx, from.dy)
+      ..quadraticBezierTo(bow.dx, bow.dy - weight, to.dx, to.dy)
+      ..quadraticBezierTo(bow.dx, bow.dy + weight, from.dx, from.dy)
+      ..close();
+    canvas.drawPath(stroke, Paint()..color = color.withValues(alpha: color.a * 0.9));
+  }
+
+  @override
+  bool shouldRepaint(_SwashPainter old) => old.color != color || old.drawn != drawn;
+}
+
+/// A small four-pointed star, as chalked along the login border.
+class ChalkStar extends StatelessWidget {
+  const ChalkStar({super.key, this.size = 15, this.seed = 0, this.color = GuildColors.chalk});
+
+  final double size;
+  final int seed;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) =>
+      SizedBox.square(dimension: size, child: CustomPaint(painter: _ChalkStarPainter(seed, color)));
+}
+
+class _ChalkStarPainter extends CustomPainter {
+  _ChalkStarPainter(this.seed, this.color);
+  final int seed;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final pen = Random(seed * 17 + 3);
+    final c = size.center(Offset.zero);
+    final r = size.width / 2;
+    final turn = (pen.nextDouble() - 0.5) * 0.7;
+    final path = Path();
+    for (var i = 0; i < 8; i++) {
+      final a = turn + i * pi / 4;
+      final reach = i.isEven ? r * (0.82 + pen.nextDouble() * 0.18) : r * 0.3;
+      final p = c + Offset(cos(a), sin(a)) * reach;
+      i == 0 ? path.moveTo(p.dx, p.dy) : path.lineTo(p.dx, p.dy);
+    }
+    path.close();
+    canvas.drawPath(path, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(_ChalkStarPainter old) => old.seed != seed || old.color != color;
 }

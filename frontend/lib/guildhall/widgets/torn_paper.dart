@@ -7,7 +7,7 @@ import '../theme/guild_theme.dart';
 
 Color paperColor(PaperTone tone) => switch (tone) {
       PaperTone.parchment => GuildColors.parchment,
-      PaperTone.sage => GuildColors.sage,
+      PaperTone.sage => GuildColors.mist,
       PaperTone.vellum => GuildColors.vellum,
     };
 
@@ -36,7 +36,7 @@ class TornPaper extends StatelessWidget {
       TornPaper(
         key: key,
         color: paperColor(tone),
-        foldColor: tone == PaperTone.sage ? GuildColors.sageDark : null,
+        foldColor: tone == PaperTone.sage ? GuildColors.mistDark : null,
         foldCorner: tone == PaperTone.sage,
         seed: seed,
         tear: tone == PaperTone.vellum ? tear * 1.5 : tear,
@@ -234,16 +234,16 @@ class _TornPaperPainter extends CustomPainter {
   final Color foldColor;
 
   static Paint _pencil(double alpha, double width) => Paint()
-    ..color = GuildColors.ink.withValues(alpha: alpha)
+    ..color = GuildColors.pencil.withValues(alpha: alpha)
     ..style = PaintingStyle.stroke
     ..strokeWidth = width
     ..strokeCap = StrokeCap.round
     ..strokeJoin = StrokeJoin.round;
 
-  static final _hatchPaint = _pencil(0.17, 1.1);
-  static final _smudgePaint = _pencil(0.05, 2.4);
-  static final _fleckPaint = _pencil(0.24, 1.3);
-  static final _loosePaint = _pencil(0.5, 1.1);
+  static final _hatchPaint = _pencil(0.34, 1);
+  static final _smudgePaint = _pencil(0.07, 2.4);
+  static final _fleckPaint = _pencil(0.4, 1.2);
+  static final _loosePaint = _pencil(0.75, 1);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -251,8 +251,8 @@ class _TornPaperPainter extends CustomPainter {
     final outline = sheet.outline;
 
     canvas.drawPath(
-      outline.shift(const Offset(4, 6)),
-      Paint()..color = GuildColors.shadow.withValues(alpha: 0.85),
+      outline.shift(const Offset(3, 4)),
+      Paint()..color = GuildColors.shadow.withValues(alpha: 0.5),
     );
     canvas.drawPath(outline, Paint()..color = color);
 
@@ -274,9 +274,9 @@ class _TornPaperPainter extends CustomPainter {
       canvas.drawPath(
         fold,
         Paint()
-          ..color = GuildColors.ink
+          ..color = GuildColors.pencil
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2
+          ..strokeWidth = 1.3
           ..strokeJoin = StrokeJoin.round,
       );
     }
@@ -284,9 +284,9 @@ class _TornPaperPainter extends CustomPainter {
     canvas.drawPath(
       outline,
       Paint()
-        ..color = GuildColors.ink
+        ..color = GuildColors.pencil
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5
+        ..strokeWidth = 1.3
         ..strokeJoin = StrokeJoin.round,
     );
     canvas.drawPath(sheet.loose, _loosePaint);

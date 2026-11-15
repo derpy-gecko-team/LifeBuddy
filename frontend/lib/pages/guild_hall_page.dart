@@ -47,8 +47,8 @@ class _GuildHallPageState extends State<GuildHallPage> {
     ));
   }
 
-  void _openQuest(String questId, {Rect? origin, double tilt = 0}) {
-    Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
+  Future<void> _openQuest(String questId, {Rect? origin, double tilt = 0}) {
+    return Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
       origin: origin,
       tilt: tilt,
       builder: (routeContext) => QuestDetailPage(

@@ -9,11 +9,11 @@ import 'sketch.dart';
 import 'torn_paper.dart';
 
 enum GuildButtonKind {
-  primary(GuildColors.crimson, GuildColors.cream, GuildColors.ink),
+  primary(GuildColors.brick, GuildColors.cream, GuildColors.brickDeep),
 
-  reward(GuildColors.gold, GuildColors.ink, GuildColors.ink),
+  reward(GuildColors.gold, GuildColors.ink, GuildColors.bronze),
 
-  quiet(GuildColors.leather, GuildColors.cream, GuildColors.panelBorder);
+  quiet(GuildColors.indigoDeep, GuildColors.cream, GuildColors.chalkLine);
 
   const GuildButtonKind(this.fill, this.text, this.border);
   final Color fill;
@@ -40,9 +40,9 @@ class GuildButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onPressed != null;
-    final fill = enabled ? kind.fill : GuildColors.panel;
+    final fill = enabled ? kind.fill : GuildColors.indigoDeep;
     final text = enabled ? kind.text : GuildColors.cream.withValues(alpha: 0.72);
-    final border = enabled ? kind.border : GuildColors.panelBorder;
+    final border = enabled ? kind.border : GuildColors.chalkLine;
 
     return Semantics(
       button: true,
@@ -57,7 +57,7 @@ class GuildButton extends StatelessWidget {
           child: SketchBox(
             color: fill,
             borderColor: border,
-            shadow: enabled ? const Offset(3, 4) : null,
+            shadow: enabled ? const Offset(2, 3) : null,
             seed: stableSeed(label),
             padding: const EdgeInsets.symmetric(horizontal: 20.5, vertical: 12.5),
             child: Row(
@@ -142,10 +142,11 @@ class _Nail extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: 16,
         height: 16,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: GuildColors.ink,
-          boxShadow: [BoxShadow(color: Colors.black38, offset: Offset(1, 2))],
+          color: GuildColors.brick,
+          border: Border.all(color: GuildColors.brickDeep, width: 1),
+          boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.45), offset: const Offset(1, 2))],
         ),
       );
 }
@@ -214,7 +215,7 @@ Future<bool> showGuildConfirm(
 }) async {
   final result = await showDialog<bool>(
     context: context,
-    barrierColor: Colors.black.withValues(alpha: 0.6),
+    barrierColor: GuildColors.shadow.withValues(alpha: 0.7),
     builder: (context) => Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -242,9 +243,9 @@ Future<bool> showGuildConfirm(
                   child: Center(
                     child: Text(
                       confirmLabel,
-                      style: GuildText.body(GuildType.md, color: GuildColors.crimsonDeep).copyWith(
+                      style: GuildText.body(GuildType.md, color: GuildColors.brickDeep).copyWith(
                         decoration: TextDecoration.underline,
-                        decorationColor: GuildColors.crimsonDeep,
+                        decorationColor: GuildColors.brickDeep,
                       ),
                     ),
                   ),
@@ -347,7 +348,7 @@ class _GuildToastState extends State<_GuildToast> with SingleTickerProviderState
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 420),
                     child: TornPaper(
-                      color: GuildColors.sage,
+                      color: GuildColors.mist,
                       seed: 5,
                       tear: 4,
                       tearBottom: 8,

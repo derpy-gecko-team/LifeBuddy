@@ -11,12 +11,13 @@ import '../widgets/deadline_format.dart';
 import '../widgets/guild_feedback.dart';
 import '../widgets/guild_icons.dart';
 import '../widgets/guild_scaffold.dart';
+import '../widgets/motion.dart';
 import '../widgets/notice_route.dart';
 import '../widgets/ornaments.dart';
 import '../widgets/pressable.dart';
 import '../widgets/quest_cards.dart';
 import '../widgets/sketch.dart';
-import '../widgets/stone_wall.dart';
+import '../widgets/painted_wall.dart';
 import '../widgets/torn_paper.dart';
 
 class QuestDetailPage extends StatelessWidget {
@@ -101,6 +102,9 @@ class _QuestPoster extends StatefulWidget {
 
 class _QuestPosterState extends State<_QuestPoster> {
   bool _justFulfilled = false;
+  bool _justSworn = false;
+
+  final _trialsEnd = GlobalKey();
 
   @override
   void didUpdateWidget(_QuestPoster old) {
@@ -108,6 +112,26 @@ class _QuestPosterState extends State<_QuestPoster> {
     if (old.quest.status != QuestStatus.fulfilled && widget.quest.status == QuestStatus.fulfilled) {
       _justFulfilled = true;
     }
+    final swornNow = old.quest.status == QuestStatus.open && widget.quest.status == QuestStatus.sworn;
+    if (swornNow) {
+      _justSworn = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showTrials());
+    } else if (widget.quest.status != QuestStatus.sworn) {
+      _justSworn = false;
+    }
+  }
+
+  /// Brings the trials into view, if they are not already, so the oath is
+  /// seen being stamped beside them.
+  void _showTrials() {
+    final target = _trialsEnd.currentContext;
+    if (target == null) return;
+    Scrollable.ensureVisible(
+      target,
+      duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 300),
+      curve: GuildMotion.easeOut,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    );
   }
 
   Future<void> _toggleTrial(Trial trial) async {
@@ -147,21 +171,20 @@ class _QuestPosterState extends State<_QuestPoster> {
                     Text(
                       'Wanted by the Guild',
                       textAlign: TextAlign.center,
-                      style: GuildText.label(GuildType.sm, color: GuildColors.crimsonDeep, spacing: 1.6),
+                      style: GuildText.label(GuildType.sm, color: GuildColors.brickDeep, spacing: 1.6),
                     ),
                     const SizedBox(height: 8),
                   ],
                   Semantics(
                     header: true,
-                    child: Text(
+                    child: LetteredTitle(
                       quest.title,
+                      size: quest.title.length > 22 ? GuildType.xl : GuildType.xxl,
+                      color: GuildColors.brick,
                       textAlign: TextAlign.center,
-                      style: GuildText.title(quest.title.length > 22 ? GuildType.xl : GuildType.xxl),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const _DiamondRule(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   if (quest.isBoss)
                     ExcludeSemantics(child: Image.asset(quest.iconAsset, height: 200, fit: BoxFit.contain))
                   else
@@ -177,7 +200,7 @@ class _QuestPosterState extends State<_QuestPoster> {
                   const SizedBox(height: 22),
                   Row(
                     children: [
-                      Expanded(
+                      Flexible(
                         child: Semantics(
                           header: true,
                           child: Text(
@@ -186,6 +209,15 @@ class _QuestPosterState extends State<_QuestPoster> {
                           ),
                         ),
                       ),
+                      if (quest.status == QuestStatus.sworn) ...[
+                        const SizedBox(width: 12),
+                        StampIn(
+                          animate: _justSworn,
+                          delay: const Duration(milliseconds: 280),
+                          child: const InkStamp('Sworn'),
+                        ),
+                      ],
+                      const Spacer(),
                       Text(
                         '${quest.trialsDone} of ${quest.trials.length}',
                         style: GuildText.aside(GuildType.sm, color: GuildColors.inkSoft),
@@ -199,7 +231,7 @@ class _QuestPosterState extends State<_QuestPoster> {
                       enabled: quest.status == QuestStatus.sworn,
                       onTap: () => _toggleTrial(trial),
                     ),
-                  const SizedBox(height: 14),
+                  SizedBox(key: _trialsEnd, height: 14),
                   const DashedLine(),
                   const SizedBox(height: 16),
                   Row(
@@ -245,7 +277,7 @@ class _QuestPosterState extends State<_QuestPoster> {
                                     deadlineDate(deadline),
                                     style: GuildText.label(
                                       GuildType.md,
-                                      color: urgent ? GuildColors.crimsonDeep : GuildColors.ink,
+                                      color: urgent ? GuildColors.brickDeep : GuildColors.ink,
                                     ),
                                   ),
                                   Text(deadlineRelative(deadline, now), style: GuildText.body(GuildType.sm)),
@@ -267,7 +299,7 @@ class _QuestPosterState extends State<_QuestPoster> {
         ),
         if (badge != null) Positioned(top: 4, right: -8, child: RoundBadge(asset: badge, size: 64)),
         if (fulfilled) ...[
-          const Positioned(top: 22, right: 14, child: FulfilledStamp(fontSize: GuildType.sm)),
+          const Positioned(top: 22, right: 14, child: InkStamp('Fulfilled', fontSize: GuildType.sm)),
           Positioned(
             left: 0,
             right: 0,
@@ -289,48 +321,13 @@ class _DoubleRule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget diamond() => Transform.rotate(
-          angle: 0.785,
-          child: Container(width: 10, height: 10, color: GuildColors.bronze),
-        );
-    final line = BorderSide(color: GuildColors.inkSoft.withValues(alpha: 0.75), width: 1.5);
-
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          decoration: BoxDecoration(border: Border.fromBorderSide(line)),
-          padding: const EdgeInsets.all(4),
-          child: Container(
-            decoration: BoxDecoration(border: Border.fromBorderSide(line)),
-            child: child,
-          ),
-        ),
-        Positioned(left: -5, top: -5, child: diamond()),
-        Positioned(right: -5, top: -5, child: diamond()),
-        Positioned(left: -5, bottom: -5, child: diamond()),
-        Positioned(right: -5, bottom: -5, child: diamond()),
-      ],
-    );
-  }
-}
-
-class _DiamondRule extends StatelessWidget {
-  const _DiamondRule();
-
-  @override
-  Widget build(BuildContext context) {
-    Widget rule() => Container(width: 80, height: 1.5, color: GuildColors.inkSoft);
-    return ExcludeSemantics(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          rule(),
-          const SizedBox(width: 10),
-          Transform.rotate(angle: 0.785, child: Container(width: 9, height: 9, color: GuildColors.bronze)),
-          const SizedBox(width: 10),
-          rule(),
-        ],
+    // The frame of the login page: one heavy pencil rule, a fine one inside.
+    return Container(
+      decoration: BoxDecoration(border: Border.all(color: GuildColors.tan, width: 3)),
+      padding: const EdgeInsets.all(5),
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(color: GuildColors.tan, width: 1.2)),
+        child: child,
       ),
     );
   }
@@ -360,12 +357,12 @@ class _WoodcutPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    canvas.drawRect(rect, Paint()..color = GuildColors.parchmentDark.withValues(alpha: 0.75));
+    canvas.drawRect(rect, Paint()..color = GuildColors.parchmentDark.withValues(alpha: 0.6));
 
     canvas.save();
     canvas.clipRect(rect);
     final hatch = Paint()
-      ..color = GuildColors.inkSoft.withValues(alpha: 0.16)
+      ..color = GuildColors.pencil.withValues(alpha: 0.3)
       ..strokeWidth = 1;
     final lines = Path();
     for (var x = -size.height; x < size.width; x += 7) {
@@ -382,14 +379,14 @@ class _WoodcutPainter extends CustomPainter {
     canvas.drawRect(
       rect,
       Paint()
-        ..color = GuildColors.ink
+        ..color = GuildColors.tan
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+        ..strokeWidth = 2.4,
     );
     canvas.drawRect(
       rect.deflate(5),
       Paint()
-        ..color = GuildColors.inkSoft.withValues(alpha: 0.6)
+        ..color = GuildColors.tan
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );
@@ -413,8 +410,8 @@ class _BuddyNote extends StatelessWidget {
         alignment: Alignment.topCenter,
         children: [
           TornPaper(
-            color: GuildColors.sage,
-            foldColor: GuildColors.sageDark,
+            color: GuildColors.mist,
+            foldColor: GuildColors.mistDark,
             foldCorner: true,
             seed: 9,
             tear: 3,
@@ -454,7 +451,7 @@ class _SealedNotice extends StatelessWidget {
         Expanded(
           child: Text(
             reason ?? 'This quest is sealed for now.',
-            style: GuildText.aside(GuildType.md, color: GuildColors.verdigrisDark),
+            style: GuildText.aside(GuildType.md, color: GuildColors.indigoDeep),
           ),
         ),
       ],
@@ -487,16 +484,14 @@ class _TrialTile extends StatelessWidget {
               InkCheckbox(checked: trial.done, enabled: enabled),
               const SizedBox(width: 14),
               Expanded(
-                child: Text(
+                child: StruckText(
                   trial.title,
                   style: GuildText.hand(
                     GuildType.lg,
                     color: trial.done ? GuildColors.inkSoft : GuildColors.ink,
-                  ).copyWith(
-                    decoration: trial.done ? TextDecoration.lineThrough : null,
-                    decorationColor: GuildColors.ink,
-                    decorationThickness: 2,
                   ),
+                  struck: trial.done,
+                  lineColor: GuildColors.inkSoft,
                 ),
               ),
             ],
@@ -626,8 +621,8 @@ class _ActionBar extends StatelessWidget {
                     onTap: onOpenBuddy,
                     haptic: true,
                     child: const SketchBox(
-                      color: GuildColors.leather,
-                      borderColor: GuildColors.panelBorder,
+                      color: GuildColors.indigoDeep,
+                      borderColor: GuildColors.chalkLine,
                       shadow: null,
                       seed: 3,
                       child: SizedBox(
@@ -712,8 +707,8 @@ class _TrialProgress extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 56),
         child: SketchBox(
-          color: GuildColors.leather,
-          borderColor: GuildColors.panelBorder,
+          color: GuildColors.indigoDeep,
+          borderColor: GuildColors.chalkLine,
           shadow: null,
           seed: 5,
           padding: const EdgeInsets.all(2.5),
@@ -728,7 +723,7 @@ class _TrialProgress extends StatelessWidget {
                   builder: (context, v, _) => FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: v,
-                    child: ColoredBox(color: GuildColors.gold.withValues(alpha: 0.28)),
+                    child: const ColoredBox(color: GuildColors.indigoLight),
                   ),
                 ),
               ),

@@ -104,7 +104,8 @@ class _EdgeSwipeBackState extends State<EdgeSwipeBack> {
   }
 }
 
-typedef OpenQuest = void Function(String questId, {Rect? origin, double tilt});
+/// Opens a quest's page; completes when that page has been closed again.
+typedef OpenQuest = Future<void> Function(String questId, {Rect? origin, double tilt});
 
 typedef OpenQuestline = void Function(String questlineId, {Rect? origin});
 

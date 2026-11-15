@@ -1,45 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// The Guildhall shares its palette with the login screens: the indigo of
+/// their painted border is the wall here, their parchment is the paper pinned
+/// on it, and the cream line their doodles are drawn in is the "chalk" that
+/// everything on the wall is written with. Nothing is outlined in black.
 abstract final class GuildColors {
-  static const mortar = Color(0xFF1C201D);
-  static const stoneDark = Color(0xFF353E37);
-  static const stone = Color(0xFF3D473F);
-  static const stoneLight = Color(0xFF424C43);
-  static const torchlight = Color(0xFFF2B25C);
+  // The painted wall.
+  static const indigo = Color(0xFF4E5387);
+  static const indigoDeep = Color(0xFF3B4071);
+  static const indigoLight = Color(0xFF6268A0);
+  static const shadow = Color(0xFF272B55);
+  static const torchlight = Color(0xFFF3CF8A);
 
-  static const panel = Color(0xFF1F231F);
-  static const panelBorder = Color(0xFF4A5046);
-  static const leather = Color(0xFF2A2F29);
-  static const wood = Color(0xFF4E3B28);
-  static const woodDark = Color(0xFF3B2C1D);
-  static const woodLight = Color(0xFF63503A);
+  // Chalk on the wall: text, doodles and outlines.
+  static const cream = Color(0xFFEFE0BC);
+  static const chalk = Color(0xFFDEC99E);
+  static const chalkLine = Color(0xB8DEC99E);
+  static const dangerText = Color(0xFFF4BDB2);
 
-  static const ink = Color(0xFF1B1D19);
-  static const inkSoft = Color(0xFF3B3A33);
-  static const shadow = Color(0xFF121512);
+  // Paper.
+  static const parchment = Color(0xFFE9D4B5);
+  static const parchmentDark = Color(0xFFD9C19C);
+  static const vellum = Color(0xFFF1E4CB);
+  static const mist = Color(0xFFDADBE8);
+  static const mistDark = Color(0xFFBFC2D8);
 
-  static const cream = Color(0xFFEDDDA8);
-  static const dangerText = Color(0xFFF0B0A8);
+  // Pencil rules on paper.
+  static const tan = Color(0xFFC4AC86);
+  static const pencil = Color(0xFF9A8463);
 
-  static const gold = Color(0xFFD9A55B);
-  static const goldBright = Color(0xFFEDC27A);
-  static const bronze = Color(0xFF6E4B10);
+  // Writing on paper.
+  static const ink = Color(0xFF2C2F58);
+  static const inkSoft = Color(0xFF4F517C);
 
-  static const crimson = Color(0xFF8C4743);
-  static const crimsonDeep = Color(0xFF7A3B38);
-  static const crimsonLight = Color(0xFFA25B56);
+  // The red of the hand lettering.
+  static const brick = Color(0xFFB95A54);
+  static const brickDeep = Color(0xFF9E423C);
 
-  static const verdigris = Color(0xFF4A6A63);
-  static const verdigrisDark = Color(0xFF3E5A54);
-  static const verdigrisLight = Color(0xFF6E9189);
-
-  static const parchment = Color(0xFFEBDDA2);
-  static const parchmentDark = Color(0xFFD9C886);
-  static const sage = Color(0xFFD7DEC9);
-  static const sageDark = Color(0xFFB9C3A8);
-  static const vellum = Color(0xFFE2D2BC);
-  static const vellumDark = Color(0xFFC9B598);
+  static const gold = Color(0xFFDDB96E);
+  static const goldBright = Color(0xFFEBD197);
+  static const bronze = Color(0xFF7D5A1C);
 }
 
 abstract final class GuildType {
@@ -62,9 +63,11 @@ abstract final class GuildMotion {
 
 abstract final class GuildText {
   static final _hand = GoogleFonts.deliciousHandrawn();
+  static final _lettering = GoogleFonts.almendra(fontWeight: FontWeight.w700);
 
   static Future<void> preload() async {
     _hand;
+    _lettering;
     try {
       await GoogleFonts.pendingFonts();
     } catch (_) {}
@@ -85,8 +88,14 @@ abstract final class GuildText {
     );
   }
 
-  static TextStyle title(double size, {Color color = GuildColors.ink}) =>
-      _style(size, color, height: 1.05, spacing: 0.3);
+  /// Headings, in the heavy hand lettering of the login title. Brick red on
+  /// paper; pass [GuildColors.cream] for headings chalked on the wall.
+  static TextStyle title(double size, {Color color = GuildColors.brickDeep}) => _lettering.copyWith(
+        fontSize: size * 0.9,
+        color: color,
+        height: 1.12,
+        letterSpacing: 0.2,
+      );
 
   static TextStyle hand(double size, {Color color = GuildColors.ink}) => _style(size, color, height: 1.2);
 

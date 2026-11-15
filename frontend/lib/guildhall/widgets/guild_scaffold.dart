@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import '../theme/guild_theme.dart';
 import 'guild_icons.dart';
 import 'pressable.dart';
-import 'stone_wall.dart';
+import 'painted_wall.dart';
 
-class GuildScaffold extends StatelessWidget {
+class GuildScaffold extends StatefulWidget {
   const GuildScaffold({
     super.key,
     required this.body,
@@ -21,26 +21,47 @@ class GuildScaffold extends StatelessWidget {
   final WallVariant wall;
 
   @override
+  State<GuildScaffold> createState() => _GuildScaffoldState();
+}
+
+class _GuildScaffoldState extends State<GuildScaffold> {
+  final _scrolled = ValueNotifier<double>(0);
+
+  @override
+  void dispose() {
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  bool _onScroll(ScrollNotification n) {
+    if (n.depth == 0 && n.metrics.axis == Axis.vertical) _scrolled.value = n.metrics.pixels;
+    return false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: GuildColors.mortar,
+        backgroundColor: GuildColors.indigo,
         body: MediaQuery.withClampedTextScaling(
           maxScaleFactor: 1.5,
           child: Stack(
             children: [
-              Positioned.fill(child: StoneWall(variant: wall)),
+              Positioned.fill(child: PaintedWall(variant: widget.wall, scroll: _scrolled)),
               SafeArea(
                 child: ScrollConfiguration(
                   behavior: ScrollConfiguration.of(context).copyWith(
                     dragDevices: PointerDeviceKind.values.toSet(),
                   ),
-                  child: Column(
-                    children: [
-                      Expanded(child: body),
-                      ?bottom,
-                    ],
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: _onScroll,
+                    child: Column(
+                      children: [
+                        Expanded(child: widget.body),
+                        ?widget.bottom,
+                      ],
+                    ),
                   ),
                 ),
               ),
