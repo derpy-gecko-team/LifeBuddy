@@ -13,7 +13,13 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  static const _pages = <Widget>[MapPage(), GuildHallPage(), BuddyPage()];
+  static const _buddyIndex = 2;
+
+  late final _pages = <Widget>[
+    const MapPage(),
+    GuildHallPage(onOpenBuddy: () => setState(() => _index = _buddyIndex)),
+    const BuddyPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {

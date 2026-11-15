@@ -1,10 +1,81 @@
 import 'package:flutter/material.dart';
 
-class GuildHallPage extends StatelessWidget {
-  const GuildHallPage({super.key});
+import '../guildhall/data/mock_quest_repository.dart';
+import '../guildhall/data/quest_repository.dart';
+import '../guildhall/pages/guild_board_page.dart';
+import '../guildhall/pages/quest_detail_page.dart';
+import '../guildhall/pages/questline_page.dart';
+import '../guildhall/state/guild_hall_controller.dart';
+import '../guildhall/theme/guild_theme.dart';
+import '../guildhall/widgets/notice_route.dart';
+
+class GuildHallPage extends StatefulWidget {
+  const GuildHallPage({super.key, this.onOpenBuddy, this.repository});
+
+  final VoidCallback? onOpenBuddy;
+
+  final QuestRepository? repository;
+
+  @override
+  State<GuildHallPage> createState() => _GuildHallPageState();
+}
+
+class _GuildHallPageState extends State<GuildHallPage> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  late final GuildHallController _controller =
+      GuildHallController(widget.repository ?? MockQuestRepository(), beforeFirstLoad: GuildText.preload)
+        ..load();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _openQuestline(String questlineId) {
+    _navigatorKey.currentState!.push(MaterialPageRoute<void>(
+      builder: (_) => QuestlinePage(
+        controller: _controller,
+        questlineId: questlineId,
+        onOpenQuest: _openQuest,
+      ),
+    ));
+  }
+
+  void _openQuest(String questId, {Rect? origin, double tilt = 0}) {
+    Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
+      origin: origin,
+      tilt: tilt,
+      builder: (routeContext) => QuestDetailPage(
+        controller: _controller,
+        questId: questId,
+        onOpenBuddy: widget.onOpenBuddy == null
+            ? null
+            : () {
+                Navigator.of(routeContext).pop();
+                widget.onOpenBuddy!();
+              },
+      ),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Guild Hall')));
+    return NavigatorPopHandler<Object?>(
+      onPopWithResult: (_) => _navigatorKey.currentState?.maybePop(),
+      child: Navigator(
+        key: _navigatorKey,
+        onGenerateInitialRoutes: (_, _) => [
+          MaterialPageRoute<void>(
+            builder: (_) => GuildBoardPage(
+              controller: _controller,
+              onOpenQuestline: _openQuestline,
+              onOpenQuest: _openQuest,
+              onOpenBuddy: widget.onOpenBuddy,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
