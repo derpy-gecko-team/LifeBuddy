@@ -261,6 +261,24 @@ class RoundBadge extends StatelessWidget {
   }
 }
 
+class QuestlineEmblem extends StatelessWidget {
+  const QuestlineEmblem({super.key, required this.questline, required this.size});
+
+  final Questline questline;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return HeroMode(
+      enabled: !MediaQuery.disableAnimationsOf(context),
+      child: Hero(
+        tag: 'questline-emblem-${questline.id}',
+        child: Image.asset(questline.emblemAsset, width: size, height: size, fit: BoxFit.contain),
+      ),
+    );
+  }
+}
+
 class PerilSkulls extends StatelessWidget {
   const PerilSkulls({super.key, required this.peril, this.size = 18});
 

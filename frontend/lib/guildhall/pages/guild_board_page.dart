@@ -50,7 +50,7 @@ class GuildBoardPage extends StatefulWidget {
   });
 
   final GuildHallController controller;
-  final ValueChanged<String> onOpenQuestline;
+  final OpenQuestline onOpenQuestline;
   final OpenQuest onOpenQuest;
   final VoidCallback? onOpenBuddy;
 
@@ -192,7 +192,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                               questline: s.line,
                               quests: s.quests,
                               now: now,
-                              onOpenQuestline: () => widget.onOpenQuestline(s.line.id),
+                              onOpenQuestline: (origin) => widget.onOpenQuestline(s.line.id, origin: origin),
                               onOpenQuest: widget.onOpenQuest,
                             ),
                           ),
@@ -266,7 +266,7 @@ class _QuestlineSection extends StatelessWidget {
   final Questline questline;
   final List<Quest> quests;
   final DateTime now;
-  final VoidCallback onOpenQuestline;
+  final ValueChanged<Rect?> onOpenQuestline;
   final OpenQuest onOpenQuest;
 
   @override

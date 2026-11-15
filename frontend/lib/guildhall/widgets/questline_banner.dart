@@ -39,7 +39,7 @@ class QuestlineBanner extends StatelessWidget {
                         color: GuildColors.cream.withValues(alpha: 0.85),
                         strokeWidth: 2,
                         padding: const EdgeInsets.all(10),
-                        child: Image.asset(questline.emblemAsset, width: 42, height: 42, fit: BoxFit.contain),
+                        child: QuestlineEmblem(questline: questline, size: 42),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

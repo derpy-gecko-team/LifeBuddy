@@ -22,18 +22,23 @@ class GuildHallPage extends StatefulWidget {
 
 class _GuildHallPageState extends State<GuildHallPage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  final _heroController = HeroController(
+    createRectTween: (begin, end) => MaterialRectArcTween(begin: begin, end: end),
+  );
   late final GuildHallController _controller =
       GuildHallController(widget.repository ?? MockQuestRepository(), beforeFirstLoad: GuildText.preload)
         ..load();
 
   @override
   void dispose() {
+    _heroController.dispose();
     _controller.dispose();
     super.dispose();
   }
 
-  void _openQuestline(String questlineId) {
-    _navigatorKey.currentState!.push(MaterialPageRoute<void>(
+  void _openQuestline(String questlineId, {Rect? origin}) {
+    _navigatorKey.currentState!.push(PlaqueRoute<void>(
+      origin: origin,
       builder: (_) => QuestlinePage(
         controller: _controller,
         questlineId: questlineId,
@@ -65,6 +70,7 @@ class _GuildHallPageState extends State<GuildHallPage> {
       onPopWithResult: (_) => _navigatorKey.currentState?.maybePop(),
       child: Navigator(
         key: _navigatorKey,
+        observers: [_heroController],
         onGenerateInitialRoutes: (_, _) => [
           MaterialPageRoute<void>(
             builder: (_) => GuildBoardPage(

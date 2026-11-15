@@ -56,6 +56,8 @@ abstract final class GuildMotion {
   static const press = Duration(milliseconds: 120);
   static const quick = Duration(milliseconds: 220);
   static const page = Duration(milliseconds: 340);
+  static const pageBack = Duration(milliseconds: 240);
+  static const easeOut = Cubic(0.23, 1, 0.32, 1);
 }
 
 abstract final class GuildText {

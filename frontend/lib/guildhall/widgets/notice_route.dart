@@ -8,7 +8,7 @@ class NoticeRoute<T> extends PageRouteBuilder<T> {
   NoticeRoute({required WidgetBuilder builder, Rect? origin, double tilt = 0})
       : super(
           transitionDuration: GuildMotion.page,
-          reverseTransitionDuration: const Duration(milliseconds: 240),
+          reverseTransitionDuration: GuildMotion.pageBack,
           pageBuilder: (context, _, _) => EdgeSwipeBack(child: builder(context)),
           transitionsBuilder: (context, animation, _, child) {
             if (origin == null || MediaQuery.disableAnimationsOf(context)) {
@@ -31,6 +31,35 @@ class NoticeRoute<T> extends PageRouteBuilder<T> {
                   turns: animation.drive(Tween(begin: tilt / (2 * pi), end: 0.0).chain(ease)),
                   child: child,
                 ),
+              ),
+            );
+          },
+        );
+}
+
+class PlaqueRoute<T> extends PageRouteBuilder<T> {
+  PlaqueRoute({required WidgetBuilder builder, Rect? origin})
+      : super(
+          transitionDuration: GuildMotion.page,
+          reverseTransitionDuration: GuildMotion.pageBack,
+          pageBuilder: (context, _, _) => EdgeSwipeBack(child: builder(context)),
+          transitionsBuilder: (context, animation, _, child) {
+            if (origin == null || MediaQuery.disableAnimationsOf(context)) {
+              return FadeTransition(opacity: animation, child: child);
+            }
+            final size = MediaQuery.sizeOf(context);
+            final alignment = Alignment(
+              (origin.center.dx / size.width) * 2 - 1,
+              (origin.center.dy / size.height) * 2 - 1,
+            );
+            return FadeTransition(
+              opacity: animation.drive(CurveTween(curve: const Interval(0, 0.5, curve: Curves.easeOut))),
+              child: ScaleTransition(
+                alignment: alignment,
+                scale: animation.drive(
+                  Tween(begin: 0.97, end: 1.0).chain(CurveTween(curve: GuildMotion.easeOut)),
+                ),
+                child: child,
               ),
             );
           },
@@ -76,6 +105,8 @@ class _EdgeSwipeBackState extends State<EdgeSwipeBack> {
 }
 
 typedef OpenQuest = void Function(String questId, {Rect? origin, double tilt});
+
+typedef OpenQuestline = void Function(String questlineId, {Rect? origin});
 
 Rect? globalRectOf(BuildContext context) {
   final box = context.findRenderObject();

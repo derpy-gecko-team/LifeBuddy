@@ -6,6 +6,7 @@ import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
 import 'deadline_format.dart';
 import 'guild_icons.dart';
+import 'notice_route.dart';
 import 'ornaments.dart';
 import 'pressable.dart';
 import 'sketch.dart';
@@ -285,7 +286,7 @@ class QuestlinePlaque extends StatelessWidget {
   const QuestlinePlaque({super.key, required this.questline, required this.onTap});
 
   final Questline questline;
-  final VoidCallback onTap;
+  final ValueChanged<Rect?> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +296,7 @@ class QuestlinePlaque extends StatelessWidget {
           '${questline.quests.length} quests fulfilled. Open questline.',
       excludeSemantics: true,
       child: GuildPressable(
-        onTap: onTap,
+        onTap: () => onTap(globalRectOf(context)),
         pressedScale: 0.98,
         child: SketchBox(
           color: GuildColors.panel,
@@ -323,7 +324,7 @@ class QuestlinePlaque extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: GuildColors.gold, width: 2.5),
                     ),
-                    child: Image.asset(questline.emblemAsset, fit: BoxFit.contain),
+                    child: QuestlineEmblem(questline: questline, size: 35),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
