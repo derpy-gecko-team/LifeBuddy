@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/guide")
+@RequestMapping("/api/guide")
 public class GuideController {
 
     // TODO: replace with the authenticated user's id once JWT auth is merged
