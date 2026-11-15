@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,10 +24,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/preferences")
-    public List<UserPreferenceDTO> getUserPreferences(
-            @RequestParam(required = false) Long userId
-    ) {
-        Long authenticatedUserId = requireOwnUserId(userId);
+    public List<UserPreferenceDTO> getUserPreferences() {
+        Long authenticatedUserId = requireAuthenticatedUserId();
         return userService.getUserPreferencesByUserId(authenticatedUserId).stream()
                 .map(preference -> new UserPreferenceDTO(
                         preference.getPreferenceType(),
@@ -39,11 +36,10 @@ public class UserController {
 
     @PutMapping("/preferences")
     public ResponseEntity<Void> addUserPreference(
-            @RequestParam(required = false) Long userId,
             @Valid @RequestBody UserPreferenceRequest request
     ) {
         userService.addUserPreference(
-                requireOwnUserId(userId),
+                requireAuthenticatedUserId(),
                 request.preferenceType(),
                 request.value()
         );
@@ -52,26 +48,22 @@ public class UserController {
 
     @DeleteMapping("/preferences")
     public ResponseEntity<Void> removeUserPreference(
-            @RequestParam(required = false) Long userId,
             @Valid @RequestBody UserPreferenceRequest request
     ) {
         userService.removeUserPreference(
-                requireOwnUserId(userId),
+                requireAuthenticatedUserId(),
                 request.preferenceType(),
                 request.value()
         );
         return ResponseEntity.noContent().build();
     }
 
-    private Long requireOwnUserId(Long requestedUserId) {
+    private Long requireAuthenticatedUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
-        }
-        if (requestedUserId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userId is required");
         }
 
         User user = userService.findByEmail(authentication.getName())
@@ -79,9 +71,6 @@ public class UserController {
                         HttpStatus.UNAUTHORIZED,
                         "Authenticated user no longer exists"
                 ));
-        if (!user.getId().equals(requestedUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot access another user's preferences");
-        }
         return user.getId();
     }
 }
