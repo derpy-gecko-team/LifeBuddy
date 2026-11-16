@@ -36,6 +36,12 @@ class HearingController extends ChangeNotifier {
   /// What has been heard so far in this go.
   String get words => _words;
 
+  final _loudness = ValueNotifier<double>(0);
+
+  /// How loud the hero is being right now, 0 to 1. It changes many times a
+  /// second, so it is its own listenable and does not wake [addListener]s.
+  ValueListenable<double> get loudness => _loudness;
+
   String? _trouble;
 
   /// Why the last attempt to listen came to nothing, in the Buddy's words.
@@ -51,7 +57,7 @@ class HearingController extends ChangeNotifier {
     _words = '';
     _set(Hearing.waking);
     try {
-      await _ears.start(onWords: _onWords, onEnded: _onEnded);
+      await _ears.start(onWords: _onWords, onEnded: _onEnded, onLoudness: _onLoudness);
       // Unless it was cancelled, or ended, while the microphone woke.
       if (_state == Hearing.waking) _set(Hearing.listening);
     } on EarsException catch (e) {
@@ -81,6 +87,10 @@ class HearingController extends ChangeNotifier {
     _notify();
   }
 
+  void _onLoudness(double loudness) {
+    if (_state == Hearing.listening && !_disposed) _loudness.value = loudness.clamp(0.0, 1.0);
+  }
+
   void _onWords(String words) {
     if (!active || words == _words) return;
     _words = words;
@@ -93,6 +103,7 @@ class HearingController extends ChangeNotifier {
     if (!active) return;
     final heard = _words.trim();
     _state = Hearing.idle;
+    if (!_disposed) _loudness.value = 0;
     // Handed over before anyone is told the listening is over, so that
     // listeners can tell "sent" from "came to nothing".
     if (heard.isNotEmpty && !_disposed) onHeard(heard);
@@ -101,6 +112,7 @@ class HearingController extends ChangeNotifier {
 
   void _set(Hearing state) {
     _state = state;
+    if (state != Hearing.listening && !_disposed) _loudness.value = 0;
     _notify();
   }
 
@@ -112,6 +124,7 @@ class HearingController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     if (active) _ears.cancel();
+    _loudness.dispose();
     super.dispose();
   }
 }

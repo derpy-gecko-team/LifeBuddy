@@ -11,8 +11,15 @@ abstract interface class BuddyEars {
   /// because [stop] was called, the hero went quiet, or something broke;
   /// by then the last words have been through [onWords].
   ///
+  /// [onLoudness], if given, is told how loud the hero is being right now,
+  /// from 0 (silence) to 1 (as loud as they have been), many times a second.
+  ///
   /// Throws an [EarsException] if listening cannot start at all.
-  Future<void> start({required void Function(String words) onWords, required void Function() onEnded});
+  Future<void> start({
+    required void Function(String words) onWords,
+    required void Function() onEnded,
+    void Function(double loudness)? onLoudness,
+  });
 
   /// Asks for the last words and the end. [start]'s `onEnded` follows.
   Future<void> stop();

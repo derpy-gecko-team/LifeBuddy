@@ -18,10 +18,11 @@ import '../widgets/hearth_life.dart';
 import '../widgets/pip_cat.dart';
 import '../widgets/sky.dart';
 import '../widgets/smoke_puff.dart';
+import '../widgets/speak_coin.dart';
 import '../widgets/writing_scroll.dart';
 
 /// The Buddy's campfire: Pip lounging on a card with the last thing it said,
-/// a horn to call it, and a line to write on.
+/// a coin to toss in the fire to speak to it, and a line to write on.
 ///
 /// Laid out from the Figma frame "Buddy – Idle v4" (393 wide, 762 tall above
 /// the tab bar). Every number below is in that frame's units and multiplied
@@ -31,7 +32,7 @@ class HearthPage extends StatefulWidget {
 
   final BuddyController controller;
 
-  /// What the horn listens with.
+  /// What Pip listens with.
   final BuddyEars ears;
 
   final VoidCallback? onOpenGuildHall;
@@ -69,10 +70,11 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
   final _text = TextEditingController();
   final _line = GlobalKey<_WritingLineState>();
 
-  // The horn: tap it and the same scroll unrolls, with no keyboard, and
-  // fills with what is heard; tap it again and that is sent.
+  // Speaking: toss the coin and the same scroll unrolls, with no keyboard,
+  // and fills with what is heard; tap the fire and that is sent.
   late final HearingController _hearing = HearingController(widget.ears, onHeard: _onHeard);
   bool _scrollIsForVoice = false;
+  static const _coinInTheAir = Duration(milliseconds: 700);
   bool _heardAndSent = false;
 
   // The sky: pulling the scene down climbs above the trees, to where the old
@@ -179,7 +181,11 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
       if (!_scrollIsForVoice) {
         _scrollIsForVoice = true;
         _focus.unfocus();
-        _writing.forward();
+        // Not before the coin has landed: the scroll rises past the fire on
+        // its way up and would hide the throw.
+        Future<void>.delayed(_still ? Duration.zero : _coinInTheAir, () {
+          if (mounted && _hearing.active) _writing.forward();
+        });
       }
       final words = _hearing.words;
       if (_text.text != words) {
@@ -627,18 +633,17 @@ class _Scene extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // With the scroll out, the horn steps down into the room the rolled-up
-                    // line has left, so the two never overlap.
-                    AnimatedBuilder(
-                      animation: Listenable.merge([hush, controller]),
-                      builder: (context, _) => Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: lerpDouble(140, 74, hush.value)! * s,
-                        child: Center(
-                          // One thing at a time: no calling Pip while it is answering.
-                          child: _Horn(s: s, hearing: hearing, enabled: !controller.replying),
-                        ),
+                    // The coin, and the fire it sets alight when it is tossed in.
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: SpeakCoin.height * s,
+                      child: ListenableBuilder(
+                        listenable: controller,
+                        // One thing at a time: no calling Pip while it is answering.
+                        builder: (context, _) =>
+                            SpeakCoin(hearing: hearing, time: time, hush: hush, enabled: !controller.replying, s: s),
                       ),
                     ),
                   ],
@@ -869,126 +874,6 @@ class _Lines extends StatelessWidget {
   }
 }
 
-/// The horn that calls Pip: tap, speak, tap again.
-class _Horn extends StatefulWidget {
-  const _Horn({required this.s, required this.hearing, required this.enabled});
-
-  final double s;
-  final HearingController hearing;
-  final bool enabled;
-
-  @override
-  State<_Horn> createState() => _HornState();
-}
-
-class _HornState extends State<_Horn> with SingleTickerProviderStateMixin {
-  // hey_pip_button.svg is 196 x 178.
-  static const _width = 176.0;
-  static const _k = _width / 196;
-
-  // Rings of sound going out from the horn while it listens.
-  late final AnimationController _rings = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1800),
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    widget.hearing.addListener(_onHearing);
-  }
-
-  @override
-  void dispose() {
-    widget.hearing.removeListener(_onHearing);
-    _rings.dispose();
-    super.dispose();
-  }
-
-  void _onHearing() {
-    final listening = widget.hearing.state == Hearing.listening;
-    if (listening && !_rings.isAnimating && !MediaQuery.disableAnimationsOf(context)) {
-      _rings.repeat();
-    } else if (!listening && _rings.isAnimating) {
-      _rings.stop();
-      _rings.value = 0;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final k = _k * widget.s;
-    final hearing = widget.hearing;
-    return AnimatedBuilder(
-      animation: hearing,
-      builder: (context, _) {
-        final (ribbon, said) = switch (hearing.state) {
-          Hearing.idle => ('Hey Pip!', 'Hey Pip! Tap to speak'),
-          Hearing.waking => ('One moment', 'Waking the horn'),
-          Hearing.listening => ('I’m listening', 'Listening. Tap to send'),
-          Hearing.finishing => ('Got it', 'Sending what you said'),
-        };
-        final size = ribbon.length > 9 ? 18.5 : 24.0;
-        return Semantics(
-          button: true,
-          enabled: widget.enabled,
-          label: said,
-          excludeSemantics: true,
-          child: GuildPressable(
-            onTap: widget.enabled ? hearing.toggle : null,
-            haptic: true,
-            child: Opacity(
-              opacity: widget.enabled ? 1 : 0.6,
-              child: SizedBox(
-                width: 196 * k,
-                height: 178 * k,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    if (hearing.state == Hearing.listening)
-                      Positioned.fill(child: CustomPaint(painter: _RingsPainter(_rings, k))),
-                    Positioned.fill(child: Image.asset(BuddyAssets.heyPipButton, fit: BoxFit.fill)),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: (133 + (24 - size) / 2) * k,
-                      child: Text(ribbon, textAlign: TextAlign.center, style: BuddyText.serif(size * k)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _RingsPainter extends CustomPainter {
-  _RingsPainter(this.progress, this.k) : super(repaint: progress);
-
-  final Animation<double> progress;
-  final double k;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // The shield's centre and radius within hey_pip_button.svg.
-    final centre = Offset(98 * k, 84 * k);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3 * k;
-    for (final lag in [0.0, 0.5]) {
-      final t = (progress.value + lag) % 1;
-      paint.color = BuddyColors.cream.withValues(alpha: 0.55 * (1 - t));
-      canvas.drawCircle(centre, (86 + 34 * t) * k, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RingsPainter old) => old.k != k;
-}
-
 /// For when the hero would rather write than speak.
 class _WritingLine extends StatefulWidget {
   const _WritingLine({
@@ -1095,7 +980,7 @@ class _WritingLineState extends State<_WritingLine> {
     final quill = ListenableBuilder(
       listenable: Listenable.merge([_text, widget.controller, widget.hearing]),
       builder: (context, _) {
-        // While the horn is listening the quill ends it too: done, send.
+        // While Pip is listening the quill ends it too: done, send.
         final listening = widget.hearing.state == Hearing.listening;
         final ready = listening || (!widget.hearing.active && widget.controller.canSend(_text.text));
         return Semantics(

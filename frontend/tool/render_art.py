@@ -46,7 +46,6 @@ SIZES = {
         "pip_eyes_shut": 1020,
         "pip_paws": 1020,
         "campfire": 1179,
-        "hey_pip_button": 588,
         "paw_seal": 150,
         "quill": 120,
         "cloud": 72,

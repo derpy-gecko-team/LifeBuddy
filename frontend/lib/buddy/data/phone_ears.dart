@@ -23,8 +23,27 @@ class PhoneEars implements BuddyEars {
   static const _notAllowed =
       'You have not let me use the microphone. Allow it in the phone’s settings, or write it down for me.';
 
+  // The recogniser reports loudness in its own units, which differ between
+  // Android and iOS and between phones. So the scale is learnt as it goes:
+  // the quietest and loudest levels heard so far are taken as 0 and 1.
+  double _quiet = double.infinity;
+  double _loud = double.negativeInfinity;
+
+  double _loudness(double level) {
+    if (level < _quiet) _quiet = level;
+    if (level > _loud) _loud = level;
+    // Until a real range has been heard, do not call a whisper a shout.
+    final range = _loud - _quiet;
+    if (range < 3) return 0;
+    return ((level - _quiet) / range).clamp(0.0, 1.0);
+  }
+
   @override
-  Future<void> start({required void Function(String words) onWords, required void Function() onEnded}) async {
+  Future<void> start({
+    required void Function(String words) onWords,
+    required void Function() onEnded,
+    void Function(double loudness)? onLoudness,
+  }) async {
     // The first call is the one that asks for the microphone.
     try {
       _ready ??= await _speech.initialize(onStatus: _onStatus, onError: _onError);
@@ -42,6 +61,7 @@ class PhoneEars implements BuddyEars {
     try {
       await _speech.listen(
         onResult: (result) => onWords(result.recognizedWords),
+        onSoundLevelChange: onLoudness == null ? null : (level) => onLoudness(_loudness(level)),
         listenOptions: SpeechListenOptions(
           localeId: locale,
           listenMode: ListenMode.dictation,

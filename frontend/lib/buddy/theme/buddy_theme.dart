@@ -39,7 +39,6 @@ abstract final class BuddyAssets {
   static const pipEyesShut = '$_dir/pip_eyes_shut.png';
   static const pipPaws = '$_dir/pip_paws.png';
   static const pawSeal = '$_dir/paw_seal.png';
-  static const heyPipButton = '$_dir/hey_pip_button.png';
   static const quill = '$_dir/quill.png';
   static const cloud = '$_dir/cloud.png';
 }

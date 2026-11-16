@@ -11,16 +11,24 @@ class FakeEars implements BuddyEars {
 
   void Function(String words)? _onWords;
   void Function()? _onEnded;
+  void Function(double loudness)? _onLoudness;
   bool cancelled = false;
 
   bool get listening => _onEnded != null;
 
   @override
-  Future<void> start({required void Function(String words) onWords, required void Function() onEnded}) async {
+  Future<void> start({
+    required void Function(String words) onWords,
+    required void Function() onEnded,
+    void Function(double loudness)? onLoudness,
+  }) async {
     if (refuses != null) throw EarsException(refuses!);
     _onWords = onWords;
     _onEnded = onEnded;
+    _onLoudness = onLoudness;
   }
+
+  void raiseVoice(double loudness) => _onLoudness?.call(loudness);
 
   void hear(String words) => _onWords!(words);
 
@@ -105,6 +113,21 @@ void main() {
 
     deaf.clearTrouble();
     expect(deaf.trouble, isNull);
+  });
+
+  test('loudness follows the voice while listening and drops to nothing after', () async {
+    await hearing.start();
+    var woken = 0;
+    hearing.addListener(() => woken++);
+
+    ears.raiseVoice(0.7);
+    expect(hearing.loudness.value, 0.7);
+    ears.raiseVoice(3);
+    expect(hearing.loudness.value, 1);
+    expect(woken, 0, reason: 'loudness is its own listenable');
+
+    await hearing.finish();
+    expect(hearing.loudness.value, 0);
   });
 
   test('listeners learn of the words before they learn the listening is over', () async {
