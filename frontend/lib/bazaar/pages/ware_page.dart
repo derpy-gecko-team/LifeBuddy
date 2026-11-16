@@ -119,8 +119,9 @@ class _WarePageState extends State<WarePage> {
   }
 
   double _offsetOf(int i) {
-    if (!_pages.hasClients || !_pages.position.haveDimensions)
+    if (!_pages.hasClients || !_pages.position.haveDimensions) {
       return (i - _index).toDouble();
+    }
     return i - (_pages.page ?? _index.toDouble());
   }
 

@@ -34,8 +34,9 @@ class _GuildScaffoldState extends State<GuildScaffold> {
   }
 
   bool _onScroll(ScrollNotification n) {
-    if (n.depth == 0 && n.metrics.axis == Axis.vertical)
+    if (n.depth == 0 && n.metrics.axis == Axis.vertical) {
       _scrolled.value = n.metrics.pixels;
+    }
     return false;
   }
 

@@ -756,10 +756,11 @@ class _SwashPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (drawn <= 0) return;
-    if (drawn < 1)
+    if (drawn < 1) {
       canvas.clipRect(
         Rect.fromLTWH(0, -size.height, size.width * drawn, size.height * 3),
       );
+    }
     final from = Offset(size.width * 0.02, size.height * 0.85);
     final to = Offset(size.width * 0.99, size.height * 0.2);
     final bow = Offset(size.width * 0.45, size.height * 0.95);

@@ -203,8 +203,9 @@ class _Doodler {
       for (var x = cell * 0.25; x < size.width; x += cell) {
         final at = Offset(x + _r(0, cell * 0.6), y + _r(0, cell * 0.6));
         final roll = pen.nextDouble();
-        if (_isQuiet(at) || at.dx > size.width - 8 || at.dy > size.height - 8)
+        if (_isQuiet(at) || at.dx > size.width - 8 || at.dy > size.height - 8) {
           continue;
+        }
         if (roll < 0.20) {
           _star(at, _r(7, 13));
         } else if (roll < 0.34) {
@@ -339,8 +340,9 @@ class _Doodler {
           _curve(_coil(stalk, out, _r(5, 10), side: side));
         } else if (roll < 0.85) {
           _leaf(at, out, _r(11, 19), filled: pen.nextDouble() < 0.45);
-          if (pen.nextDouble() < 0.5)
+          if (pen.nextDouble() < 0.5) {
             _leaf(at, dir - side * _r(0.7, 1.2), _r(9, 15));
+          }
         } else {
           final dot = at + Offset(cos(out), sin(out)) * _r(8, 14);
           _solid.addOval(Rect.fromCircle(center: dot, radius: _r(1.3, 2.2)));

@@ -12,8 +12,9 @@ import 'torn_paper.dart';
 
 String? questBadgeAsset(Quest quest, DateTime now) {
   if (quest.status == QuestStatus.fulfilled ||
-      quest.status == QuestStatus.sealed)
+      quest.status == QuestStatus.sealed) {
     return null;
+  }
   if (quest.isBoss) return GuildAssets.badgeSkull;
   if (quest.isUrgent(now)) return GuildAssets.badgeFlame;
   return null;

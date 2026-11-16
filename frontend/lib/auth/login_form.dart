@@ -68,8 +68,9 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     if (!mounted) return; // on success the parent usually navigates away
-    if (error == null)
+    if (error == null) {
       TextInput.finishAutofillContext(); // offer to save password
+    }
     setState(() {
       _loading = false;
       _error = error;

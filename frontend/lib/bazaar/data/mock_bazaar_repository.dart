@@ -33,8 +33,9 @@ class MockBazaarRepository implements BazaarRepository {
   @override
   Future<BazaarData> buy(String wareId, {WareDye? dye}) {
     final ware = _find(wareId);
-    if (ware.owned)
+    if (ware.owned) {
       throw BazaarException('${ware.name} is already in your chest.');
+    }
     if (dye != null && !ware.dyes.contains(dye)) {
       throw BazaarException('${ware.name} does not come in that dye.');
     }
@@ -63,10 +64,12 @@ class MockBazaarRepository implements BazaarRepository {
   @override
   Future<BazaarData> setWorn(String wareId, {required bool worn}) {
     final ware = _find(wareId);
-    if (!ware.owned)
+    if (!ware.owned) {
       throw BazaarException('Buy ${ware.name} before putting it on.');
-    if (!ware.wearable)
+    }
+    if (!ware.wearable) {
       throw BazaarException('${ware.name} is kept in your chest, not worn.');
+    }
     if (worn) {
       for (final other in _data.wares.toList()) {
         if (other.worn && other.slot == ware.slot && other.id != ware.id) {

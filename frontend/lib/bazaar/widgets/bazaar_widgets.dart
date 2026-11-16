@@ -124,8 +124,9 @@ class _DiamondPainter extends CustomPainter {
       Rarity.rare => const Color(0xFF8D93C9),
       Rarity.legendary => GuildColors.gold,
     };
-    if (fill != null)
+    if (fill != null) {
       canvas.drawPath(path, Paint()..color = fill.withValues(alpha: ink.a));
+    }
     canvas.drawPath(
       path,
       Sketch.pen(
