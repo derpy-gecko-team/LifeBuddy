@@ -37,7 +37,10 @@ class ShopEntrance extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final signWidth = _signHeight * ShopSign.aspect;
-        final slipWidth = ((constraints.maxWidth - signWidth) / 2 - 24).clamp(52.0, 120.0);
+        final slipWidth = ((constraints.maxWidth - signWidth) / 2 - 24).clamp(
+          52.0,
+          120.0,
+        );
 
         return SizedBox(
           height: _signHeight + 6,
@@ -87,7 +90,11 @@ class _Plaque extends StatelessWidget {
         children: [
           Positioned.fill(
             child: ExcludeSemantics(
-              child: Image.asset(BazaarAssets.sidePlaque, fit: BoxFit.fill, filterQuality: FilterQuality.medium),
+              child: Image.asset(
+                BazaarAssets.sidePlaque,
+                fit: BoxFit.fill,
+                filterQuality: FilterQuality.medium,
+              ),
             ),
           ),
           Align(
@@ -116,15 +123,27 @@ class _PurseSlip extends StatelessWidget {
       children: [
         SizedBox(
           width: 24,
-          child: Center(child: CurrencyIcon(currency, size: currency == Currency.gold ? 23 : 21)),
+          child: Center(
+            child: CurrencyIcon(
+              currency,
+              size: currency == Currency.gold ? 23 : 21,
+            ),
+          ),
         ),
         const SizedBox(width: 6),
-        Text(formatAmount(amount), style: GuildText.title(GuildType.md, color: GuildColors.ink).copyWith(height: 1)),
+        Text(
+          formatAmount(amount),
+          style: GuildText.title(
+            GuildType.md,
+            color: GuildColors.ink,
+          ).copyWith(height: 1),
+        ),
       ],
     );
 
     return Semantics(
-      label: '${formatAmount(purse.gold)} gold, ${formatAmount(purse.moonstones)} moonstones',
+      label:
+          '${formatAmount(purse.gold)} gold, ${formatAmount(purse.moonstones)} moonstones',
       excludeSemantics: true,
       child: _Plaque(
         child: Column(
@@ -164,9 +183,16 @@ class _ChestSlip extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('My chest', style: GuildText.hand(GuildType.sm).copyWith(height: 1)),
+                  Text(
+                    'My chest',
+                    style: GuildText.hand(GuildType.sm).copyWith(height: 1),
+                  ),
                   const SizedBox(width: 2),
-                  const GuildIcon(GuildGlyph.chevronRight, size: 13, color: GuildColors.ink),
+                  const GuildIcon(
+                    GuildGlyph.chevronRight,
+                    size: 13,
+                    color: GuildColors.ink,
+                  ),
                 ],
               ),
             ],
@@ -189,7 +215,13 @@ class ShopSign extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unit = height / _artHeight;
-    Widget line(double top, double left, double right, double tall, Widget child) => Positioned(
+    Widget line(
+      double top,
+      double left,
+      double right,
+      double tall,
+      Widget child,
+    ) => Positioned(
       top: top * unit,
       left: left * unit,
       right: right * unit,
@@ -207,7 +239,11 @@ class ShopSign extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: Image.asset(BazaarAssets.shopSign, fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+              child: Image.asset(
+                BazaarAssets.shopSign,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.medium,
+              ),
             ),
             line(
               166,
@@ -223,7 +259,10 @@ class ShopSign extends StatelessWidget {
                     child: Text(
                       'THE',
                       textScaler: TextScaler.noScaling,
-                      style: GuildText.title(20, color: GuildColors.ink).copyWith(letterSpacing: 4, height: 1),
+                      style: GuildText.title(
+                        20,
+                        color: GuildColors.ink,
+                      ).copyWith(letterSpacing: 4, height: 1),
                     ),
                   ),
                   Container(width: 26, height: 1.6, color: GuildColors.ink),
@@ -238,7 +277,10 @@ class ShopSign extends StatelessWidget {
               Text(
                 'BAZAAR',
                 textScaler: TextScaler.noScaling,
-                style: GuildText.title(60, color: GuildColors.ink).copyWith(letterSpacing: 2, height: 1),
+                style: GuildText.title(
+                  60,
+                  color: GuildColors.ink,
+                ).copyWith(letterSpacing: 2, height: 1),
               ),
             ),
             line(
@@ -249,7 +291,10 @@ class ShopSign extends StatelessWidget {
               Text(
                 'NEW WARES AT EVERY DAWN',
                 textScaler: TextScaler.noScaling,
-                style: GuildText.title(15, color: GuildColors.ink).copyWith(letterSpacing: 1.4, height: 1),
+                style: GuildText.title(
+                  15,
+                  color: GuildColors.ink,
+                ).copyWith(letterSpacing: 1.4, height: 1),
               ),
             ),
           ],

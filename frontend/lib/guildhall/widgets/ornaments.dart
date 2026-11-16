@@ -9,7 +9,13 @@ import '../theme/guild_theme.dart';
 import 'guild_icons.dart';
 import 'sketch.dart';
 
-void drawDashedPath(Canvas canvas, Path path, Paint paint, {double dash = 6, double gap = 5}) {
+void drawDashedPath(
+  Canvas canvas,
+  Path path,
+  Paint paint, {
+  double dash = 6,
+  double gap = 5,
+}) {
   final pen = Random(41);
   final dashed = Path();
   for (final PathMetric metric in path.computeMetrics()) {
@@ -32,17 +38,21 @@ void drawDashedPath(Canvas canvas, Path path, Paint paint, {double dash = 6, dou
 }
 
 class DashedLine extends StatelessWidget {
-  const DashedLine({super.key, this.color = GuildColors.pencil, this.height = 1.5});
+  const DashedLine({
+    super.key,
+    this.color = GuildColors.pencil,
+    this.height = 1.5,
+  });
 
   final Color color;
   final double height;
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: height,
-        width: double.infinity,
-        child: CustomPaint(painter: _DashedLinePainter(color, height)),
-      );
+    height: height,
+    width: double.infinity,
+    child: CustomPaint(painter: _DashedLinePainter(color, height)),
+  );
 }
 
 class _DashedLinePainter extends CustomPainter {
@@ -88,9 +98,9 @@ class DashedBorder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-        painter: _DashedBorderPainter(color, circle, radius, strokeWidth),
-        child: Padding(padding: padding, child: child),
-      );
+    painter: _DashedBorderPainter(color, circle, radius, strokeWidth),
+    child: Padding(padding: padding, child: child),
+  );
 }
 
 class _DashedBorderPainter extends CustomPainter {
@@ -105,8 +115,14 @@ class _DashedBorderPainter extends CustomPainter {
     final rect = (Offset.zero & size).deflate(strokeWidth / 2 + 1);
     final outline = circle
         ? (Path()..addOval(rect))
-        : (Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius))));
-    final path = traceByHand(outline, Random(size.width.round() * 31 + size.height.round()), wobble: 0.8, step: 9);
+        : (Path()
+            ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius))));
+    final path = traceByHand(
+      outline,
+      Random(size.width.round() * 31 + size.height.round()),
+      wobble: 0.8,
+      step: 9,
+    );
     drawDashedPath(
       canvas,
       path,
@@ -150,7 +166,9 @@ class GuildProgressBar extends StatelessWidget {
         alignment: Alignment.centerLeft,
         child: TweenAnimationBuilder<double>(
           tween: Tween(end: value.clamp(0, 1)),
-          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 500),
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 500),
           curve: Curves.easeOutCubic,
           builder: (context, v, _) => FractionallySizedBox(
             widthFactor: v,
@@ -164,7 +182,12 @@ class GuildProgressBar extends StatelessWidget {
 }
 
 class SealProgress extends StatelessWidget {
-  const SealProgress({super.key, required this.total, required this.done, this.size = 18});
+  const SealProgress({
+    super.key,
+    required this.total,
+    required this.done,
+    this.size = 18,
+  });
 
   final int total;
   final int done;
@@ -190,7 +213,8 @@ class SealProgress extends StatelessWidget {
                   duration: MediaQuery.disableAnimationsOf(context)
                       ? Duration.zero
                       : const Duration(milliseconds: 1100),
-                  builder: (context, t, _) => CustomPaint(painter: _SealDotPainter(t)),
+                  builder: (context, t, _) =>
+                      CustomPaint(painter: _SealDotPainter(t)),
                 ),
               ),
           ],
@@ -216,10 +240,18 @@ class _SealDotPainter extends CustomPainter {
     final rays = _rays.transform(risen);
 
     if (disc < 1) {
-      canvas.drawCircle(c, r * 0.52, Sketch.pen(GuildColors.cream.withValues(alpha: 0.7 * (1 - disc)), 1.4));
+      canvas.drawCircle(
+        c,
+        r * 0.52,
+        Sketch.pen(GuildColors.cream.withValues(alpha: 0.7 * (1 - disc)), 1.4),
+      );
     }
     if (disc > 0) {
-      canvas.drawCircle(c, r * 0.52 * disc, Paint()..color = GuildColors.goldBright);
+      canvas.drawCircle(
+        c,
+        r * 0.52 * disc,
+        Paint()..color = GuildColors.goldBright,
+      );
     }
     if (rays > 0) {
       final path = Path();
@@ -231,7 +263,13 @@ class _SealDotPainter extends CustomPainter {
           ..moveTo(c.dx + dir.dx * r * 0.72, c.dy + dir.dy * r * 0.72)
           ..lineTo(c.dx + dir.dx * reach, c.dy + dir.dy * reach);
       }
-      canvas.drawPath(path, Sketch.pen(GuildColors.goldBright.withValues(alpha: rays.clamp(0.0, 1.0)), 1.5));
+      canvas.drawPath(
+        path,
+        Sketch.pen(
+          GuildColors.goldBright.withValues(alpha: rays.clamp(0.0, 1.0)),
+          1.5,
+        ),
+      );
     }
   }
 
@@ -260,8 +298,16 @@ class RoundBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: GuildColors.cream, width: size >= 56 ? 2.2 : 1.8),
-        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
+        border: Border.all(
+          color: GuildColors.cream,
+          width: size >= 56 ? 2.2 : 1.8,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: GuildColors.shadow.withValues(alpha: 0.5),
+            offset: const Offset(2, 3),
+          ),
+        ],
       ),
       child: Image.asset(asset, fit: BoxFit.contain),
     );
@@ -280,7 +326,12 @@ class JourneyEmblem extends StatelessWidget {
       enabled: !MediaQuery.disableAnimationsOf(context),
       child: Hero(
         tag: 'journey-emblem-${journey.id}',
-        child: Image.asset(journey.emblemAsset, width: size, height: size, fit: BoxFit.contain),
+        child: Image.asset(
+          journey.emblemAsset,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
@@ -319,9 +370,19 @@ class PerilSkulls extends StatelessWidget {
 }
 
 enum SealKind {
-  locked(GuildColors.indigoLight, GuildColors.indigoDeep, GuildGlyph.lock, GuildColors.cream),
+  locked(
+    GuildColors.indigoLight,
+    GuildColors.indigoDeep,
+    GuildGlyph.lock,
+    GuildColors.cream,
+  ),
 
-  claimed(GuildColors.goldBright, GuildColors.gold, GuildGlyph.check, GuildColors.ink);
+  claimed(
+    GuildColors.goldBright,
+    GuildColors.gold,
+    GuildGlyph.check,
+    GuildColors.ink,
+  );
 
   const SealKind(this.light, this.dark, this.glyph, this.mark);
   final Color light;
@@ -368,7 +429,10 @@ class _WaxSealPainter extends CustomPainter {
     }
     path.close();
 
-    canvas.drawPath(path.shift(const Offset(2, 3)), Paint()..color = GuildColors.shadow.withValues(alpha: 0.45));
+    canvas.drawPath(
+      path.shift(const Offset(2, 3)),
+      Paint()..color = GuildColors.shadow.withValues(alpha: 0.45),
+    );
     canvas.drawPath(
       path,
       Paint()
@@ -400,7 +464,11 @@ class _WaxSealPainter extends CustomPainter {
 }
 
 class SealRibbon extends StatelessWidget {
-  const SealRibbon({super.key, this.axis = Axis.horizontal, this.thickness = 14});
+  const SealRibbon({
+    super.key,
+    this.axis = Axis.horizontal,
+    this.thickness = 14,
+  });
 
   final Axis axis;
   final double thickness;
@@ -437,7 +505,14 @@ class InkStamp extends StatelessWidget {
           border: Border.all(color: GuildColors.brickDeep, width: 1.8),
           borderRadius: BorderRadius.circular(3),
         ),
-        child: Text(label, style: GuildText.label(fontSize, color: GuildColors.brickDeep, spacing: 1.2)),
+        child: Text(
+          label,
+          style: GuildText.label(
+            fontSize,
+            color: GuildColors.brickDeep,
+            spacing: 1.2,
+          ),
+        ),
       ),
     );
   }
@@ -451,7 +526,9 @@ class GuildArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExcludeSemantics(child: Image.asset(asset, height: height, fit: BoxFit.contain));
+    return ExcludeSemantics(
+      child: Image.asset(asset, height: height, fit: BoxFit.contain),
+    );
   }
 }
 
@@ -464,9 +541,12 @@ class TorchGlow extends StatefulWidget {
   State<TorchGlow> createState() => _TorchGlowState();
 }
 
-class _TorchGlowState extends State<TorchGlow> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller =
-      AnimationController(vsync: this, duration: const Duration(seconds: 6));
+class _TorchGlowState extends State<TorchGlow>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 6),
+  );
   late final Animation<double> _opacity = _controller.drive(_FlickerTween());
 
   @override
@@ -522,7 +602,12 @@ class _FlickerTween extends Animatable<double> {
 }
 
 class InkCheckbox extends StatelessWidget {
-  const InkCheckbox({super.key, required this.checked, this.enabled = true, this.size = 28});
+  const InkCheckbox({
+    super.key,
+    required this.checked,
+    this.enabled = true,
+    this.size = 28,
+  });
 
   final bool checked;
   final bool enabled;
@@ -532,7 +617,9 @@ class InkCheckbox extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(end: checked ? 1 : 0),
-      duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.quick,
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : GuildMotion.quick,
       curve: Curves.easeOut,
       builder: (context, t, _) => SizedBox.square(
         dimension: size,
@@ -549,14 +636,22 @@ class _InkCheckPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final box = RRect.fromRectAndRadius((Offset.zero & size).deflate(1.5), const Radius.circular(3));
+    final box = RRect.fromRectAndRadius(
+      (Offset.zero & size).deflate(1.5),
+      const Radius.circular(3),
+    );
     if (t > 0) {
-      canvas.drawRRect(box, Paint()..color = GuildColors.parchmentDark.withValues(alpha: 0.7 * t));
+      canvas.drawRRect(
+        box,
+        Paint()..color = GuildColors.parchmentDark.withValues(alpha: 0.7 * t),
+      );
     }
     canvas.drawRRect(
       box,
       Paint()
-        ..color = enabled || t > 0 ? GuildColors.ink : GuildColors.inkSoft.withValues(alpha: 0.55)
+        ..color = enabled || t > 0
+            ? GuildColors.ink
+            : GuildColors.inkSoft.withValues(alpha: 0.55)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.7,
     );
@@ -579,7 +674,8 @@ class _InkCheckPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_InkCheckPainter old) => old.t != t || old.enabled != enabled;
+  bool shouldRepaint(_InkCheckPainter old) =>
+      old.t != t || old.enabled != enabled;
 }
 
 class LetteredTitle extends StatelessWidget {
@@ -616,7 +712,8 @@ class LetteredTitle extends StatelessWidget {
         duration: const Duration(milliseconds: 900),
         curve: const Interval(0.3, 1, curve: Curves.easeInOutCubic),
         onEnd: onDrawn,
-        builder: (context, t, _) => CustomPaint(painter: _SwashPainter(color, t)),
+        builder: (context, t, _) =>
+            CustomPaint(painter: _SwashPainter(color, t)),
       );
     }
     return IntrinsicWidth(
@@ -627,7 +724,13 @@ class LetteredTitle extends StatelessWidget {
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(text: initial, style: TextStyle(fontSize: style.fontSize! * 1.5, height: 0.95)),
+                TextSpan(
+                  text: initial,
+                  style: TextStyle(
+                    fontSize: style.fontSize! * 1.5,
+                    height: 0.95,
+                  ),
+                ),
                 TextSpan(text: text.substring(initial.length)),
               ],
             ),
@@ -653,7 +756,10 @@ class _SwashPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (drawn <= 0) return;
-    if (drawn < 1) canvas.clipRect(Rect.fromLTWH(0, -size.height, size.width * drawn, size.height * 3));
+    if (drawn < 1)
+      canvas.clipRect(
+        Rect.fromLTWH(0, -size.height, size.width * drawn, size.height * 3),
+      );
     final from = Offset(size.width * 0.02, size.height * 0.85);
     final to = Offset(size.width * 0.99, size.height * 0.2);
     final bow = Offset(size.width * 0.45, size.height * 0.95);
@@ -663,23 +769,34 @@ class _SwashPainter extends CustomPainter {
       ..quadraticBezierTo(bow.dx, bow.dy - weight, to.dx, to.dy)
       ..quadraticBezierTo(bow.dx, bow.dy + weight, from.dx, from.dy)
       ..close();
-    canvas.drawPath(stroke, Paint()..color = color.withValues(alpha: color.a * 0.9));
+    canvas.drawPath(
+      stroke,
+      Paint()..color = color.withValues(alpha: color.a * 0.9),
+    );
   }
 
   @override
-  bool shouldRepaint(_SwashPainter old) => old.color != color || old.drawn != drawn;
+  bool shouldRepaint(_SwashPainter old) =>
+      old.color != color || old.drawn != drawn;
 }
 
 class ChalkStar extends StatelessWidget {
-  const ChalkStar({super.key, this.size = 15, this.seed = 0, this.color = GuildColors.chalk});
+  const ChalkStar({
+    super.key,
+    this.size = 15,
+    this.seed = 0,
+    this.color = GuildColors.chalk,
+  });
 
   final double size;
   final int seed;
   final Color color;
 
   @override
-  Widget build(BuildContext context) =>
-      SizedBox.square(dimension: size, child: CustomPaint(painter: _ChalkStarPainter(seed, color)));
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: size,
+    child: CustomPaint(painter: _ChalkStarPainter(seed, color)),
+  );
 }
 
 class _ChalkStarPainter extends CustomPainter {
@@ -705,5 +822,6 @@ class _ChalkStarPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_ChalkStarPainter old) => old.seed != seed || old.color != color;
+  bool shouldRepaint(_ChalkStarPainter old) =>
+      old.seed != seed || old.color != color;
 }

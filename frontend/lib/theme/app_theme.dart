@@ -16,20 +16,21 @@ abstract final class AppFonts {
 
 abstract final class AppTheme {
   static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.indigo,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: AppColors.indigo,
-      onPrimary: AppColors.parchmentLight,
-      secondary: AppColors.gold,
-      onSecondary: AppColors.ink,
-      tertiary: AppColors.wax,
-      surface: AppColors.parchment,
-      onSurface: AppColors.ink,
-      error: AppColors.waxDark,
-      onError: AppColors.parchmentLight,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.indigo,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: AppColors.indigo,
+          onPrimary: AppColors.parchmentLight,
+          secondary: AppColors.gold,
+          onSecondary: AppColors.ink,
+          tertiary: AppColors.wax,
+          surface: AppColors.parchment,
+          onSurface: AppColors.ink,
+          error: AppColors.waxDark,
+          onError: AppColors.parchmentLight,
+        );
 
     final base = ThemeData(useMaterial3: true, colorScheme: scheme);
 

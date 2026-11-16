@@ -3,18 +3,21 @@ import 'bazaar_repository.dart';
 import 'models.dart';
 
 class MockBazaarRepository implements BazaarRepository {
-  MockBazaarRepository({DateTime? now, this.latency = const Duration(milliseconds: 280)})
-      : _data = _seed(now ?? DateTime.now());
+  MockBazaarRepository({
+    DateTime? now,
+    this.latency = const Duration(milliseconds: 280),
+  }) : _data = _seed(now ?? DateTime.now());
 
   final Duration latency;
   BazaarData _data;
 
-  Future<BazaarData> _reply() => Future<BazaarData>.delayed(latency, () => _data);
+  Future<BazaarData> _reply() =>
+      Future<BazaarData>.delayed(latency, () => _data);
 
   Ware _find(String id) => _data.wares.firstWhere(
-        (w) => w.id == id,
-        orElse: () => throw BazaarException('That ware is no longer on the stall.'),
-      );
+    (w) => w.id == id,
+    orElse: () => throw BazaarException('That ware is no longer on the stall.'),
+  );
 
   void _replace(Ware ware) {
     _data = BazaarData(
@@ -30,29 +33,40 @@ class MockBazaarRepository implements BazaarRepository {
   @override
   Future<BazaarData> buy(String wareId, {WareDye? dye}) {
     final ware = _find(wareId);
-    if (ware.owned) throw BazaarException('${ware.name} is already in your chest.');
+    if (ware.owned)
+      throw BazaarException('${ware.name} is already in your chest.');
     if (dye != null && !ware.dyes.contains(dye)) {
       throw BazaarException('${ware.name} does not come in that dye.');
     }
     final purse = _data.purse;
     if (!purse.canAfford(ware.price)) {
       final short = ware.price.amount - purse.of(ware.price.currency);
-      throw BazaarException('You are $short ${ware.price.currency.label} short for this one.');
+      throw BazaarException(
+        'You are $short ${ware.price.currency.label} short for this one.',
+      );
     }
-    _data = BazaarData(purse: purse.minus(ware.price), wares: _data.wares, featuredId: _data.featuredId);
-    _replace(ware.copyWith(
-      owned: true,
-      sold: ware.sold + 1,
-      dye: dye ?? (ware.dyes.isEmpty ? null : ware.dyes.first),
-    ));
+    _data = BazaarData(
+      purse: purse.minus(ware.price),
+      wares: _data.wares,
+      featuredId: _data.featuredId,
+    );
+    _replace(
+      ware.copyWith(
+        owned: true,
+        sold: ware.sold + 1,
+        dye: dye ?? (ware.dyes.isEmpty ? null : ware.dyes.first),
+      ),
+    );
     return _reply();
   }
 
   @override
   Future<BazaarData> setWorn(String wareId, {required bool worn}) {
     final ware = _find(wareId);
-    if (!ware.owned) throw BazaarException('Buy ${ware.name} before putting it on.');
-    if (!ware.wearable) throw BazaarException('${ware.name} is kept in your chest, not worn.');
+    if (!ware.owned)
+      throw BazaarException('Buy ${ware.name} before putting it on.');
+    if (!ware.wearable)
+      throw BazaarException('${ware.name} is kept in your chest, not worn.');
     if (worn) {
       for (final other in _data.wares.toList()) {
         if (other.worn && other.slot == ware.slot && other.id != ware.id) {
@@ -71,8 +85,14 @@ class MockBazaarRepository implements BazaarRepository {
   }
 
   static BazaarData _seed(DateTime now) {
-    const allDyes = [WareDye.indigo, WareDye.brick, WareDye.moss, WareDye.umber];
-    const worn = 'Shows on your avatar, your guild card and next to your quests.';
+    const allDyes = [
+      WareDye.indigo,
+      WareDye.brick,
+      WareDye.moss,
+      WareDye.umber,
+    ];
+    const worn =
+        'Shows on your avatar, your guild card and next to your quests.';
     const kept = 'Kept in your chest for all to admire.';
 
     return BazaarData(
@@ -87,9 +107,11 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.legendary,
           price: const Price(2400),
           blurb: 'A wiser buddy who hoots your reminders at dusk.',
-          description: 'Raised in the rafters of the old observatory. It keeps watch over your quests '
+          description:
+              'Raised in the rafters of the old observatory. It keeps watch over your quests '
               'while you sleep and hoots your reminders at dusk.',
-          perk: 'Takes your Buddy’s place in the Buddy tab and in your letters.',
+          perk:
+              'Takes your Buddy’s place in the Buddy tab and in your letters.',
           asset: BazaarAssets.moonOwl,
           slot: 'buddy',
           sold: 41,
@@ -103,7 +125,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(450),
           blurb: 'Midnight silk and a little stardust.',
-          description: 'Woven from midnight silk and a little stardust. Worn by apprentices who '
+          description:
+              'Woven from midnight silk and a little stardust. Worn by apprentices who '
               'finish what they start.',
           perk: worn,
           asset: BazaarAssets.wizardHat,
@@ -120,7 +143,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(180),
           blurb: 'Plain steel, honestly dented.',
-          description: 'Plain steel with a brass ridge, dented in all the right places. It has '
+          description:
+              'Plain steel with a brass ridge, dented in all the right places. It has '
               'already seen one adventurer through their first week.',
           perk: worn,
           asset: BazaarAssets.ironcladHelm,
@@ -136,9 +160,11 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.legendary,
           price: Price(35, Currency.moonstones),
           blurb: 'Warm to the touch, and ticking.',
-          description: 'Warm to the touch and faintly ticking. Keep your oaths and something '
+          description:
+              'Warm to the touch and faintly ticking. Keep your oaths and something '
               'small and fierce will hatch to keep you company.',
-          perk: 'Takes your Buddy’s place in the Buddy tab and in your letters.',
+          perk:
+              'Takes your Buddy’s place in the Buddy tab and in your letters.',
           asset: BazaarAssets.dragonEgg,
           slot: 'buddy',
           sold: 17,
@@ -151,7 +177,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(380),
           blurb: 'Heavy wool with a brass clasp.',
-          description: 'Heavy wool, a brass clasp, and a hem that has swept the floor of every '
+          description:
+              'Heavy wool, a brass clasp, and a hem that has swept the floor of every '
               'tavern between here and the coast.',
           perk: worn,
           asset: BazaarAssets.crimsonCloak,
@@ -167,7 +194,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(320),
           blurb: 'A ring of gold for your portrait.',
-          description: 'A ring of beaten gold set with four garnets. Hang your portrait in it and '
+          description:
+              'A ring of beaten gold set with four garnets. Hang your portrait in it and '
               'the whole guild will know whose it is.',
           perk: 'Frames your portrait on your guild card.',
           asset: BazaarAssets.starlitFrame,
@@ -182,7 +210,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(150),
           blurb: 'A name earned the hard way.',
-          description: 'A deed from the guild scribe naming you Ironclad. For those who turned up '
+          description:
+              'A deed from the guild scribe naming you Ironclad. For those who turned up '
               'on the days they did not feel like it.',
           perk: 'Written under your name on your guild card.',
           asset: BazaarAssets.titleScroll,
@@ -197,7 +226,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(900),
           blurb: 'Quick hands, quicker exits.',
-          description: 'Quick hands and quicker exits. The rogue is never seen starting a task, '
+          description:
+              'Quick hands and quicker exits. The rogue is never seen starting a task, '
               'only walking away from it finished.',
           perk: worn,
           asset: BazaarAssets.avatarRogue,
@@ -212,7 +242,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(850),
           blurb: 'Knows every mushroom by name.',
-          description: 'Knows every mushroom in the wood by name and will not be hurried. Small '
+          description:
+              'Knows every mushroom in the wood by name and will not be hurried. Small '
               'steps, a full satchel by evening.',
           perk: worn,
           asset: BazaarAssets.avatarForager,
@@ -227,7 +258,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.legendary,
           price: Price(28, Currency.moonstones),
           blurb: 'Three wisps and a borrowed tome.',
-          description: 'Followed everywhere by three wisps and one overdue library book. Studies '
+          description:
+              'Followed everywhere by three wisps and one overdue library book. Studies '
               'late, and it shows.',
           perk: worn,
           asset: BazaarAssets.avatarMage,
@@ -242,7 +274,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.legendary,
           price: Price(2200),
           blurb: 'Scarred, patched, still standing.',
-          description: 'Scarred, patched and still standing. The old wolf has never missed a '
+          description:
+              'Scarred, patched and still standing. The old wolf has never missed a '
               'morning drill and does not plan to start.',
           perk: worn,
           asset: BazaarAssets.avatarWolf,
@@ -257,7 +290,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(950),
           blurb: 'Sings your deeds, loudly.',
-          description: 'Sings your deeds back to you, loudly, with a songbird for harmony. Even '
+          description:
+              'Sings your deeds back to you, loudly, with a songbird for harmony. Even '
               'the small ones get a verse.',
           perk: worn,
           asset: BazaarAssets.avatarBard,
@@ -272,7 +306,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(1000),
           blurb: 'Walks far, packs light.',
-          description: 'Walks far, packs light, and always has the lantern lit before dark. '
+          description:
+              'Walks far, packs light, and always has the lantern lit before dark. '
               'Patient as snowfall.',
           perk: worn,
           asset: BazaarAssets.avatarRanger,
@@ -287,7 +322,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(60),
           blurb: 'Sweet, fizzy, faintly medicinal.',
-          description: 'Sweet, fizzy and faintly medicinal. Brewed by the stallkeeper’s aunt for '
+          description:
+              'Sweet, fizzy and faintly medicinal. Brewed by the stallkeeper’s aunt for '
               'mornings that start badly.',
           perk: kept,
           asset: BazaarAssets.potionRuby,
@@ -301,7 +337,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(260),
           blurb: 'Bottled at midnight, tied with bay.',
-          description: 'Bottled at midnight and tied with a sprig of bay. The swirl inside never '
+          description:
+              'Bottled at midnight and tied with a sprig of bay. The swirl inside never '
               'quite settles.',
           perk: kept,
           asset: BazaarAssets.potionMoonlit,
@@ -315,7 +352,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.legendary,
           price: Price(12, Currency.moonstones),
           blurb: 'Sunlight, kept in cut glass.',
-          description: 'A summer afternoon kept in cut glass. Hold it to a window and the whole '
+          description:
+              'A summer afternoon kept in cut glass. Hold it to a window and the whole '
               'room turns gold.',
           perk: kept,
           asset: BazaarAssets.potionAmber,
@@ -329,7 +367,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(240),
           blurb: 'Still warm from the mountain.',
-          description: 'Chipped from a seam under the mountain and still a little warm. It hums '
+          description:
+              'Chipped from a seam under the mountain and still a little warm. It hums '
               'when you are close to finishing something.',
           perk: kept,
           asset: BazaarAssets.crystalRed,
@@ -343,7 +382,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(120),
           blurb: 'Every notch has a story.',
-          description: 'Every notch has a story and the stallkeeper will tell you all of them. '
+          description:
+              'Every notch has a story and the stallkeeper will tell you all of them. '
               'Still sharp where it counts.',
           perk: kept,
           asset: BazaarAssets.chippedSword,
@@ -357,7 +397,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(140),
           blurb: 'Four planks and an iron rim.',
-          description: 'Four oak planks and an iron rim. It has stopped worse than a bad Monday.',
+          description:
+              'Four oak planks and an iron rim. It has stopped worse than a bad Monday.',
           perk: kept,
           asset: BazaarAssets.woodenShield,
           sold: 640,
@@ -370,7 +411,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(300),
           blurb: 'Nobody knows what it opens.',
-          description: 'Nobody at the stall knows what it opens. Somebody, somewhere, is missing '
+          description:
+              'Nobody at the stall knows what it opens. Somebody, somewhere, is missing '
               'a door.',
           perk: kept,
           asset: BazaarAssets.brassKey,
@@ -384,7 +426,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(90),
           blurb: 'Addressed to no one in particular.',
-          description: 'Addressed to no one in particular and sealed in red wax. Opening it would '
+          description:
+              'Addressed to no one in particular and sealed in red wax. Opening it would '
               'spoil it.',
           perk: kept,
           asset: BazaarAssets.sealedLetter,
@@ -398,7 +441,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.common,
           price: Price(70),
           blurb: 'Picked this morning. Do not eat.',
-          description: 'Picked this morning from the foot of the old oak. Lovely to look at. Do '
+          description:
+              'Picked this morning from the foot of the old oak. Lovely to look at. Do '
               'not eat them.',
           perk: kept,
           asset: BazaarAssets.mushrooms,
@@ -412,7 +456,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(420),
           blurb: 'It winks when you slack off.',
-          description: 'Somebody set an amethyst where the left eye was. It seems to wink when '
+          description:
+              'Somebody set an amethyst where the left eye was. It seems to wink when '
               'you put things off.',
           perk: kept,
           asset: BazaarAssets.gemSkull,
@@ -426,7 +471,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.legendary,
           price: Price(30, Currency.moonstones),
           blurb: 'A garnet the size of a plum.',
-          description: 'A garnet the size of a plum on a chain of brass beads. Heavier than it '
+          description:
+              'A garnet the size of a plum on a chain of brass beads. Heavier than it '
               'looks, like most promises.',
           perk: kept,
           asset: BazaarAssets.rubyAmulet,
@@ -440,7 +486,8 @@ class MockBazaarRepository implements BazaarRepository {
           rarity: Rarity.rare,
           price: Price(500),
           blurb: 'The lock is the interesting part.',
-          description: 'Bound in slate-grey leather with a brass lock and no keyhole on the '
+          description:
+              'Bound in slate-grey leather with a brass lock and no keyhole on the '
               'outside. The runes on the cover change when nobody is looking.',
           perk: kept,
           asset: BazaarAssets.lockedTome,

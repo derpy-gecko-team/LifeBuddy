@@ -23,11 +23,13 @@ class GuildHallPage extends StatefulWidget {
 class _GuildHallPageState extends State<GuildHallPage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
   final _heroController = HeroController(
-    createRectTween: (begin, end) => MaterialRectArcTween(begin: begin, end: end),
+    createRectTween: (begin, end) =>
+        MaterialRectArcTween(begin: begin, end: end),
   );
-  late final GuildHallController _controller =
-      GuildHallController(widget.repository ?? MockQuestRepository(), beforeFirstLoad: GuildText.preload)
-        ..load();
+  late final GuildHallController _controller = GuildHallController(
+    widget.repository ?? MockQuestRepository(),
+    beforeFirstLoad: GuildText.preload,
+  )..load();
 
   @override
   void dispose() {
@@ -37,31 +39,35 @@ class _GuildHallPageState extends State<GuildHallPage> {
   }
 
   void _openJourney(String journeyId, {Rect? origin}) {
-    _navigatorKey.currentState!.push(PlaqueRoute<void>(
-      origin: origin,
-      builder: (_) => JourneyPage(
-        controller: _controller,
-        journeyId: journeyId,
-        onOpenQuest: _openQuest,
+    _navigatorKey.currentState!.push(
+      PlaqueRoute<void>(
+        origin: origin,
+        builder: (_) => JourneyPage(
+          controller: _controller,
+          journeyId: journeyId,
+          onOpenQuest: _openQuest,
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _openQuest(String questId, {Rect? origin, double tilt = 0}) {
-    return Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
-      origin: origin,
-      tilt: tilt,
-      builder: (routeContext) => QuestDetailPage(
-        controller: _controller,
-        questId: questId,
-        onOpenBuddy: widget.onOpenBuddy == null
-            ? null
-            : () {
-                Navigator.of(routeContext).pop();
-                widget.onOpenBuddy!();
-              },
+    return Navigator.of(context, rootNavigator: true).push(
+      NoticeRoute<void>(
+        origin: origin,
+        tilt: tilt,
+        builder: (routeContext) => QuestDetailPage(
+          controller: _controller,
+          questId: questId,
+          onOpenBuddy: widget.onOpenBuddy == null
+              ? null
+              : () {
+                  Navigator.of(routeContext).pop();
+                  widget.onOpenBuddy!();
+                },
+        ),
       ),
-    ));
+    );
   }
 
   @override

@@ -10,7 +10,11 @@ import '../theme/bazaar_assets.dart';
 import '../widgets/bazaar_widgets.dart';
 
 class ChestPage extends StatelessWidget {
-  const ChestPage({super.key, required this.controller, required this.onOpenWare});
+  const ChestPage({
+    super.key,
+    required this.controller,
+    required this.onOpenWare,
+  });
 
   final BazaarController controller;
   final OpenWare onOpenWare;
@@ -29,7 +33,10 @@ class ChestPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 6, 16, 0),
-                child: GuildBackLink(label: 'Bazaar', onTap: () => Navigator.of(context).maybePop()),
+                child: GuildBackLink(
+                  label: 'Bazaar',
+                  onTap: () => Navigator.of(context).maybePop(),
+                ),
               ),
               Expanded(
                 child: ListView(
@@ -47,7 +54,13 @@ class ChestPage extends StatelessWidget {
                               children: [
                                 Semantics(
                                   header: true,
-                                  child: Text('My chest', style: GuildText.title(GuildType.xxl, color: GuildColors.cream)),
+                                  child: Text(
+                                    'My chest',
+                                    style: GuildText.title(
+                                      GuildType.xxl,
+                                      color: GuildColors.cream,
+                                    ),
+                                  ),
                                 ),
                                 Text(
                                   chest.isEmpty
@@ -67,7 +80,8 @@ class ChestPage extends StatelessWidget {
                         child: Center(
                           child: GuildNote(
                             title: 'Your chest is empty',
-                            message: 'Whatever you buy at the stall is kept here.',
+                            message:
+                                'Whatever you buy at the stall is kept here.',
                             action: GuildButton(
                               label: 'Back to the stall',
                               onPressed: () => Navigator.of(context).maybePop(),
@@ -76,7 +90,11 @@ class ChestPage extends StatelessWidget {
                         ),
                       )
                     else
-                      WareTable(wares: chest, onOpen: onOpenWare, markOwned: false),
+                      WareTable(
+                        wares: chest,
+                        onOpen: onOpenWare,
+                        markOwned: false,
+                      ),
                   ],
                 ),
               ),

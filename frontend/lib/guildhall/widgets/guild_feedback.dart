@@ -41,7 +41,9 @@ class GuildButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = onPressed != null;
     final fill = enabled ? kind.fill : GuildColors.indigoDeep;
-    final text = enabled ? kind.text : GuildColors.cream.withValues(alpha: 0.72);
+    final text = enabled
+        ? kind.text
+        : GuildColors.cream.withValues(alpha: 0.72);
     final border = enabled ? kind.border : GuildColors.chalkLine;
 
     return Semantics(
@@ -53,13 +55,19 @@ class GuildButton extends StatelessWidget {
         onTap: onPressed,
         haptic: true,
         child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 56, minWidth: expand ? double.infinity : 0),
+          constraints: BoxConstraints(
+            minHeight: 56,
+            minWidth: expand ? double.infinity : 0,
+          ),
           child: SketchBox(
             color: fill,
             borderColor: border,
             shadow: enabled ? const Offset(2, 3) : null,
             seed: stableSeed(label),
-            padding: const EdgeInsets.symmetric(horizontal: 20.5, vertical: 12.5),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.5,
+              vertical: 12.5,
+            ),
             child: Row(
               mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -72,7 +80,11 @@ class GuildButton extends StatelessWidget {
                   child: Text(
                     label,
                     textAlign: TextAlign.center,
-                    style: GuildText.label(GuildType.md, color: text, spacing: 1),
+                    style: GuildText.label(
+                      GuildType.md,
+                      color: text,
+                      spacing: 1,
+                    ),
                   ),
                 ),
               ],
@@ -112,19 +124,21 @@ class GuildNote extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(title, textAlign: TextAlign.center, style: GuildText.title(GuildType.xl)),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: GuildText.title(GuildType.xl),
+                ),
                 if (message != null) ...[
                   const SizedBox(height: 8),
-                  Text(message!, textAlign: TextAlign.center, style: GuildText.body(GuildType.md)),
+                  Text(
+                    message!,
+                    textAlign: TextAlign.center,
+                    style: GuildText.body(GuildType.md),
+                  ),
                 ],
-                if (busy) ...[
-                  const SizedBox(height: 16),
-                  const _InkDots(),
-                ],
-                if (action != null) ...[
-                  const SizedBox(height: 20),
-                  action!,
-                ],
+                if (busy) ...[const SizedBox(height: 16), const _InkDots()],
+                if (action != null) ...[const SizedBox(height: 20), action!],
               ],
             ),
           ),
@@ -140,15 +154,20 @@ class _Nail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: 16,
-        height: 16,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: GuildColors.brick,
-          border: Border.all(color: GuildColors.brickDeep, width: 1),
-          boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.45), offset: const Offset(1, 2))],
+    width: 16,
+    height: 16,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: GuildColors.brick,
+      border: Border.all(color: GuildColors.brickDeep, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: GuildColors.shadow.withValues(alpha: 0.45),
+          offset: const Offset(1, 2),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _InkDots extends StatefulWidget {
@@ -158,9 +177,12 @@ class _InkDots extends StatefulWidget {
   State<_InkDots> createState() => _InkDotsState();
 }
 
-class _InkDotsState extends State<_InkDots> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+class _InkDotsState extends State<_InkDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  );
 
   @override
   void didChangeDependencies() {
@@ -195,7 +217,9 @@ class _InkDotsState extends State<_InkDots> with SingleTickerProviderStateMixin 
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: GuildColors.ink.withValues(
-                    alpha: 0.25 + 0.75 * (1 - ((_c.value * 3 - i).abs().clamp(0, 1))),
+                    alpha:
+                        0.25 +
+                        0.75 * (1 - ((_c.value * 3 - i).abs().clamp(0, 1))),
                   ),
                 ),
               ),
@@ -226,11 +250,22 @@ Future<bool> showGuildConfirm(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(title, textAlign: TextAlign.center, style: GuildText.title(GuildType.xl)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GuildText.title(GuildType.xl),
+            ),
             const SizedBox(height: 10),
-            Text(message, textAlign: TextAlign.center, style: GuildText.body(GuildType.md)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GuildText.body(GuildType.md),
+            ),
             const SizedBox(height: 22),
-            GuildButton(label: cancelLabel, onPressed: () => Navigator.pop(context, false)),
+            GuildButton(
+              label: cancelLabel,
+              onPressed: () => Navigator.pop(context, false),
+            ),
             const SizedBox(height: 6),
             Semantics(
               button: true,
@@ -243,10 +278,14 @@ Future<bool> showGuildConfirm(
                   child: Center(
                     child: Text(
                       confirmLabel,
-                      style: GuildText.body(GuildType.md, color: GuildColors.brickDeep).copyWith(
-                        decoration: TextDecoration.underline,
-                        decorationColor: GuildColors.brickDeep,
-                      ),
+                      style:
+                          GuildText.body(
+                            GuildType.md,
+                            color: GuildColors.brickDeep,
+                          ).copyWith(
+                            decoration: TextDecoration.underline,
+                            decorationColor: GuildColors.brickDeep,
+                          ),
                     ),
                   ),
                 ),
@@ -293,7 +332,8 @@ class _GuildToast extends StatefulWidget {
   State<_GuildToast> createState() => _GuildToastState();
 }
 
-class _GuildToastState extends State<_GuildToast> with SingleTickerProviderStateMixin {
+class _GuildToastState extends State<_GuildToast>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
     duration: GuildMotion.quick,
@@ -326,8 +366,10 @@ class _GuildToastState extends State<_GuildToast> with SingleTickerProviderState
   Widget build(BuildContext context) {
     final reduced = MediaQuery.disableAnimationsOf(context);
     final slide = _c.drive(
-      Tween(begin: reduced ? Offset.zero : const Offset(0, -1.2), end: Offset.zero)
-          .chain(CurveTween(curve: Curves.easeOutCubic)),
+      Tween(
+        begin: reduced ? Offset.zero : const Offset(0, -1.2),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeOutCubic)),
     );
     return Positioned(
       top: MediaQuery.paddingOf(context).top + 8,
@@ -356,7 +398,10 @@ class _GuildToastState extends State<_GuildToast> with SingleTickerProviderState
                       child: Text(
                         widget.message,
                         textAlign: TextAlign.center,
-                        style: GuildText.body(GuildType.md, color: GuildColors.ink),
+                        style: GuildText.body(
+                          GuildType.md,
+                          color: GuildColors.ink,
+                        ),
                       ),
                     ),
                   ),

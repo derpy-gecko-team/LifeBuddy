@@ -65,8 +65,9 @@ class _NinePatchBoxState extends State<NinePatchBox> {
   }
 
   void _subscribe() {
-    final next = AssetImage(widget.asset)
-        .resolve(createLocalImageConfiguration(context));
+    final next = AssetImage(
+      widget.asset,
+    ).resolve(createLocalImageConfiguration(context));
     if (next.key == _stream?.key) return;
     _stream?.removeListener(_listener);
     _stream = next..addListener(_listener);

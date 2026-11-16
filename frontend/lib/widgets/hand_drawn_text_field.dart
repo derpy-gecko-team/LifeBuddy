@@ -32,83 +32,84 @@ class HandDrawnTextField extends FormField<String> {
     bool autocorrect = true,
     bool enableSuggestions = true,
   }) : super(
-          initialValue: '',
-          // Always validate the controller's live text, never a stale copy.
-          validator:
-              validator == null ? null : (_) => validator(controller.text),
-          builder: (field) {
-            final theme = Theme.of(field.context);
-            final isEnabled = field.widget.enabled;
-            final textStyle = theme.textTheme.bodyLarge;
+         initialValue: '',
+         // Always validate the controller's live text, never a stale copy.
+         validator: validator == null
+             ? null
+             : (_) => validator(controller.text),
+         builder: (field) {
+           final theme = Theme.of(field.context);
+           final isEnabled = field.widget.enabled;
+           final textStyle = theme.textTheme.bodyLarge;
 
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 150),
-                  opacity: isEnabled ? 1 : 0.6,
-                  child: NinePatchBox(
-                    asset: _borderAsset,
-                    slice: _borderSlice,
-                    imageScale: _borderScale,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 6,
-                    ),
-                    child: ConstrainedBox(
-                      // Same height for every field, with or without a suffix.
-                      constraints: const BoxConstraints(minHeight: 52),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: controller,
-                              enabled: isEnabled,
-                              obscureText: obscureText,
-                              keyboardType: keyboardType,
-                              textInputAction: textInputAction,
-                              autofillHints: autofillHints,
-                              autocorrect: autocorrect,
-                              enableSuggestions: enableSuggestions,
-                              onSubmitted: onSubmitted,
-                              style: textStyle,
-                              decoration: InputDecoration.collapsed(
-                                hintText: hint,
-                                hintStyle: textStyle?.copyWith(
-                                  color: AppColors.inkFaded,
-                                ),
-                              ),
-                            ),
-                          ),
-                          ?suffix,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Error text slides open instead of popping in.
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  alignment: Alignment.topCenter,
-                  child: field.hasError
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 6, left: 8),
-                          child: Text(
-                            field.errorText!,
-                            style: textStyle?.copyWith(
-                              fontSize: 14,
-                              color: theme.colorScheme.error,
-                            ),
-                          ),
-                        )
-                      : const SizedBox(width: double.infinity),
-                ),
-              ],
-            );
-          },
-        );
+           return Column(
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.stretch,
+             children: [
+               AnimatedOpacity(
+                 duration: const Duration(milliseconds: 150),
+                 opacity: isEnabled ? 1 : 0.6,
+                 child: NinePatchBox(
+                   asset: _borderAsset,
+                   slice: _borderSlice,
+                   imageScale: _borderScale,
+                   padding: const EdgeInsets.symmetric(
+                     horizontal: 20,
+                     vertical: 6,
+                   ),
+                   child: ConstrainedBox(
+                     // Same height for every field, with or without a suffix.
+                     constraints: const BoxConstraints(minHeight: 52),
+                     child: Row(
+                       children: [
+                         Expanded(
+                           child: TextField(
+                             controller: controller,
+                             enabled: isEnabled,
+                             obscureText: obscureText,
+                             keyboardType: keyboardType,
+                             textInputAction: textInputAction,
+                             autofillHints: autofillHints,
+                             autocorrect: autocorrect,
+                             enableSuggestions: enableSuggestions,
+                             onSubmitted: onSubmitted,
+                             style: textStyle,
+                             decoration: InputDecoration.collapsed(
+                               hintText: hint,
+                               hintStyle: textStyle?.copyWith(
+                                 color: AppColors.inkFaded,
+                               ),
+                             ),
+                           ),
+                         ),
+                         ?suffix,
+                       ],
+                     ),
+                   ),
+                 ),
+               ),
+               // Error text slides open instead of popping in.
+               AnimatedSize(
+                 duration: const Duration(milliseconds: 200),
+                 curve: Curves.easeOut,
+                 alignment: Alignment.topCenter,
+                 child: field.hasError
+                     ? Padding(
+                         padding: const EdgeInsets.only(top: 6, left: 8),
+                         child: Text(
+                           field.errorText!,
+                           style: textStyle?.copyWith(
+                             fontSize: 14,
+                             color: theme.colorScheme.error,
+                           ),
+                         ),
+                       )
+                     : const SizedBox(width: double.infinity),
+               ),
+             ],
+           );
+         },
+       );
 
   final TextEditingController controller;
 

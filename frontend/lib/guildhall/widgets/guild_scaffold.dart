@@ -34,7 +34,8 @@ class _GuildScaffoldState extends State<GuildScaffold> {
   }
 
   bool _onScroll(ScrollNotification n) {
-    if (n.depth == 0 && n.metrics.axis == Axis.vertical) _scrolled.value = n.metrics.pixels;
+    if (n.depth == 0 && n.metrics.axis == Axis.vertical)
+      _scrolled.value = n.metrics.pixels;
     return false;
   }
 
@@ -48,12 +49,14 @@ class _GuildScaffoldState extends State<GuildScaffold> {
           maxScaleFactor: 1.5,
           child: Stack(
             children: [
-              Positioned.fill(child: PaintedWall(variant: widget.wall, scroll: _scrolled)),
+              Positioned.fill(
+                child: PaintedWall(variant: widget.wall, scroll: _scrolled),
+              ),
               SafeArea(
                 child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: PointerDeviceKind.values.toSet(),
-                  ),
+                  behavior: ScrollConfiguration.of(
+                    context,
+                  ).copyWith(dragDevices: PointerDeviceKind.values.toSet()),
                   child: NotificationListener<ScrollNotification>(
                     onNotification: _onScroll,
                     child: Column(
@@ -74,7 +77,12 @@ class _GuildScaffoldState extends State<GuildScaffold> {
 }
 
 class GuildBackLink extends StatelessWidget {
-  const GuildBackLink({super.key, required this.label, required this.onTap, this.showLabel = true});
+  const GuildBackLink({
+    super.key,
+    required this.label,
+    required this.onTap,
+    this.showLabel = true,
+  });
 
   final String label;
   final VoidCallback onTap;
@@ -102,7 +110,10 @@ class GuildBackLink extends StatelessWidget {
                     child: Text(
                       label,
                       overflow: TextOverflow.ellipsis,
-                      style: GuildText.hand(GuildType.lg, color: GuildColors.cream),
+                      style: GuildText.hand(
+                        GuildType.lg,
+                        color: GuildColors.cream,
+                      ),
                     ),
                   ),
                 ],

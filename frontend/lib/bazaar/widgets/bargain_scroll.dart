@@ -12,10 +12,10 @@ import 'bazaar_widgets.dart';
 enum BargainChoice { wear, browse }
 
 String wearLabel(Ware ware) => switch (ware.category) {
-      WareCategory.buddy => 'Call it to your side',
-      WareCategory.title => 'Take the title',
-      _ => 'Wear it now',
-    };
+  WareCategory.buddy => 'Call it to your side',
+  WareCategory.title => 'Take the title',
+  _ => 'Wear it now',
+};
 
 Future<BargainChoice?> showBargainSealed(
   BuildContext context, {
@@ -40,12 +40,17 @@ Future<BargainChoice?> showBargainSealed(
         ),
       ),
     ),
-    transitionBuilder: (context, animation, _, child) => FadeTransition(opacity: animation, child: child),
+    transitionBuilder: (context, animation, _, child) =>
+        FadeTransition(opacity: animation, child: child),
   );
 }
 
 class _BargainScroll extends StatefulWidget {
-  const _BargainScroll({required this.ware, required this.before, required this.after});
+  const _BargainScroll({
+    required this.ware,
+    required this.before,
+    required this.after,
+  });
 
   final Ware ware;
   final Purse before;
@@ -55,8 +60,12 @@ class _BargainScroll extends StatefulWidget {
   State<_BargainScroll> createState() => _BargainScrollState();
 }
 
-class _BargainScrollState extends State<_BargainScroll> with SingleTickerProviderStateMixin {
-  late final AnimationController _unroll = AnimationController(vsync: this, duration: const Duration(milliseconds: 520));
+class _BargainScrollState extends State<_BargainScroll>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _unroll = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 520),
+  );
   bool _animate = true;
   bool _started = false;
 
@@ -84,12 +93,16 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       decoration: const BoxDecoration(
         color: GuildColors.parchment,
-        border: Border.symmetric(vertical: BorderSide(color: GuildColors.tan, width: 2)),
+        border: Border.symmetric(
+          vertical: BorderSide(color: GuildColors.tan, width: 2),
+        ),
       ),
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 26, 16, 20),
         decoration: const BoxDecoration(
-          border: Border.symmetric(vertical: BorderSide(color: GuildColors.tan, width: 1)),
+          border: Border.symmetric(
+            vertical: BorderSide(color: GuildColors.tan, width: 1),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -103,7 +116,10 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
                     Text(
                       'Bargain sealed!',
                       textAlign: TextAlign.center,
-                      style: GuildText.title(GuildType.xxl, color: GuildColors.brick),
+                      style: GuildText.title(
+                        GuildType.xxl,
+                        color: GuildColors.brick,
+                      ),
                     ),
                     const InkUnderline(),
                   ],
@@ -120,7 +136,8 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
             ),
             const SizedBox(height: 10),
             Semantics(
-              label: '${formatAmount(widget.after.of(currency))} ${currency.label} left',
+              label:
+                  '${formatAmount(widget.after.of(currency))} ${currency.label} left',
               excludeSemantics: true,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -129,14 +146,22 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
                   const SizedBox(width: 8),
                   Text(
                     formatAmount(widget.before.of(currency)),
-                    style: GuildText.hand(GuildType.md, color: GuildColors.inkSoft).copyWith(
-                      decoration: TextDecoration.lineThrough,
-                      decorationColor: GuildColors.inkSoft,
-                    ),
+                    style:
+                        GuildText.hand(
+                          GuildType.md,
+                          color: GuildColors.inkSoft,
+                        ).copyWith(
+                          decoration: TextDecoration.lineThrough,
+                          decorationColor: GuildColors.inkSoft,
+                        ),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: GuildIcon(GuildGlyph.chevronRight, size: 14, color: GuildColors.ink),
+                    child: GuildIcon(
+                      GuildGlyph.chevronRight,
+                      size: 14,
+                      color: GuildColors.ink,
+                    ),
                   ),
                   Text(
                     '${formatAmount(widget.after.of(currency))} ${currency.label}',
@@ -147,9 +172,15 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
             ),
             const SizedBox(height: 18),
             if (ware.wearable) ...[
-              GuildButton(label: wearLabel(ware), onPressed: () => Navigator.pop(context, BargainChoice.wear)),
+              GuildButton(
+                label: wearLabel(ware),
+                onPressed: () => Navigator.pop(context, BargainChoice.wear),
+              ),
               const SizedBox(height: 4),
-              _InkLink(label: 'Keep browsing the stall', onTap: () => Navigator.pop(context, BargainChoice.browse)),
+              _InkLink(
+                label: 'Keep browsing the stall',
+                onTap: () => Navigator.pop(context, BargainChoice.browse),
+              ),
             ] else
               GuildButton(
                 label: 'Keep browsing the stall',
@@ -175,7 +206,9 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
                   animation: _unroll,
                   builder: (context, child) => Align(
                     alignment: Alignment.topCenter,
-                    heightFactor: Curves.easeOutCubic.transform(_unroll.value).clamp(0.02, 1.0),
+                    heightFactor: Curves.easeOutCubic
+                        .transform(_unroll.value)
+                        .clamp(0.02, 1.0),
                     child: child,
                   ),
                   child: sheet,
@@ -204,8 +237,15 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
               right: star.right,
               top: star.top,
               child: FadeTransition(
-                opacity: CurvedAnimation(parent: _unroll, curve: Interval(0.35 + i * 0.12, 1)),
-                child: ChalkStar(size: star.size, seed: i + 5, color: GuildColors.gold),
+                opacity: CurvedAnimation(
+                  parent: _unroll,
+                  curve: Interval(0.35 + i * 0.12, 1),
+                ),
+                child: ChalkStar(
+                  size: star.size,
+                  seed: i + 5,
+                  color: GuildColors.gold,
+                ),
               ),
             ),
         ],
@@ -225,10 +265,19 @@ class _Roller extends StatelessWidget {
         color: const Color(0xFFE2D0AA),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: GuildColors.tan, width: 2),
-        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: GuildColors.shadow.withValues(alpha: 0.5),
+            offset: const Offset(2, 3),
+          ),
+        ],
       ),
       alignment: const Alignment(0, -0.35),
-      child: Container(height: 1.2, margin: const EdgeInsets.symmetric(horizontal: 14), color: GuildColors.tan),
+      child: Container(
+        height: 1.2,
+        margin: const EdgeInsets.symmetric(horizontal: 14),
+        color: GuildColors.tan,
+      ),
     );
   }
 }
@@ -246,7 +295,12 @@ class _SealedCheck extends StatelessWidget {
         color: GuildColors.brick,
         shape: BoxShape.circle,
         border: Border.all(color: GuildColors.cream, width: 2.4),
-        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: GuildColors.shadow.withValues(alpha: 0.5),
+            offset: const Offset(2, 3),
+          ),
+        ],
       ),
       child: const GuildIcon(GuildGlyph.check, size: 26),
     );
@@ -272,10 +326,11 @@ class _InkLink extends StatelessWidget {
           child: Center(
             child: Text(
               label,
-              style: GuildText.body(GuildType.md, color: GuildColors.brickDeep).copyWith(
-                decoration: TextDecoration.underline,
-                decorationColor: GuildColors.brickDeep,
-              ),
+              style: GuildText.body(GuildType.md, color: GuildColors.brickDeep)
+                  .copyWith(
+                    decoration: TextDecoration.underline,
+                    decorationColor: GuildColors.brickDeep,
+                  ),
             ),
           ),
         ),

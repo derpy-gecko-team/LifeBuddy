@@ -53,7 +53,8 @@ class _ClaimCeremony extends StatefulWidget {
   State<_ClaimCeremony> createState() => _ClaimCeremonyState();
 }
 
-class _ClaimCeremonyState extends State<_ClaimCeremony> with SingleTickerProviderStateMixin {
+class _ClaimCeremonyState extends State<_ClaimCeremony>
+    with SingleTickerProviderStateMixin {
   bool get _rankUp => widget.after.level > widget.before.level;
 
   late final AnimationController _c = AnimationController(
@@ -134,12 +135,19 @@ class _ClaimCeremonyState extends State<_ClaimCeremony> with SingleTickerProvide
                   ? _lerp(widget.before.progress, 1, _fill.transform(t))
                   : _lerp(0, widget.after.progress, _refill.transform(t));
             } else {
-              bar = _lerp(widget.before.progress, widget.after.progress, _fill.transform(t));
+              bar = _lerp(
+                widget.before.progress,
+                widget.after.progress,
+                _fill.transform(t),
+              );
             }
-            final hero = reduced || shownRankedUp || !_rankUp ? widget.after : widget.before;
+            final hero = reduced || shownRankedUp || !_rankUp
+                ? widget.after
+                : widget.before;
 
             final fly = _fly.transform(t);
-            final showToken = !reduced && widget.from != null && t > 0.05 && t < 0.25;
+            final showToken =
+                !reduced && widget.from != null && t > 0.05 && t < 0.25;
 
             return Stack(
               children: [
@@ -179,13 +187,24 @@ class _ClaimCeremonyState extends State<_ClaimCeremony> with SingleTickerProvide
                     width: 120,
                     child: IgnorePointer(
                       child: Opacity(
-                        opacity: (1 - (fly - 0.8).clamp(0.0, 0.2) * 5).clamp(0.0, 1.0).toDouble(),
+                        opacity: (1 - (fly - 0.8).clamp(0.0, 0.2) * 5)
+                            .clamp(0.0, 1.0)
+                            .toDouble(),
                         child: Text(
                           '+${widget.xpGained} XP',
                           textAlign: TextAlign.center,
-                          style: GuildText.label(GuildType.xl, color: GuildColors.goldBright).copyWith(
-                            shadows: const [Shadow(color: GuildColors.shadow, offset: Offset(2, 2))],
-                          ),
+                          style:
+                              GuildText.label(
+                                GuildType.xl,
+                                color: GuildColors.goldBright,
+                              ).copyWith(
+                                shadows: const [
+                                  Shadow(
+                                    color: GuildColors.shadow,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
                         ),
                       ),
                     ),
@@ -247,7 +266,13 @@ class _SignContent extends StatelessWidget {
                           style: GuildText.title(GuildType.lg),
                         ),
                       ),
-                      Text('+$xpGained XP', style: GuildText.label(GuildType.md, color: GuildColors.bronze)),
+                      Text(
+                        '+$xpGained XP',
+                        style: GuildText.label(
+                          GuildType.md,
+                          color: GuildColors.bronze,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),

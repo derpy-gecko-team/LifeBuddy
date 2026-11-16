@@ -1,12 +1,4 @@
-enum QuestStatus {
-  open,
-
-  sworn,
-
-  sealed,
-
-  fulfilled,
-}
+enum QuestStatus { open, sworn, sealed, fulfilled }
 
 enum Peril {
   minor(1, 'Minor'),
@@ -85,26 +77,26 @@ class Quest {
     List<Trial>? trials,
     String? sealedReason,
     bool clearSealedReason = false,
-  }) =>
-      Quest(
-        id: id,
-        journeyId: journeyId,
-        title: title,
-        flavor: flavor,
-        description: description,
-        iconAsset: iconAsset,
-        xp: xp,
-        peril: peril,
-        status: status ?? this.status,
-        trials: trials ?? this.trials,
-        deadline: deadline,
-        isBoss: isBoss,
-        titleReward: titleReward,
-        sealedReason:
-            clearSealedReason ? null : (sealedReason ?? this.sealedReason),
-        prerequisiteId: prerequisiteId,
-        paper: paper,
-      );
+  }) => Quest(
+    id: id,
+    journeyId: journeyId,
+    title: title,
+    flavor: flavor,
+    description: description,
+    iconAsset: iconAsset,
+    xp: xp,
+    peril: peril,
+    status: status ?? this.status,
+    trials: trials ?? this.trials,
+    deadline: deadline,
+    isBoss: isBoss,
+    titleReward: titleReward,
+    sealedReason: clearSealedReason
+        ? null
+        : (sealedReason ?? this.sealedReason),
+    prerequisiteId: prerequisiteId,
+    paper: paper,
+  );
 }
 
 class Journey {
@@ -135,14 +127,14 @@ class Journey {
   bool get isComplete => quests.isNotEmpty && fulfilledCount == quests.length;
 
   Journey copyWith({List<Quest>? quests}) => Journey(
-        id: id,
-        name: name,
-        emblemAsset: emblemAsset,
-        quote: quote,
-        bountyXp: bountyXp,
-        bountyTitle: bountyTitle,
-        quests: quests ?? this.quests,
-      );
+    id: id,
+    name: name,
+    emblemAsset: emblemAsset,
+    quote: quote,
+    bountyXp: bountyXp,
+    bountyTitle: bountyTitle,
+    quests: quests ?? this.quests,
+  );
 }
 
 class HeroProgress {
@@ -163,12 +155,12 @@ class HeroProgress {
   double get progress => xpToNext == 0 ? 0 : (xp / xpToNext).clamp(0, 1);
 
   HeroProgress copyWith({int? level, int? xp, int? coins}) => HeroProgress(
-        rankTitle: rankTitle,
-        level: level ?? this.level,
-        xp: xp ?? this.xp,
-        xpToNext: xpToNext,
-        coins: coins ?? this.coins,
-      );
+    rankTitle: rankTitle,
+    level: level ?? this.level,
+    xp: xp ?? this.xp,
+    xpToNext: xpToNext,
+    coins: coins ?? this.coins,
+  );
 }
 
 class GuildHallData {

@@ -6,10 +6,10 @@ import '../data/models.dart';
 import '../theme/guild_theme.dart';
 
 Color paperColor(PaperTone tone) => switch (tone) {
-      PaperTone.parchment => GuildColors.parchment,
-      PaperTone.sage => GuildColors.mist,
-      PaperTone.vellum => GuildColors.vellum,
-    };
+  PaperTone.parchment => GuildColors.parchment,
+  PaperTone.sage => GuildColors.mist,
+  PaperTone.vellum => GuildColors.vellum,
+};
 
 class TornPaper extends StatelessWidget {
   const TornPaper({
@@ -32,18 +32,17 @@ class TornPaper extends StatelessWidget {
     double tear = 6,
     double? tearBottom,
     EdgeInsets padding = const EdgeInsets.all(16),
-  }) =>
-      TornPaper(
-        key: key,
-        color: paperColor(tone),
-        foldColor: tone == PaperTone.sage ? GuildColors.mistDark : null,
-        foldCorner: tone == PaperTone.sage,
-        seed: seed,
-        tear: tone == PaperTone.vellum ? tear * 1.5 : tear,
-        tearBottom: tearBottom,
-        padding: padding,
-        child: child,
-      );
+  }) => TornPaper(
+    key: key,
+    color: paperColor(tone),
+    foldColor: tone == PaperTone.sage ? GuildColors.mistDark : null,
+    foldCorner: tone == PaperTone.sage,
+    seed: seed,
+    tear: tone == PaperTone.vellum ? tear * 1.5 : tear,
+    tearBottom: tearBottom,
+    padding: padding,
+    child: child,
+  );
 
   final Widget child;
   final Color color;
@@ -72,7 +71,13 @@ class TornPaper extends StatelessWidget {
   }
 }
 
-typedef _Sheet = ({Path outline, Path loose, Path hatch, Path smudge, Path flecks});
+typedef _Sheet = ({
+  Path outline,
+  Path loose,
+  Path hatch,
+  Path smudge,
+  Path flecks,
+});
 
 @immutable
 class _TearShape {
@@ -113,7 +118,11 @@ class _TearShape {
     void add(double x, double y) => points.add(Offset(x, y));
 
     add(jag(tear), jag(tear));
-    for (var x = 12.0; x < s.width - (foldCorner ? fold : 12); x += 10 + rnd.nextDouble() * 14) {
+    for (
+      var x = 12.0;
+      x < s.width - (foldCorner ? fold : 12);
+      x += 10 + rnd.nextDouble() * 14
+    ) {
       add(x, jag(tear));
     }
     if (foldCorner) {
@@ -141,8 +150,14 @@ class _TearShape {
     var penDown = false;
     for (var i = 0; i <= points.length; i++) {
       final p = points[i % points.length];
-      final x = p.dx + (s.width / 2 - p.dx).sign * 2.4 + (pen.nextDouble() - 0.5) * 2.4;
-      final y = p.dy + (s.height / 2 - p.dy).sign * 2.4 + (pen.nextDouble() - 0.5) * 2.4;
+      final x =
+          p.dx +
+          (s.width / 2 - p.dx).sign * 2.4 +
+          (pen.nextDouble() - 0.5) * 2.4;
+      final y =
+          p.dy +
+          (s.height / 2 - p.dy).sign * 2.4 +
+          (pen.nextDouble() - 0.5) * 2.4;
       if (penDown && pen.nextDouble() > 0.12) {
         path.lineTo(x, y);
       } else {
@@ -167,10 +182,19 @@ class _TearShape {
     for (var x = s.width - 4; x > 6; x -= 4.5 + pen.nextDouble() * 2.5) {
       final near = ((x - (s.width - corner)) / corner).clamp(0.0, 1.0);
       if (near == 0 && pen.nextDouble() < 0.45) continue;
-      stroke(x, s.height - tearBottom * 0.3, upLeft, 5 + near * near * 24 + pen.nextDouble() * 5);
+      stroke(
+        x,
+        s.height - tearBottom * 0.3,
+        upLeft,
+        5 + near * near * 24 + pen.nextDouble() * 5,
+      );
     }
     final side = min(s.height * 0.5, 150.0);
-    for (var y = s.height - 10; y > s.height - side; y -= 5 + pen.nextDouble() * 3) {
+    for (
+      var y = s.height - 10;
+      y > s.height - side;
+      y -= 5 + pen.nextDouble() * 3
+    ) {
       final near = (y - (s.height - side)) / side;
       stroke(s.width - 1, y, upLeft, 4 + near * 13 + pen.nextDouble() * 4);
     }
@@ -227,7 +251,11 @@ class _TearShape {
 }
 
 class _TornPaperPainter extends CustomPainter {
-  _TornPaperPainter({required this.shape, required this.color, required this.foldColor});
+  _TornPaperPainter({
+    required this.shape,
+    required this.color,
+    required this.foldColor,
+  });
 
   final _TearShape shape;
   final Color color;

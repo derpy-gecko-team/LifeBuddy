@@ -5,15 +5,11 @@ import 'package:lifebuddy/widgets/hand_drawn_text_field.dart';
 
 /// Each callback returns an error message to display, or null on success.
 class LoginForm extends StatefulWidget {
-  const LoginForm({
-    super.key,
-    required this.onLogin,
-    required this.onRegister,
-  });
+  const LoginForm({super.key, required this.onLogin, required this.onRegister});
 
   final Future<String?> Function(String identifier, String password) onLogin;
   final Future<String?> Function(String username, String email, String password)
-      onRegister;
+  onRegister;
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -72,7 +68,8 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     if (!mounted) return; // on success the parent usually navigates away
-    if (error == null) TextInput.finishAutofillContext(); // offer to save password
+    if (error == null)
+      TextInput.finishAutofillContext(); // offer to save password
     setState(() {
       _loading = false;
       _error = error;
@@ -87,9 +84,11 @@ class _LoginFormState extends State<LoginForm> {
     final email = _email.text.trim();
     final password = _password.text; // never trim passwords
 
-    await _run(() => _isRegister
-        ? widget.onRegister(username, email, password)
-        : widget.onLogin(username, password));
+    await _run(
+      () => _isRegister
+          ? widget.onRegister(username, email, password)
+          : widget.onLogin(username, password),
+    );
   }
 
   @override
@@ -168,12 +167,15 @@ class _LoginFormState extends State<LoginForm> {
                           obscureText: _obscure,
                           hint: 'Password',
                           suffix: IconButton(
-                            tooltip:
-                                _obscure ? 'Show password' : 'Hide password',
+                            tooltip: _obscure
+                                ? 'Show password'
+                                : 'Hide password',
                             visualDensity: VisualDensity.compact,
-                            icon: Icon(_obscure
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined),
+                            icon: Icon(
+                              _obscure
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
                             onPressed: () =>
                                 setState(() => _obscure = !_obscure),
                           ),

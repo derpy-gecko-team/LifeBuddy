@@ -22,7 +22,8 @@ String formatAmount(int n) {
   return out.toString();
 }
 
-String formatPrice(Price price) => '${formatAmount(price.amount)} ${price.currency.label}';
+String formatPrice(Price price) =>
+    '${formatAmount(price.amount)} ${price.currency.label}';
 
 String leavesLabel(DateTime leavesAt, DateTime now) {
   final left = leavesAt.difference(now);
@@ -33,9 +34,9 @@ String leavesLabel(DateTime leavesAt, DateTime now) {
 }
 
 String currencyAsset(Currency currency) => switch (currency) {
-      Currency.gold => BazaarAssets.coin,
-      Currency.moonstones => BazaarAssets.moonstone,
-    };
+  Currency.gold => BazaarAssets.coin,
+  Currency.moonstones => BazaarAssets.moonstone,
+};
 
 class CurrencyIcon extends StatelessWidget {
   const CurrencyIcon(this.currency, {super.key, this.size = 20});
@@ -45,8 +46,13 @@ class CurrencyIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
-        child: Image.asset(currencyAsset(currency), width: size, height: size, filterQuality: FilterQuality.medium),
-      );
+    child: Image.asset(
+      currencyAsset(currency),
+      width: size,
+      height: size,
+      filterQuality: FilterQuality.medium,
+    ),
+  );
 }
 
 class WareArt extends StatelessWidget {
@@ -57,19 +63,24 @@ class WareArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
-        child: Image.asset(
-          asset,
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.medium,
-          gaplessPlayback: true,
-        ),
-      );
+    child: Image.asset(
+      asset,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+      gaplessPlayback: true,
+    ),
+  );
 }
 
 class RarityMark extends StatelessWidget {
-  const RarityMark(this.rarity, {super.key, this.size = GuildType.sm, this.color = GuildColors.ink});
+  const RarityMark(
+    this.rarity, {
+    super.key,
+    this.size = GuildType.sm,
+    this.color = GuildColors.ink,
+  });
 
   final Rarity rarity;
   final double size;
@@ -80,9 +91,14 @@ class RarityMark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox.square(dimension: size * 0.9, child: CustomPaint(painter: _DiamondPainter(rarity, color))),
+        SizedBox.square(
+          dimension: size * 0.9,
+          child: CustomPaint(painter: _DiamondPainter(rarity, color)),
+        ),
         SizedBox(width: size * 0.4),
-        Flexible(child: Text(rarity.label, style: GuildText.hand(size, color: color))),
+        Flexible(
+          child: Text(rarity.label, style: GuildText.hand(size, color: color)),
+        ),
       ],
     );
   }
@@ -108,12 +124,22 @@ class _DiamondPainter extends CustomPainter {
       Rarity.rare => const Color(0xFF8D93C9),
       Rarity.legendary => GuildColors.gold,
     };
-    if (fill != null) canvas.drawPath(path, Paint()..color = fill.withValues(alpha: ink.a));
-    canvas.drawPath(path, Sketch.pen(rarity == Rarity.legendary ? GuildColors.bronze.withValues(alpha: ink.a) : ink, 1.6));
+    if (fill != null)
+      canvas.drawPath(path, Paint()..color = fill.withValues(alpha: ink.a));
+    canvas.drawPath(
+      path,
+      Sketch.pen(
+        rarity == Rarity.legendary
+            ? GuildColors.bronze.withValues(alpha: ink.a)
+            : ink,
+        1.6,
+      ),
+    );
   }
 
   @override
-  bool shouldRepaint(_DiamondPainter old) => old.rarity != rarity || old.ink != ink;
+  bool shouldRepaint(_DiamondPainter old) =>
+      old.rarity != rarity || old.ink != ink;
 }
 
 class PriceTag extends StatelessWidget {
@@ -125,15 +151,25 @@ class PriceTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _PriceTagPainter(stableSeed('${price.amount}${price.currency.name}')),
+      painter: _PriceTagPainter(
+        stableSeed('${price.amount}${price.currency.name}'),
+      ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(size * 1.75, size * 0.34, size * 1.1, size * 0.34),
+        padding: EdgeInsets.fromLTRB(
+          size * 1.75,
+          size * 0.34,
+          size * 1.1,
+          size * 0.34,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             CurrencyIcon(price.currency, size: size * 1.2),
             SizedBox(width: size * 0.4),
-            Text(formatAmount(price.amount), style: GuildText.title(size * 1.15, color: GuildColors.ink)),
+            Text(
+              formatAmount(price.amount),
+              style: GuildText.title(size * 1.15, color: GuildColors.ink),
+            ),
           ],
         ),
       ),
@@ -157,7 +193,11 @@ class _PriceTagPainter extends CustomPainter {
     ], seed);
     sketch.paintFill(canvas, GuildColors.vellum, shadow: const Offset(1.5, 2));
     sketch.paintBorder(canvas, color: GuildColors.ink, width: 1.7);
-    canvas.drawCircle(Offset(point + 2, size.height / 2), 2.8, Paint()..color = GuildColors.indigoDeep);
+    canvas.drawCircle(
+      Offset(point + 2, size.height / 2),
+      2.8,
+      Paint()..color = GuildColors.indigoDeep,
+    );
   }
 
   @override
@@ -182,12 +222,18 @@ class OwnedStamp extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.fromLTRB(8, 1, 6, 1),
           decoration: BoxDecoration(
-            border: Border.all(color: GuildColors.brick.withValues(alpha: 0.6), width: 1),
+            border: Border.all(
+              color: GuildColors.brick.withValues(alpha: 0.6),
+              width: 1,
+            ),
             borderRadius: BorderRadius.circular(2),
           ),
           child: Text(
             label,
-            style: GuildText.title(GuildType.md, color: GuildColors.brick).copyWith(letterSpacing: 2.4),
+            style: GuildText.title(
+              GuildType.md,
+              color: GuildColors.brick,
+            ).copyWith(letterSpacing: 2.4),
           ),
         ),
       ),
@@ -196,7 +242,12 @@ class OwnedStamp extends StatelessWidget {
 }
 
 class RuledFrame extends StatelessWidget {
-  const RuledFrame({super.key, required this.child, this.padding = const EdgeInsets.all(12), this.color});
+  const RuledFrame({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(12),
+    this.color,
+  });
 
   final Widget child;
   final EdgeInsets padding;
@@ -210,7 +261,12 @@ class RuledFrame extends StatelessWidget {
       decoration: BoxDecoration(border: Border.all(color: line, width: 1.6)),
       child: Container(
         padding: padding,
-        decoration: BoxDecoration(border: Border.all(color: line.withValues(alpha: line.a * 0.7), width: 1)),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: line.withValues(alpha: line.a * 0.7),
+            width: 1,
+          ),
+        ),
         child: child,
       ),
     );
@@ -223,8 +279,12 @@ class InkUnderline extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) =>
-      SizedBox(height: 6, child: ExcludeSemantics(child: CustomPaint(painter: _UnderlinePainter(color))));
+  Widget build(BuildContext context) => SizedBox(
+    height: 6,
+    child: ExcludeSemantics(
+      child: CustomPaint(painter: _UnderlinePainter(color)),
+    ),
+  );
 }
 
 class _UnderlinePainter extends CustomPainter {
@@ -266,8 +326,14 @@ class _RingedArt extends StatelessWidget {
         height: size,
         margin: const EdgeInsets.all(3),
         alignment: Alignment.center,
-        decoration: const BoxDecoration(color: GuildColors.vellum, shape: BoxShape.circle),
-        child: WareHero(ware: ware, child: WareArt(ware.artFor(ware.dye), size: size * 0.8)),
+        decoration: const BoxDecoration(
+          color: GuildColors.vellum,
+          shape: BoxShape.circle,
+        ),
+        child: WareHero(
+          ware: ware,
+          child: WareArt(ware.artFor(ware.dye), size: size * 0.8),
+        ),
       ),
     );
   }
@@ -280,7 +346,13 @@ String wareSemantics(Ware ware) => ware.owned
     : '${ware.name}, ${ware.shelf}, ${ware.rarity.label}, ${formatPrice(ware.price)}';
 
 class WareNote extends StatelessWidget {
-  const WareNote({super.key, required this.ware, required this.onOpen, this.tilt = 0, this.markOwned = true});
+  const WareNote({
+    super.key,
+    required this.ware,
+    required this.onOpen,
+    this.tilt = 0,
+    this.markOwned = true,
+  });
 
   final Ware ware;
   final VoidCallback onOpen;
@@ -317,39 +389,71 @@ class WareNote extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Opacity(opacity: owned ? 0.7 : 1, child: _RingedArt(ware: ware, size: 70)),
+                    Opacity(
+                      opacity: owned ? 0.7 : 1,
+                      child: _RingedArt(ware: ware, size: 70),
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       ware.shelf,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GuildText.label(GuildType.xs, color: GuildColors.pencil.withValues(alpha: quiet), spacing: 0.4),
+                      style: GuildText.label(
+                        GuildType.xs,
+                        color: GuildColors.pencil.withValues(alpha: quiet),
+                        spacing: 0.4,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       ware.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GuildText.title(GuildType.lg, color: GuildColors.brick.withValues(alpha: owned ? 0.65 : 1)),
+                      style: GuildText.title(
+                        GuildType.lg,
+                        color: GuildColors.brick.withValues(
+                          alpha: owned ? 0.65 : 1,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
-                    RarityMark(ware.rarity, color: GuildColors.ink.withValues(alpha: owned ? 0.6 : 1)),
+                    RarityMark(
+                      ware.rarity,
+                      color: GuildColors.ink.withValues(alpha: owned ? 0.6 : 1),
+                    ),
                     const SizedBox(height: 8),
                     if (ware.owned)
                       Text(
                         ware.worn ? 'In use' : 'In your chest',
-                        style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft),
+                        style: GuildText.hand(
+                          GuildType.sm,
+                          color: GuildColors.inkSoft,
+                        ),
                       )
                     else
-                      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: PriceTag(ware.price, size: 14)),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: PriceTag(ware.price, size: 14),
+                      ),
                   ],
                 ),
               ),
               if (taped)
-                const Positioned(top: -8, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape)))
+                const Positioned(
+                  top: -8,
+                  left: 0,
+                  right: 0,
+                  child: Center(child: Fastener(kind: FastenerKind.tape)),
+                )
               else
-                const Positioned(top: 6, right: 30, child: Fastener(kind: FastenerKind.pin)),
-              if (owned) const Positioned(top: 24, right: -5, child: OwnedStamp()),
+                const Positioned(
+                  top: 6,
+                  right: 30,
+                  child: Fastener(kind: FastenerKind.pin),
+                ),
+              if (owned)
+                const Positioned(top: 24, right: -5, child: OwnedStamp()),
             ],
           ),
         ),
@@ -359,7 +463,12 @@ class WareNote extends StatelessWidget {
 }
 
 class MirrorFrame extends StatelessWidget {
-  const MirrorFrame({super.key, required this.child, this.width = 196, this.height = 214});
+  const MirrorFrame({
+    super.key,
+    required this.child,
+    this.width = 196,
+    this.height = 214,
+  });
 
   final Widget child;
   final double width;
@@ -392,7 +501,10 @@ class _MirrorPainter extends CustomPainter {
     final outer = (Offset.zero & size).deflate(2);
     final inner = outer.deflate(MirrorFrame._rim);
     final ink = Sketch.pen(GuildColors.ink, 2.4);
-    canvas.drawOval(outer.shift(const Offset(2, 3)), Paint()..color = GuildColors.shadow.withValues(alpha: 0.35));
+    canvas.drawOval(
+      outer.shift(const Offset(2, 3)),
+      Paint()..color = GuildColors.shadow.withValues(alpha: 0.35),
+    );
     canvas.drawOval(outer, Paint()..color = GuildColors.gold);
     canvas.drawOval(outer, ink);
     canvas.drawOval(inner, Paint()..color = GuildColors.mist);
@@ -401,10 +513,19 @@ class _MirrorPainter extends CustomPainter {
     final mid = outer.deflate(MirrorFrame._rim / 2);
     for (var i = 0; i < 8; i++) {
       final a = i * pi / 4 - pi / 2;
-      final at = mid.center + Offset(cos(a) * mid.width / 2, sin(a) * mid.height / 2);
+      final at =
+          mid.center + Offset(cos(a) * mid.width / 2, sin(a) * mid.height / 2);
       final major = i.isEven;
-      canvas.drawCircle(at, major ? 4.6 : 2.8, Paint()..color = major ? GuildColors.brick : GuildColors.vellum);
-      canvas.drawCircle(at, major ? 4.6 : 2.8, Sketch.pen(GuildColors.ink, 1.5));
+      canvas.drawCircle(
+        at,
+        major ? 4.6 : 2.8,
+        Paint()..color = major ? GuildColors.brick : GuildColors.vellum,
+      );
+      canvas.drawCircle(
+        at,
+        major ? 4.6 : 2.8,
+        Sketch.pen(GuildColors.ink, 1.5),
+      );
     }
   }
 
@@ -434,8 +555,10 @@ class HeartMark extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) =>
-      SizedBox.square(dimension: size, child: CustomPaint(painter: _HeartPainter(filled)));
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: size,
+    child: CustomPaint(painter: _HeartPainter(filled)),
+  );
 }
 
 class _HeartPainter extends CustomPainter {
@@ -453,7 +576,10 @@ class _HeartPainter extends CustomPainter {
       ..cubicTo(s * 0.96, s * 0.2, s * 0.92, s * 0.58, s * 0.5, s * 0.86)
       ..close();
     if (filled) canvas.drawPath(path, Paint()..color = GuildColors.brick);
-    canvas.drawPath(path, Sketch.pen(filled ? GuildColors.cream : GuildColors.chalkLine, 2));
+    canvas.drawPath(
+      path,
+      Sketch.pen(filled ? GuildColors.cream : GuildColors.chalkLine, 2),
+    );
   }
 
   @override
@@ -461,7 +587,12 @@ class _HeartPainter extends CustomPainter {
 }
 
 class WareTable extends StatelessWidget {
-  const WareTable({super.key, required this.wares, required this.onOpen, this.markOwned = true});
+  const WareTable({
+    super.key,
+    required this.wares,
+    required this.onOpen,
+    this.markOwned = true,
+  });
 
   final List<Ware> wares;
   final OpenWare onOpen;
@@ -471,14 +602,19 @@ class WareTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final shelf = [for (final w in wares) w.id];
     Widget note(int i) => RepaintBoundary(
-          child: WareNote(
-            key: ValueKey(wares[i].id),
-            ware: wares[i],
-            onOpen: () => onOpen(wares[i].id, shelf: shelf),
-            markOwned: markOwned,
-            tilt: switch (i % 4) { 0 => -0.012, 1 => 0.014, 2 => 0.01, _ => -0.016 },
-          ),
-        );
+      child: WareNote(
+        key: ValueKey(wares[i].id),
+        ware: wares[i],
+        onOpen: () => onOpen(wares[i].id, shelf: shelf),
+        markOwned: markOwned,
+        tilt: switch (i % 4) {
+          0 => -0.012,
+          1 => 0.014,
+          2 => 0.01,
+          _ => -0.016,
+        },
+      ),
+    );
 
     return SketchBox(
       color: GuildColors.indigoDeep,
@@ -488,7 +624,9 @@ class WareTable extends StatelessWidget {
       seed: 83,
       padding: const EdgeInsets.all(6),
       child: Container(
-        decoration: BoxDecoration(border: Border.all(color: GuildColors.chalkLine, width: 1)),
+        decoration: BoxDecoration(
+          border: Border.all(color: GuildColors.chalkLine, width: 1),
+        ),
         padding: const EdgeInsets.fromLTRB(9, 20, 9, 14),
         child: Column(
           children: [
@@ -501,7 +639,11 @@ class WareTable extends StatelessWidget {
                     children: [
                       Expanded(child: note(i)),
                       const SizedBox(width: 18),
-                      Expanded(child: i + 1 < wares.length ? note(i + 1) : const SizedBox.shrink()),
+                      Expanded(
+                        child: i + 1 < wares.length
+                            ? note(i + 1)
+                            : const SizedBox.shrink(),
+                      ),
                     ],
                   ),
                 ),

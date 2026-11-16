@@ -73,9 +73,9 @@ class _LoginPageState extends State<LoginPage>
   Future<String?> _fakeAuth() async {
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return null;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeShell()));
     return null; // returning a String instead shows it as the error message
   }
 

@@ -4,7 +4,7 @@ import 'quest_repository.dart';
 
 class MockQuestRepository implements QuestRepository {
   MockQuestRepository({DateTime Function()? clock})
-      : _clock = clock ?? DateTime.now {
+    : _clock = clock ?? DateTime.now {
     _data = _seed(_clock());
   }
 
@@ -57,11 +57,18 @@ class MockQuestRepository implements QuestRepository {
       case QuestStatus.sealed:
         throw QuestActionException('This quest is sealed.');
       case QuestStatus.open:
-        throw QuestActionException('Swear the oath before attempting its trials.');
+        throw QuestActionException(
+          'Swear the oath before attempting its trials.',
+        );
     }
-    _replace(quest.copyWith(trials: [
-      for (final t in quest.trials) t.id == trialId ? t.copyWith(done: done) : t,
-    ]));
+    _replace(
+      quest.copyWith(
+        trials: [
+          for (final t in quest.trials)
+            t.id == trialId ? t.copyWith(done: done) : t,
+        ],
+      ),
+    );
     return _data;
   }
 
@@ -72,7 +79,9 @@ class MockQuestRepository implements QuestRepository {
       throw QuestActionException('Only sworn quests can be claimed.');
     }
     if (quest.trialsDone < quest.trials.length) {
-      throw QuestActionException('Finish every trial before claiming the bounty.');
+      throw QuestActionException(
+        'Finish every trial before claiming the bounty.',
+      );
     }
     _replace(quest.copyWith(status: QuestStatus.fulfilled));
     _awardXp(quest.xp);
@@ -83,9 +92,9 @@ class MockQuestRepository implements QuestRepository {
   }
 
   Quest _quest(String id) => _data.allQuests.firstWhere(
-        (q) => q.id == id,
-        orElse: () => throw QuestActionException('Unknown quest $id'),
-      );
+    (q) => q.id == id,
+    orElse: () => throw QuestActionException('Unknown quest $id'),
+  );
 
   void _replace(Quest updated) {
     _data = GuildHallData(
@@ -94,9 +103,12 @@ class MockQuestRepository implements QuestRepository {
       journeys: [
         for (final line in _data.journeys)
           line.id == updated.journeyId
-              ? line.copyWith(quests: [
-                  for (final q in line.quests) q.id == updated.id ? updated : q,
-                ])
+              ? line.copyWith(
+                  quests: [
+                    for (final q in line.quests)
+                      q.id == updated.id ? updated : q,
+                  ],
+                )
               : line,
       ],
     );
@@ -149,7 +161,8 @@ class MockQuestRepository implements QuestRepository {
           id: 'iron-body',
           name: 'The Iron Body',
           emblemAsset: GuildAssets.emblemIronBody,
-          quote: '“Steel is forged one blow at a time. So is the body that '
+          quote:
+              '“Steel is forged one blow at a time. So is the body that '
               'carries it.” — the Guildmaster',
           bountyXp: 250,
           bountyTitle: 'Ironclad',
@@ -159,7 +172,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'iron-body',
               title: 'Walk the Ten Thousand Steps',
               flavor: 'March the city walls until your boots ache.',
-              description: 'The city walls are long and your legs are '
+              description:
+                  'The city walls are long and your legs are '
                   'restless. Walk until the step counter reads ten '
                   'thousand, then rest by the fire.',
               iconAsset: GuildAssets.questBoot,
@@ -168,7 +182,11 @@ class MockQuestRepository implements QuestRepository {
               status: QuestStatus.sworn,
               deadline: at(0, 19),
               trials: const [
-                Trial(id: 't1', title: 'Morning march — 4,000 steps', done: true),
+                Trial(
+                  id: 't1',
+                  title: 'Morning march — 4,000 steps',
+                  done: true,
+                ),
                 Trial(id: 't2', title: 'Evening march — 6,000 steps'),
               ],
             ),
@@ -177,7 +195,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'iron-body',
               title: 'Drink from the Spring',
               flavor: 'Eight cups of water before the moon rises.',
-              description: 'A hero who forgets to drink falls before any '
+              description:
+                  'A hero who forgets to drink falls before any '
                   'blade reaches them. Visit the spring through the day.',
               iconAsset: GuildAssets.questPotion,
               xp: 25,
@@ -194,7 +213,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'iron-body',
               title: 'Train at the Barracks',
               flavor: 'Three sessions with the drill sergeant this week.',
-              description: 'The sergeant does not care for excuses. Show up '
+              description:
+                  'The sergeant does not care for excuses. Show up '
                   'three times this week and lift what you are told.',
               iconAsset: GuildAssets.questSword,
               xp: 90,
@@ -229,7 +249,8 @@ class MockQuestRepository implements QuestRepository {
           id: 'scholar-tower',
           name: 'The Scholar’s Tower',
           emblemAsset: GuildAssets.emblemScholarTower,
-          quote: '“Knowledge is a dungeon with no final floor. Clear these '
+          quote:
+              '“Knowledge is a dungeon with no final floor. Clear these '
               'chambers and the Tower shall know your name.” — the Guildmaster',
           bountyXp: 300,
           bountyTitle: 'Keeper of Tomes',
@@ -239,7 +260,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'scholar-tower',
               title: 'Forge the Lab Report',
               flavor: 'The professor’s raven awaits it.',
-              description: 'Measurements gathered, conclusions pending. '
+              description:
+                  'Measurements gathered, conclusions pending. '
                   'Hammer the findings into a report fit for the professor.',
               iconAsset: GuildAssets.questScroll,
               xp: 80,
@@ -257,7 +279,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'scholar-tower',
               title: 'Duel the Algorithm',
               flavor: 'Defeat three dynamic-programming beasts.',
-              description: 'They hide in overlapping subproblems. Memoise '
+              description:
+                  'They hide in overlapping subproblems. Memoise '
                   'their weaknesses and strike three of them down.',
               iconAsset: GuildAssets.questSword,
               xp: 120,
@@ -306,7 +329,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'scholar-tower',
               title: 'The Exam Wyrm',
               flavor: 'It breathes deadlines.',
-              description: 'The final exam of the semester has woken. It '
+              description:
+                  'The final exam of the semester has woken. It '
                   'breathes deadlines and feeds on unread notes. Weaken it '
                   'with the trials below before you face it.',
               iconAsset: GuildAssets.bossDragon,
@@ -328,7 +352,8 @@ class MockQuestRepository implements QuestRepository {
           id: 'clean-hearth',
           name: 'The Clean Hearth',
           emblemAsset: GuildAssets.rankShield,
-          quote: '“A hero’s home is their first keep. Let no dust beast '
+          quote:
+              '“A hero’s home is their first keep. Let no dust beast '
               'claim it.” — the Guildmaster',
           bountyXp: 150,
           bountyTitle: 'Warden of the Hearth',
@@ -338,7 +363,8 @@ class MockQuestRepository implements QuestRepository {
               journeyId: 'clean-hearth',
               title: 'Brave the Laundry Caves',
               flavor: 'The pile grows hungrier by the day.',
-              description: 'Descend into the basement, feed the machines '
+              description:
+                  'Descend into the basement, feed the machines '
                   'their coin and return with clean garments.',
               iconAsset: GuildAssets.questPotion,
               xp: 30,
@@ -379,7 +405,8 @@ class MockQuestRepository implements QuestRepository {
               xp: 70,
               peril: Peril.dire,
               status: QuestStatus.sealed,
-              sealedReason: 'Your free quests for this week are used up. '
+              sealedReason:
+                  'Your free quests for this week are used up. '
                   'The seal breaks on Monday.',
               paper: PaperTone.vellum,
               trials: const [

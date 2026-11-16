@@ -55,16 +55,19 @@ class Purse {
   final int moonstones;
 
   int of(Currency currency) => switch (currency) {
-        Currency.gold => gold,
-        Currency.moonstones => moonstones,
-      };
+    Currency.gold => gold,
+    Currency.moonstones => moonstones,
+  };
 
   bool canAfford(Price price) => of(price.currency) >= price.amount;
 
   Purse minus(Price price) => switch (price.currency) {
-        Currency.gold => Purse(gold: gold - price.amount, moonstones: moonstones),
-        Currency.moonstones => Purse(gold: gold, moonstones: moonstones - price.amount),
-      };
+    Currency.gold => Purse(gold: gold - price.amount, moonstones: moonstones),
+    Currency.moonstones => Purse(
+      gold: gold,
+      moonstones: moonstones - price.amount,
+    ),
+  };
 }
 
 class Ware {
@@ -126,34 +129,41 @@ class Ware {
 
   String artFor(WareDye? dye) => _dyed(asset, dye);
 
-  String? tryOnFor(WareDye? dye) => tryOnAsset == null ? null : _dyed(tryOnAsset!, dye);
+  String? tryOnFor(WareDye? dye) =>
+      tryOnAsset == null ? null : _dyed(tryOnAsset!, dye);
 
   String _dyed(String path, WareDye? dye) {
     if (dye == null || dyes.isEmpty || dye == dyes.first) return path;
     return path.replaceFirst('.png', '_${dye.name}.png');
   }
 
-  Ware copyWith({bool? owned, bool? worn, bool? wishlisted, WareDye? dye, int? sold}) => Ware(
-        id: id,
-        name: name,
-        category: category,
-        kind: kind,
-        rarity: rarity,
-        price: price,
-        blurb: blurb,
-        description: description,
-        perk: perk,
-        asset: asset,
-        tryOnAsset: tryOnAsset,
-        slot: slot,
-        dyes: dyes,
-        dye: dye ?? this.dye,
-        sold: sold ?? this.sold,
-        owned: owned ?? this.owned,
-        worn: worn ?? this.worn,
-        wishlisted: wishlisted ?? this.wishlisted,
-        leavesAt: leavesAt,
-      );
+  Ware copyWith({
+    bool? owned,
+    bool? worn,
+    bool? wishlisted,
+    WareDye? dye,
+    int? sold,
+  }) => Ware(
+    id: id,
+    name: name,
+    category: category,
+    kind: kind,
+    rarity: rarity,
+    price: price,
+    blurb: blurb,
+    description: description,
+    perk: perk,
+    asset: asset,
+    tryOnAsset: tryOnAsset,
+    slot: slot,
+    dyes: dyes,
+    dye: dye ?? this.dye,
+    sold: sold ?? this.sold,
+    owned: owned ?? this.owned,
+    worn: worn ?? this.worn,
+    wishlisted: wishlisted ?? this.wishlisted,
+    leavesAt: leavesAt,
+  );
 }
 
 class BazaarData {

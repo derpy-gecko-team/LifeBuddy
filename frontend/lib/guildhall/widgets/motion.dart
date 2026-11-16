@@ -8,7 +8,12 @@ import '../theme/guild_theme.dart';
 import 'ornaments.dart';
 
 class StampIn extends StatefulWidget {
-  const StampIn({super.key, required this.child, required this.animate, this.delay = Duration.zero});
+  const StampIn({
+    super.key,
+    required this.child,
+    required this.animate,
+    this.delay = Duration.zero,
+  });
 
   final Widget child;
 
@@ -27,8 +32,20 @@ class _StampInState extends State<StampIn> with SingleTickerProviderStateMixin {
   );
 
   static final _scale = TweenSequence<double>([
-    TweenSequenceItem(tween: Tween(begin: 2.6, end: 0.9).chain(CurveTween(curve: Curves.easeInCubic)), weight: 68),
-    TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0).chain(CurveTween(curve: Curves.easeOut)), weight: 32),
+    TweenSequenceItem(
+      tween: Tween(
+        begin: 2.6,
+        end: 0.9,
+      ).chain(CurveTween(curve: Curves.easeInCubic)),
+      weight: 68,
+    ),
+    TweenSequenceItem(
+      tween: Tween(
+        begin: 0.9,
+        end: 1.0,
+      ).chain(CurveTween(curve: Curves.easeOut)),
+      weight: 32,
+    ),
   ]);
 
   @override
@@ -65,7 +82,13 @@ class _StampInState extends State<StampIn> with SingleTickerProviderStateMixin {
 }
 
 class PinnedSwing extends StatefulWidget {
-  const PinnedSwing({super.key, required this.rest, required this.held, required this.child, this.nudges = 0});
+  const PinnedSwing({
+    super.key,
+    required this.rest,
+    required this.held,
+    required this.child,
+    this.nudges = 0,
+  });
 
   final double rest;
   final bool held;
@@ -76,11 +99,23 @@ class PinnedSwing extends StatefulWidget {
   State<PinnedSwing> createState() => _PinnedSwingState();
 }
 
-class _PinnedSwingState extends State<PinnedSwing> with SingleTickerProviderStateMixin {
-  late final AnimationController _angle = AnimationController.unbounded(vsync: this, value: widget.rest);
+class _PinnedSwingState extends State<PinnedSwing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _angle = AnimationController.unbounded(
+    vsync: this,
+    value: widget.rest,
+  );
 
-  static final _steady = SpringDescription.withDampingRatio(mass: 1, stiffness: 420, ratio: 0.85);
-  static final _loose = SpringDescription.withDampingRatio(mass: 1, stiffness: 170, ratio: 0.3);
+  static final _steady = SpringDescription.withDampingRatio(
+    mass: 1,
+    stiffness: 420,
+    ratio: 0.85,
+  );
+  static final _loose = SpringDescription.withDampingRatio(
+    mass: 1,
+    stiffness: 170,
+    ratio: 0.3,
+  );
 
   static const _push = 1.5;
 
@@ -127,7 +162,12 @@ class _PinnedSwingState extends State<PinnedSwing> with SingleTickerProviderStat
 }
 
 class HangingSway extends StatefulWidget {
-  const HangingSway({super.key, required this.nudged, required this.child, this.reach = 0.11});
+  const HangingSway({
+    super.key,
+    required this.nudged,
+    required this.child,
+    this.reach = 0.11,
+  });
 
   final bool nudged;
   final Widget child;
@@ -138,14 +178,20 @@ class HangingSway extends StatefulWidget {
   State<HangingSway> createState() => _HangingSwayState();
 }
 
-class _HangingSwayState extends State<HangingSway> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 950), value: 1);
+class _HangingSwayState extends State<HangingSway>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 950),
+    value: 1,
+  );
 
   @override
   void didUpdateWidget(HangingSway old) {
     super.didUpdateWidget(old);
-    if (widget.nudged && !old.nudged && !MediaQuery.disableAnimationsOf(context)) {
+    if (widget.nudged &&
+        !old.nudged &&
+        !MediaQuery.disableAnimationsOf(context)) {
       _c.forward(from: 0);
     }
   }
@@ -162,8 +208,14 @@ class _HangingSwayState extends State<HangingSway> with SingleTickerProviderStat
       animation: _c,
       builder: (context, child) {
         final t = _c.value;
-        final angle = t >= 1 ? 0.0 : widget.reach * exp(-4.4 * t) * sin(t * 2 * pi * 2.2);
-        return Transform.rotate(angle: angle, alignment: Alignment.topCenter, child: child);
+        final angle = t >= 1
+            ? 0.0
+            : widget.reach * exp(-4.4 * t) * sin(t * 2 * pi * 2.2);
+        return Transform.rotate(
+          angle: angle,
+          alignment: Alignment.topCenter,
+          child: child,
+        );
       },
       child: widget.child,
     );
@@ -171,7 +223,13 @@ class _HangingSwayState extends State<HangingSway> with SingleTickerProviderStat
 }
 
 class StruckText extends StatelessWidget {
-  const StruckText(this.text, {super.key, required this.style, required this.struck, this.lineColor});
+  const StruckText(
+    this.text, {
+    super.key,
+    required this.style,
+    required this.struck,
+    this.lineColor,
+  });
 
   final String text;
   final TextStyle style;
@@ -187,9 +245,11 @@ class StruckText extends StatelessWidget {
       duration: reduced
           ? Duration.zero
           : struck
-              ? const Duration(milliseconds: 460)
-              : const Duration(milliseconds: 160),
-      curve: struck ? const Interval(0.35, 1, curve: Curves.easeInOutCubic) : Curves.easeOut,
+          ? const Duration(milliseconds: 460)
+          : const Duration(milliseconds: 160),
+      curve: struck
+          ? const Interval(0.35, 1, curve: Curves.easeInOutCubic)
+          : Curves.easeOut,
       builder: (context, t, child) => CustomPaint(
         foregroundPainter: _StrikePainter(
           text: text,
@@ -284,9 +344,12 @@ class SealBreak extends StatefulWidget {
   State<SealBreak> createState() => _SealBreakState();
 }
 
-class _SealBreakState extends State<SealBreak> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 760));
+class _SealBreakState extends State<SealBreak>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 760),
+  );
 
   @override
   void initState() {
@@ -329,7 +392,11 @@ class _SealBreakState extends State<SealBreak> with SingleTickerProviderStateMix
 }
 
 class PartingRibbon extends StatelessWidget {
-  const PartingRibbon({super.key, required this.breaking, this.axis = Axis.horizontal});
+  const PartingRibbon({
+    super.key,
+    required this.breaking,
+    this.axis = Axis.horizontal,
+  });
 
   final Animation<double> breaking;
   final Axis axis;
@@ -345,16 +412,16 @@ class PartingRibbon extends StatelessWidget {
         final left = 1 - gone;
         final horizontal = axis == Axis.horizontal;
         Widget half(Alignment anchor) => Expanded(
-              child: Opacity(
-                opacity: (left * 2).clamp(0.0, 1.0),
-                child: FractionallySizedBox(
-                  alignment: anchor,
-                  widthFactor: horizontal ? left : null,
-                  heightFactor: horizontal ? null : left,
-                  child: SealRibbon(axis: axis),
-                ),
-              ),
-            );
+          child: Opacity(
+            opacity: (left * 2).clamp(0.0, 1.0),
+            child: FractionallySizedBox(
+              alignment: anchor,
+              widthFactor: horizontal ? left : null,
+              heightFactor: horizontal ? null : left,
+              child: SealRibbon(axis: axis),
+            ),
+          ),
+        );
         return Flex(
           direction: axis,
           children: [
@@ -387,7 +454,10 @@ class FallingSeal extends StatelessWidget {
         return Opacity(
           opacity: (1 - fall * 1.15).clamp(0.0, 1.0),
           child: Transform.translate(
-            offset: Offset(fall * size * 0.25, fall * size * 1.2 - sin(knock * pi) * 3),
+            offset: Offset(
+              fall * size * 0.25,
+              fall * size * 1.2 - sin(knock * pi) * 3,
+            ),
             child: Transform.rotate(
               angle: sin(knock * pi) * -0.12 + fall * 0.7,
               child: child,

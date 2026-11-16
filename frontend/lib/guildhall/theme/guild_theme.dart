@@ -63,11 +63,17 @@ abstract final class GuildText {
     } catch (_) {}
   }
 
-  static double _optical(double size) => size < GuildType.xl ? size * 1.12 : size;
+  static double _optical(double size) =>
+      size < GuildType.xl ? size * 1.12 : size;
 
   static double _wordGap(double size) => size * 0.14;
 
-  static TextStyle _style(double size, Color color, {double height = 1.25, double spacing = 0.2}) {
+  static TextStyle _style(
+    double size,
+    Color color, {
+    double height = 1.25,
+    double spacing = 0.2,
+  }) {
     final fontSize = _optical(size);
     return _hand.copyWith(
       fontSize: fontSize,
@@ -78,21 +84,28 @@ abstract final class GuildText {
     );
   }
 
-  static TextStyle title(double size, {Color color = GuildColors.brickDeep}) => _lettering.copyWith(
+  static TextStyle title(double size, {Color color = GuildColors.brickDeep}) =>
+      _lettering.copyWith(
         fontSize: size * 0.9,
         color: color,
         height: 1.12,
         letterSpacing: 0.2,
       );
 
-  static TextStyle hand(double size, {Color color = GuildColors.ink}) => _style(size, color, height: 1.2);
+  static TextStyle hand(double size, {Color color = GuildColors.ink}) =>
+      _style(size, color, height: 1.2);
 
-  static TextStyle label(double size, {Color color = GuildColors.cream, double spacing = 0.8}) =>
-      _style(size, color, height: 1.2, spacing: spacing);
+  static TextStyle label(
+    double size, {
+    Color color = GuildColors.cream,
+    double spacing = 0.8,
+  }) => _style(size, color, height: 1.2, spacing: spacing);
 
-  static TextStyle body(double size, {Color color = GuildColors.inkSoft}) => _style(size, color, height: 1.3);
+  static TextStyle body(double size, {Color color = GuildColors.inkSoft}) =>
+      _style(size, color, height: 1.3);
 
-  static TextStyle aside(double size, {Color color = GuildColors.cream}) => _style(size, color, height: 1.3);
+  static TextStyle aside(double size, {Color color = GuildColors.cream}) =>
+      _style(size, color, height: 1.3);
 }
 
 int stableSeed(String id) {

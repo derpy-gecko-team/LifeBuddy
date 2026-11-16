@@ -13,16 +13,18 @@ enum QuestFilter {
   final String label;
 
   bool matches(Quest q) => switch (this) {
-        QuestFilter.all => true,
-        QuestFilter.sworn => q.status == QuestStatus.sworn,
-        QuestFilter.sealed => q.status == QuestStatus.sealed,
-        QuestFilter.fulfilled => q.status == QuestStatus.fulfilled,
-      };
+    QuestFilter.all => true,
+    QuestFilter.sworn => q.status == QuestStatus.sworn,
+    QuestFilter.sealed => q.status == QuestStatus.sealed,
+    QuestFilter.fulfilled => q.status == QuestStatus.fulfilled,
+  };
 }
 
 class GuildHallController extends ChangeNotifier {
-  GuildHallController(this._repository, {Future<void> Function()? beforeFirstLoad})
-      : _beforeFirstLoad = beforeFirstLoad;
+  GuildHallController(
+    this._repository, {
+    Future<void> Function()? beforeFirstLoad,
+  }) : _beforeFirstLoad = beforeFirstLoad;
 
   final QuestRepository _repository;
 

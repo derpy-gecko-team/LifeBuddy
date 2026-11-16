@@ -16,11 +16,12 @@ enum WareSort {
 
 const _moonstoneInGold = 100;
 
-int _worth(Price p) => p.currency == Currency.gold ? p.amount : p.amount * _moonstoneInGold;
+int _worth(Price p) =>
+    p.currency == Currency.gold ? p.amount : p.amount * _moonstoneInGold;
 
 class BazaarController extends ChangeNotifier {
   BazaarController(this._repository, {Future<void> Function()? beforeFirstLoad})
-      : _beforeFirstLoad = beforeFirstLoad;
+    : _beforeFirstLoad = beforeFirstLoad;
 
   final BazaarRepository _repository;
   Future<void> Function()? _beforeFirstLoad;
@@ -78,7 +79,11 @@ class BazaarController extends ChangeNotifier {
     final data = _data;
     if (data == null) return const [];
     final wares = data.wares
-        .where((w) => _category == null ? w.id != data.featuredId : w.category == _category)
+        .where(
+          (w) => _category == null
+              ? w.id != data.featuredId
+              : w.category == _category,
+        )
         .toList();
     int byPrice(Ware a, Ware b) => _worth(a.price).compareTo(_worth(b.price));
     wares.sort((a, b) {
@@ -87,17 +92,19 @@ class BazaarController extends ChangeNotifier {
         WareSort.cheapest => byPrice(a, b),
         WareSort.dearest => byPrice(b, a),
         WareSort.rarest => switch (b.rarity.index.compareTo(a.rarity.index)) {
-            0 => byPrice(b, a),
-            final byRarity => byRarity,
-          },
+          0 => byPrice(b, a),
+          final byRarity => byRarity,
+        },
       };
     });
     return wares;
   }
 
-  Future<void> buy(String wareId, {WareDye? dye}) => _run(() => _repository.buy(wareId, dye: dye));
+  Future<void> buy(String wareId, {WareDye? dye}) =>
+      _run(() => _repository.buy(wareId, dye: dye));
 
-  Future<void> setWorn(String wareId, bool worn) => _run(() => _repository.setWorn(wareId, worn: worn));
+  Future<void> setWorn(String wareId, bool worn) =>
+      _run(() => _repository.setWorn(wareId, worn: worn));
 
   Future<void> setWishlisted(String wareId, bool wishlisted) =>
       _run(() => _repository.setWishlisted(wareId, wishlisted: wishlisted));

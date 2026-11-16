@@ -11,7 +11,8 @@ abstract final class AuthValidators {
     final s = v?.trim() ?? '';
     if (s.isEmpty) return 'Choose a username';
     if (s.length < 3 || s.length > 20) return 'Use 3-20 characters';
-    if (!_usernameRe.hasMatch(s)) return 'Only letters, numbers and underscores';
+    if (!_usernameRe.hasMatch(s))
+      return 'Only letters, numbers and underscores';
     return null;
   }
 

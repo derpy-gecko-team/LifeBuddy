@@ -35,8 +35,9 @@ void main() {
     expect(find.text('Enter your password'), findsOneWidget);
   });
 
-  testWidgets('Register reveals the extra fields and Log in hides them',
-      (tester) async {
+  testWidgets('Register reveals the extra fields and Log in hides them', (
+    tester,
+  ) async {
     await pumpLoginPage(tester);
 
     await tester.tap(find.text("Don't have an account? Register"));

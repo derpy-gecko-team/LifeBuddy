@@ -16,8 +16,19 @@ import 'motion.dart';
 
 String toRoman(int n) {
   const map = {
-    1000: 'M', 900: 'CM', 500: 'D', 400: 'CD', 100: 'C', 90: 'XC',
-    50: 'L', 40: 'XL', 10: 'X', 9: 'IX', 5: 'V', 4: 'IV', 1: 'I',
+    1000: 'M',
+    900: 'CM',
+    500: 'D',
+    400: 'CD',
+    100: 'C',
+    90: 'XC',
+    50: 'L',
+    40: 'XL',
+    10: 'X',
+    9: 'IX',
+    5: 'V',
+    4: 'IV',
+    1: 'I',
   };
   final out = StringBuffer();
   var rest = n;
@@ -31,7 +42,12 @@ String toRoman(int n) {
 }
 
 class BoardHeader extends StatelessWidget {
-  const BoardHeader({super.key, required this.newToday, this.drawTitle = false, this.onTitleDrawn});
+  const BoardHeader({
+    super.key,
+    required this.newToday,
+    this.drawTitle = false,
+    this.onTitleDrawn,
+  });
 
   final int newToday;
 
@@ -103,7 +119,9 @@ class RankSign extends StatelessWidget {
           child: HangingSlip(
             child: Row(
               children: [
-                ExcludeSemantics(child: Image.asset(GuildAssets.rankShield, height: 34)),
+                ExcludeSemantics(
+                  child: Image.asset(GuildAssets.rankShield, height: 34),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -120,7 +138,10 @@ class RankSign extends StatelessWidget {
                           ),
                           Text(
                             '${hero.xp} / ${hero.xpToNext} XP',
-                            style: GuildText.label(GuildType.xs, color: GuildColors.inkSoft),
+                            style: GuildText.label(
+                              GuildType.xs,
+                              color: GuildColors.inkSoft,
+                            ),
                           ),
                         ],
                       ),
@@ -151,7 +172,10 @@ class RankSign extends StatelessWidget {
               onTap: onOpenBuddy,
               haptic: true,
               pressedScale: 0.92,
-              child: const RoundBadge(asset: GuildAssets.buddyEnvelope, size: 60),
+              child: const RoundBadge(
+                asset: GuildAssets.buddyEnvelope,
+                size: 60,
+              ),
             ),
           ),
         ],
@@ -200,7 +224,13 @@ class QuestTagRail extends StatelessWidget {
 }
 
 class HangingTag extends StatelessWidget {
-  const HangingTag({super.key, required this.label, required this.selected, required this.onTap, this.count});
+  const HangingTag({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.count,
+  });
 
   final String label;
   final int? count;
@@ -223,9 +253,17 @@ class HangingTag extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(width: 2, height: 12, margin: const EdgeInsets.only(top: 6), color: GuildColors.chalkLine),
+              Container(
+                width: 2,
+                height: 12,
+                margin: const EdgeInsets.only(top: 6),
+                color: GuildColors.chalkLine,
+              ),
               CustomPaint(
-                painter: _TagPainter(selected: selected, seed: stableSeed(label)),
+                painter: _TagPainter(
+                  selected: selected,
+                  seed: stableSeed(label),
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 42),
                   child: Padding(
@@ -233,20 +271,32 @@ class HangingTag extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(label, style: GuildText.label(GuildType.sm, color: fg)),
+                        Text(
+                          label,
+                          style: GuildText.label(GuildType.sm, color: fg),
+                        ),
                         if (count != null) ...[
                           const SizedBox(width: 8),
                           Container(
                             constraints: const BoxConstraints(minWidth: 22),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
-                              color: selected ? GuildColors.brickDeep : GuildColors.shadow,
+                              color: selected
+                                  ? GuildColors.brickDeep
+                                  : GuildColors.shadow,
                               borderRadius: BorderRadius.circular(11),
                             ),
                             child: Text(
                               '$count',
                               textAlign: TextAlign.center,
-                              style: GuildText.label(GuildType.xs, color: GuildColors.cream, spacing: 0),
+                              style: GuildText.label(
+                                GuildType.xs,
+                                color: GuildColors.cream,
+                                spacing: 0,
+                              ),
                             ),
                           ),
                         ],
@@ -279,13 +329,21 @@ class _TagPainter extends CustomPainter {
       Offset(0, size.height),
       const Offset(0, cut),
     ], seed);
-    sketch.paintFill(canvas, selected ? GuildColors.parchment : GuildColors.indigoDeep, shadow: const Offset(2, 3));
+    sketch.paintFill(
+      canvas,
+      selected ? GuildColors.parchment : GuildColors.indigoDeep,
+      shadow: const Offset(2, 3),
+    );
     sketch.paintShading(
       canvas,
       ink: selected ? GuildColors.pencil : GuildColors.cream,
       strength: selected ? 1.2 : 0.45,
     );
-    sketch.paintBorder(canvas, color: selected ? GuildColors.pencil : GuildColors.chalkLine, width: 1.5);
+    sketch.paintBorder(
+      canvas,
+      color: selected ? GuildColors.pencil : GuildColors.chalkLine,
+      width: 1.5,
+    );
     canvas.drawCircle(
       Offset(size.width / 2, 5),
       2.2,
@@ -294,7 +352,8 @@ class _TagPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_TagPainter old) => old.selected != selected || old.seed != seed;
+  bool shouldRepaint(_TagPainter old) =>
+      old.selected != selected || old.seed != seed;
 }
 
 class JourneyPlaque extends StatelessWidget {
@@ -307,7 +366,8 @@ class JourneyPlaque extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '${journey.name}, ${journey.fulfilledCount} of '
+      label:
+          '${journey.name}, ${journey.fulfilledCount} of '
           '${journey.quests.length} quests fulfilled. Open journey.',
       excludeSemantics: true,
       child: GuildPressable(
@@ -327,7 +387,11 @@ class JourneyPlaque extends StatelessWidget {
               const Positioned(left: -7, top: -5, child: ChalkStar(seed: 1)),
               const Positioned(right: -3, top: -5, child: ChalkStar(seed: 2)),
               const Positioned(left: -7, bottom: -5, child: ChalkStar(seed: 3)),
-              const Positioned(right: -3, bottom: -5, child: ChalkStar(seed: 4)),
+              const Positioned(
+                right: -3,
+                bottom: -5,
+                child: ChalkStar(seed: 4),
+              ),
               Row(
                 children: [
                   Container(
@@ -346,19 +410,32 @@ class JourneyPlaque extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(journey.name, style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
+                        Text(
+                          journey.name,
+                          style: GuildText.title(
+                            GuildType.lg,
+                            color: GuildColors.cream,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(
                           '${journey.fulfilledCount} of ${journey.quests.length} quests fulfilled',
                           style: GuildText.aside(GuildType.sm),
                         ),
                         const SizedBox(height: 8),
-                        SealProgress(total: journey.quests.length, done: journey.fulfilledCount),
+                        SealProgress(
+                          total: journey.quests.length,
+                          done: journey.fulfilledCount,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const GuildIcon(GuildGlyph.chevronRight, size: 22, color: GuildColors.goldBright),
+                  const GuildIcon(
+                    GuildGlyph.chevronRight,
+                    size: 22,
+                    color: GuildColors.goldBright,
+                  ),
                 ],
               ),
             ],
@@ -370,7 +447,12 @@ class JourneyPlaque extends StatelessWidget {
 }
 
 class DueTodayStrip extends StatelessWidget {
-  const DueTodayStrip({super.key, required this.quests, required this.now, required this.onOpenQuest});
+  const DueTodayStrip({
+    super.key,
+    required this.quests,
+    required this.now,
+    required this.onOpenQuest,
+  });
 
   final List<Quest> quests;
   final DateTime now;
@@ -389,7 +471,11 @@ class DueTodayStrip extends StatelessWidget {
         children: [
           Row(
             children: [
-              const GuildIcon(GuildGlyph.flame, size: 20, color: GuildColors.brickDeep),
+              const GuildIcon(
+                GuildGlyph.flame,
+                size: 20,
+                color: GuildColors.brickDeep,
+              ),
               const SizedBox(width: 8),
               Semantics(
                 header: true,
@@ -403,7 +489,8 @@ class DueTodayStrip extends StatelessWidget {
             Builder(
               builder: (rowContext) => Semantics(
                 button: true,
-                label: '${quest.title}, ${deadlineLabel(quest.deadline!, now)}, ${quest.xp} XP',
+                label:
+                    '${quest.title}, ${deadlineLabel(quest.deadline!, now)}, ${quest.xp} XP',
                 excludeSemantics: true,
                 child: GuildPressable(
                   onTap: () => onOpenQuest(quest.id, rowContext),
@@ -421,10 +508,17 @@ class DueTodayStrip extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text(
                           deadlineLabel(quest.deadline!, now),
-                          style: GuildText.aside(GuildType.sm, color: GuildColors.inkSoft),
+                          style: GuildText.aside(
+                            GuildType.sm,
+                            color: GuildColors.inkSoft,
+                          ),
                         ),
                         const SizedBox(width: 6),
-                        const GuildIcon(GuildGlyph.chevronRight, size: 18, color: GuildColors.ink),
+                        const GuildIcon(
+                          GuildGlyph.chevronRight,
+                          size: 18,
+                          color: GuildColors.ink,
+                        ),
                       ],
                     ),
                   ),

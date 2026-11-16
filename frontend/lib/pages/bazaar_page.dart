@@ -20,8 +20,10 @@ class BazaarPage extends StatefulWidget {
 
 class _BazaarPageState extends State<BazaarPage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  late final BazaarController _controller =
-      BazaarController(widget.repository ?? MockBazaarRepository(), beforeFirstLoad: GuildText.preload)..load();
+  late final BazaarController _controller = BazaarController(
+    widget.repository ?? MockBazaarRepository(),
+    beforeFirstLoad: GuildText.preload,
+  )..load();
 
   @override
   void dispose() {
@@ -30,15 +32,21 @@ class _BazaarPageState extends State<BazaarPage> {
   }
 
   void _openWare(String wareId, {List<String> shelf = const []}) {
-    Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
-      builder: (_) => WarePage(controller: _controller, wareId: wareId, shelf: shelf),
-    ));
+    Navigator.of(context, rootNavigator: true).push(
+      NoticeRoute<void>(
+        builder: (_) =>
+            WarePage(controller: _controller, wareId: wareId, shelf: shelf),
+      ),
+    );
   }
 
   void _openChest() {
-    _navigatorKey.currentState!.push(PlaqueRoute<void>(
-      builder: (_) => ChestPage(controller: _controller, onOpenWare: _openWare),
-    ));
+    _navigatorKey.currentState!.push(
+      PlaqueRoute<void>(
+        builder: (_) =>
+            ChestPage(controller: _controller, onOpenWare: _openWare),
+      ),
+    );
   }
 
   @override
@@ -49,7 +57,11 @@ class _BazaarPageState extends State<BazaarPage> {
         key: _navigatorKey,
         onGenerateInitialRoutes: (_, _) => [
           MaterialPageRoute<void>(
-            builder: (_) => StallPage(controller: _controller, onOpenWare: _openWare, onOpenChest: _openChest),
+            builder: (_) => StallPage(
+              controller: _controller,
+              onOpenWare: _openWare,
+              onOpenChest: _openChest,
+            ),
           ),
         ],
       ),

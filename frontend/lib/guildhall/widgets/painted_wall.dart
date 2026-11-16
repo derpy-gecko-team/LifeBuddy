@@ -68,7 +68,8 @@ abstract final class _WallCache {
   static final _images = <String, ui.Image>{};
 
   static ui.Image imageFor(Size size, double dpr, WallVariant variant) {
-    final key = '${size.width.round()}x${size.height.round()}@$dpr#${variant.name}';
+    final key =
+        '${size.width.round()}x${size.height.round()}@$dpr#${variant.name}';
     final cached = _images[key];
     if (cached != null) return cached;
 
@@ -79,7 +80,10 @@ abstract final class _WallCache {
     _paintWash(canvas, size, variant.seed);
     _Doodler(canvas, size, variant).draw();
     final picture = recorder.endRecording();
-    final image = picture.toImageSync((size.width * dpr).ceil(), (size.height * dpr).ceil());
+    final image = picture.toImageSync(
+      (size.width * dpr).ceil(),
+      (size.height * dpr).ceil(),
+    );
     picture.dispose();
     return _images[key] = image;
   }
@@ -96,7 +100,10 @@ void _paintWash(Canvas canvas, Size size, int seed) {
   final patches = (size.width * size.height / 16000).round();
   for (var i = 0; i < patches; i++) {
     final lighter = rnd.nextBool();
-    final center = Offset(rnd.nextDouble() * size.width, rnd.nextDouble() * size.height);
+    final center = Offset(
+      rnd.nextDouble() * size.width,
+      rnd.nextDouble() * size.height,
+    );
     final w = 90 + rnd.nextDouble() * 170;
     final h = 50 + rnd.nextDouble() * 110;
     canvas.drawOval(
@@ -124,8 +131,11 @@ void _paintWash(Canvas canvas, Size size, int seed) {
     canvas.drawPath(
       path,
       Paint()
-        ..color = (rnd.nextDouble() < 0.55 ? GuildColors.indigoLight : GuildColors.shadow)
-            .withValues(alpha: 0.05 + rnd.nextDouble() * 0.07)
+        ..color =
+            (rnd.nextDouble() < 0.55
+                    ? GuildColors.indigoLight
+                    : GuildColors.shadow)
+                .withValues(alpha: 0.05 + rnd.nextDouble() * 0.07)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3 + rnd.nextDouble() * 14
         ..strokeCap = StrokeCap.round
@@ -136,7 +146,8 @@ void _paintWash(Canvas canvas, Size size, int seed) {
 }
 
 class _Doodler {
-  _Doodler(this.canvas, this.size, this.variant) : pen = Random(variant.seed * 13 + 1);
+  _Doodler(this.canvas, this.size, this.variant)
+    : pen = Random(variant.seed * 13 + 1);
 
   final Canvas canvas;
   final Size size;
@@ -152,27 +163,48 @@ class _Doodler {
   double _jitter(double amount) => (pen.nextDouble() - 0.5) * 2 * amount;
 
   List<Rect> get _quiet => switch (variant) {
-        WallVariant.board => [Rect.fromLTWH(0, 0, size.width * 0.8, 200)],
-        WallVariant.journey => [Rect.fromLTWH(0, 0, size.width, 120)],
-        WallVariant.quest => [Rect.fromLTWH(0, 0, size.width, 150)],
-        WallVariant.bazaar => [Rect.fromLTWH(0, 0, size.width, 215)],
-      };
+    WallVariant.board => [Rect.fromLTWH(0, 0, size.width * 0.8, 200)],
+    WallVariant.journey => [Rect.fromLTWH(0, 0, size.width, 120)],
+    WallVariant.quest => [Rect.fromLTWH(0, 0, size.width, 150)],
+    WallVariant.bazaar => [Rect.fromLTWH(0, 0, size.width, 215)],
+  };
 
   bool _isQuiet(Offset p) => _quiet.any((r) => r.contains(p));
 
   void draw() {
     final topLeft = _quiet.first.bottom;
-    _vine(Offset(_r(10, 22), topLeft + _r(10, 40)), pi / 2, size.height - topLeft - 60, sway: 16);
-    _vine(Offset(size.width - _r(10, 22), _r(160, 200)), pi / 2, size.height - 260, sway: 16);
-    _vine(Offset(size.width * _r(0.25, 0.4), size.height * _r(0.52, 0.6)), _r(-0.5, 0.2), size.width * 0.5, sway: 12);
-    _vine(Offset(size.width * _r(0.5, 0.7), size.height * _r(0.86, 0.92)), pi + _r(-0.3, 0.3), size.width * 0.45, sway: 12);
+    _vine(
+      Offset(_r(10, 22), topLeft + _r(10, 40)),
+      pi / 2,
+      size.height - topLeft - 60,
+      sway: 16,
+    );
+    _vine(
+      Offset(size.width - _r(10, 22), _r(160, 200)),
+      pi / 2,
+      size.height - 260,
+      sway: 16,
+    );
+    _vine(
+      Offset(size.width * _r(0.25, 0.4), size.height * _r(0.52, 0.6)),
+      _r(-0.5, 0.2),
+      size.width * 0.5,
+      sway: 12,
+    );
+    _vine(
+      Offset(size.width * _r(0.5, 0.7), size.height * _r(0.86, 0.92)),
+      pi + _r(-0.3, 0.3),
+      size.width * 0.45,
+      sway: 12,
+    );
 
     const cell = 104.0;
     for (var y = cell * 0.2; y < size.height; y += cell) {
       for (var x = cell * 0.25; x < size.width; x += cell) {
         final at = Offset(x + _r(0, cell * 0.6), y + _r(0, cell * 0.6));
         final roll = pen.nextDouble();
-        if (_isQuiet(at) || at.dx > size.width - 8 || at.dy > size.height - 8) continue;
+        if (_isQuiet(at) || at.dx > size.width - 8 || at.dy > size.height - 8)
+          continue;
         if (roll < 0.20) {
           _star(at, _r(7, 13));
         } else if (roll < 0.34) {
@@ -190,7 +222,10 @@ class _Doodler {
     }
 
     final chalk = GuildColors.chalk;
-    canvas.drawPath(_solid, Paint()..color = chalk.withValues(alpha: _alpha * 0.9));
+    canvas.drawPath(
+      _solid,
+      Paint()..color = chalk.withValues(alpha: _alpha * 0.9),
+    );
     canvas.drawPath(
       _line,
       Paint()
@@ -221,14 +256,26 @@ class _Doodler {
     _line.lineTo(points.last.dx, points.last.dy);
   }
 
-  List<Offset> _coil(Offset start, double heading, double radius, {required double side, double turns = 1.6}) {
-    final center = start + Offset(cos(heading + side * pi / 2), sin(heading + side * pi / 2)) * radius;
+  List<Offset> _coil(
+    Offset start,
+    double heading,
+    double radius, {
+    required double side,
+    double turns = 1.6,
+  }) {
+    final center =
+        start +
+        Offset(cos(heading + side * pi / 2), sin(heading + side * pi / 2)) *
+            radius;
     final from = heading - side * pi / 2;
     final steps = (turns * 18).round();
     return [
       for (var i = 0; i <= steps; i++)
         center +
-            Offset(cos(from + side * turns * 2 * pi * i / steps), sin(from + side * turns * 2 * pi * i / steps)) *
+            Offset(
+                  cos(from + side * turns * 2 * pi * i / steps),
+                  sin(from + side * turns * 2 * pi * i / steps),
+                ) *
                 (radius * (1 - 0.82 * i / steps)),
     ];
   }
@@ -240,11 +287,26 @@ class _Doodler {
     final target = filled ? _solid : _line;
     target
       ..moveTo(base.dx, base.dy)
-      ..quadraticBezierTo(mid.dx + across.dx, mid.dy + across.dy, tip.dx, tip.dy)
-      ..quadraticBezierTo(mid.dx - across.dx, mid.dy - across.dy, base.dx, base.dy);
+      ..quadraticBezierTo(
+        mid.dx + across.dx,
+        mid.dy + across.dy,
+        tip.dx,
+        tip.dy,
+      )
+      ..quadraticBezierTo(
+        mid.dx - across.dx,
+        mid.dy - across.dy,
+        base.dx,
+        base.dy,
+      );
   }
 
-  void _vine(Offset start, double heading, double length, {required double sway}) {
+  void _vine(
+    Offset start,
+    double heading,
+    double length, {
+    required double sway,
+  }) {
     final points = <Offset>[start];
     final phase = _r(0, 2 * pi);
     final wave = _r(110, 170);
@@ -256,7 +318,8 @@ class _Doodler {
     while (travelled < length) {
       const step = 13.0;
       travelled += step;
-      final bend = cos(travelled / wave * 2 * pi + phase) * sway / wave * 2 * pi;
+      final bend =
+          cos(travelled / wave * 2 * pi + phase) * sway / wave * 2 * pi;
       final dir = heading + atan(bend) + _jitter(0.08);
       at += Offset(cos(dir), sin(dir)) * step;
       points.add(at);
@@ -268,11 +331,16 @@ class _Doodler {
         final roll = pen.nextDouble();
         if (roll < 0.42) {
           final stalk = at + Offset(cos(out), sin(out)) * _r(8, 16);
-          _curve([at, Offset.lerp(at, stalk, 0.5)! + Offset(_jitter(2), _jitter(2)), stalk]);
+          _curve([
+            at,
+            Offset.lerp(at, stalk, 0.5)! + Offset(_jitter(2), _jitter(2)),
+            stalk,
+          ]);
           _curve(_coil(stalk, out, _r(5, 10), side: side));
         } else if (roll < 0.85) {
           _leaf(at, out, _r(11, 19), filled: pen.nextDouble() < 0.45);
-          if (pen.nextDouble() < 0.5) _leaf(at, dir - side * _r(0.7, 1.2), _r(9, 15));
+          if (pen.nextDouble() < 0.5)
+            _leaf(at, dir - side * _r(0.7, 1.2), _r(9, 15));
         } else {
           final dot = at + Offset(cos(out), sin(out)) * _r(8, 14);
           _solid.addOval(Rect.fromCircle(center: dot, radius: _r(1.3, 2.2)));
@@ -282,13 +350,17 @@ class _Doodler {
     _curve(points);
     final last = points.last;
     final before = points[points.length - 2];
-    _curve(_coil(last, (last - before).direction, _r(7, 12), side: side, turns: 1.4));
+    _curve(
+      _coil(last, (last - before).direction, _r(7, 12), side: side, turns: 1.4),
+    );
   }
 
   void _sprig(Offset at, double angle) {
     final length = _r(22, 38);
     final tip = at + Offset(cos(angle), sin(angle)) * length;
-    final bend = Offset.lerp(at, tip, 0.5)! + Offset(-sin(angle), cos(angle)) * _jitter(6);
+    final bend =
+        Offset.lerp(at, tip, 0.5)! +
+        Offset(-sin(angle), cos(angle)) * _jitter(6);
     _curve([at, bend, tip]);
     for (final t in [0.35, 0.65, 1.0]) {
       final on = Offset.lerp(at, tip, t)!;
@@ -299,7 +371,15 @@ class _Doodler {
 
   void _swirl(Offset at, double radius) {
     final heading = _r(0, 2 * pi);
-    _curve(_coil(at, heading, radius, side: pen.nextBool() ? 1 : -1, turns: _r(1.5, 2.3)));
+    _curve(
+      _coil(
+        at,
+        heading,
+        radius,
+        side: pen.nextBool() ? 1 : -1,
+        turns: _r(1.5, 2.3),
+      ),
+    );
   }
 
   void _star(Offset at, double radius) {
@@ -336,7 +416,8 @@ class _Doodler {
       _curve([
         for (var i = 0; i <= 20; i++)
           at +
-              Offset(cos(from + i * 2 * pi / 19), sin(from + i * 2 * pi / 19)) * (radius + _jitter(wobble)) +
+              Offset(cos(from + i * 2 * pi / 19), sin(from + i * 2 * pi / 19)) *
+                  (radius + _jitter(wobble)) +
               Offset(pass * 0.8, pass * 0.6),
       ]);
     }
@@ -348,7 +429,12 @@ class _Doodler {
       var flip = 1.0;
       for (var d = -radius * 0.8; d <= radius * 0.8; d += radius * 0.17) {
         final half = sqrt(max(0, radius * radius * 0.86 - d * d));
-        scribble.add(at + along * d + across * (half * flip) + Offset(_jitter(0.8), _jitter(0.8)));
+        scribble.add(
+          at +
+              along * d +
+              across * (half * flip) +
+              Offset(_jitter(0.8), _jitter(0.8)),
+        );
         flip = -flip;
       }
       for (var i = 0; i < scribble.length - 1; i++) {
@@ -357,7 +443,15 @@ class _Doodler {
           ..lineTo(scribble[i + 1].dx, scribble[i + 1].dy);
       }
     } else {
-      _curve(_coil(at + Offset(radius * 0.5, 0), -pi / 2, radius * 0.5, side: -1, turns: 1.2));
+      _curve(
+        _coil(
+          at + Offset(radius * 0.5, 0),
+          -pi / 2,
+          radius * 0.5,
+          side: -1,
+          turns: 1.2,
+        ),
+      );
     }
   }
 
@@ -365,7 +459,10 @@ class _Doodler {
     final count = 2 + pen.nextInt(4);
     for (var i = 0; i < count; i++) {
       _solid.addOval(
-        Rect.fromCircle(center: at + Offset(_jitter(16), _jitter(16)), radius: _r(1.1, 2.3)),
+        Rect.fromCircle(
+          center: at + Offset(_jitter(16), _jitter(16)),
+          radius: _r(1.1, 2.3),
+        ),
       );
     }
   }

@@ -19,7 +19,12 @@ import '../widgets/bazaar_widgets.dart';
 import '../widgets/shop_shelves.dart' show WareHero;
 
 class WarePage extends StatefulWidget {
-  const WarePage({super.key, required this.controller, required this.wareId, this.shelf = const []});
+  const WarePage({
+    super.key,
+    required this.controller,
+    required this.wareId,
+    this.shelf = const [],
+  });
 
   final BazaarController controller;
   final String wareId;
@@ -31,8 +36,9 @@ class WarePage extends StatefulWidget {
 }
 
 class _WarePageState extends State<WarePage> {
-  late final List<String> _shelf =
-      widget.shelf.contains(widget.wareId) ? widget.shelf : [widget.wareId];
+  late final List<String> _shelf = widget.shelf.contains(widget.wareId)
+      ? widget.shelf
+      : [widget.wareId];
   late int _index = _shelf.indexOf(widget.wareId);
   late final PageController _pages = PageController(initialPage: _index);
   final _dyes = <String, WareDye>{};
@@ -60,7 +66,12 @@ class _WarePageState extends State<WarePage> {
     final bought = _controller.wareById(ware.id);
     if (bought == null || !bought.owned) return;
 
-    final choice = await showBargainSealed(context, ware: bought, before: before, after: _controller.data!.purse);
+    final choice = await showBargainSealed(
+      context,
+      ware: bought,
+      before: before,
+      after: _controller.data!.purse,
+    );
     if (!mounted) return;
     switch (choice) {
       case BargainChoice.wear:
@@ -79,10 +90,19 @@ class _WarePageState extends State<WarePage> {
   }
 
   static String _wornToast(Ware ware, bool worn) => switch (ware.category) {
-        WareCategory.buddy => worn ? '${ware.name} is at your side.' : '${ware.name} is resting in your chest.',
-        WareCategory.title => worn ? 'You now go by ${ware.name.replaceFirst('Title: ', '')}.' : 'Title set aside.',
-        _ => worn ? 'You are wearing the ${ware.name}.' : '${ware.name} is back in your chest.',
-      };
+    WareCategory.buddy =>
+      worn
+          ? '${ware.name} is at your side.'
+          : '${ware.name} is resting in your chest.',
+    WareCategory.title =>
+      worn
+          ? 'You now go by ${ware.name.replaceFirst('Title: ', '')}.'
+          : 'Title set aside.',
+    _ =>
+      worn
+          ? 'You are wearing the ${ware.name}.'
+          : '${ware.name} is back in your chest.',
+  };
 
   void _step(int by) {
     final to = _index + by;
@@ -90,17 +110,23 @@ class _WarePageState extends State<WarePage> {
     if (MediaQuery.disableAnimationsOf(context)) {
       _pages.jumpToPage(to);
     } else {
-      _pages.animateToPage(to, duration: const Duration(milliseconds: 380), curve: GuildMotion.easeOut);
+      _pages.animateToPage(
+        to,
+        duration: const Duration(milliseconds: 380),
+        curve: GuildMotion.easeOut,
+      );
     }
   }
 
   double _offsetOf(int i) {
-    if (!_pages.hasClients || !_pages.position.haveDimensions) return (i - _index).toDouble();
+    if (!_pages.hasClients || !_pages.position.haveDimensions)
+      return (i - _index).toDouble();
     return i - (_pages.page ?? _index.toDouble());
   }
 
-  WareDye? _dyeFor(Ware ware) =>
-      ware.owned ? ware.dye : (_dyes[ware.id] ?? (ware.dyes.isEmpty ? null : ware.dyes.first));
+  WareDye? _dyeFor(Ware ware) => ware.owned
+      ? ware.dye
+      : (_dyes[ware.id] ?? (ware.dyes.isEmpty ? null : ware.dyes.first));
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +144,10 @@ class _WarePageState extends State<WarePage> {
                 child: GuildNote(
                   title: 'Gone from the stall',
                   message: 'This ware is no longer for sale.',
-                  action: GuildButton(label: 'Back to the stall', onPressed: () => Navigator.of(context).maybePop()),
+                  action: GuildButton(
+                    label: 'Back to the stall',
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
                 ),
               ),
             ),
@@ -135,11 +164,19 @@ class _WarePageState extends State<WarePage> {
                 padding: const EdgeInsets.fromLTRB(8, 6, 20, 0),
                 child: Row(
                   children: [
-                    GuildBackLink(label: 'Bazaar', onTap: () => Navigator.of(context).maybePop()),
+                    GuildBackLink(
+                      label: 'Bazaar',
+                      onTap: () => Navigator.of(context).maybePop(),
+                    ),
                     const Spacer(),
                     Text(
-                      _shelf.length > 1 ? '${ware.shelf}  ·  ${_index + 1} of ${_shelf.length}' : ware.shelf,
-                      style: GuildText.label(GuildType.xs, color: GuildColors.cream),
+                      _shelf.length > 1
+                          ? '${ware.shelf}  ·  ${_index + 1} of ${_shelf.length}'
+                          : ware.shelf,
+                      style: GuildText.label(
+                        GuildType.xs,
+                        color: GuildColors.cream,
+                      ),
                     ),
                   ],
                 ),
@@ -164,7 +201,9 @@ class _WarePageState extends State<WarePage> {
                               ware: w,
                               dye: _dyeFor(w),
                               now: now,
-                              onDye: w.owned ? null : (d) => setState(() => _dyes[w.id] = d),
+                              onDye: w.owned
+                                  ? null
+                                  : (d) => setState(() => _dyes[w.id] = d),
                             ),
                           ),
                         );
@@ -177,7 +216,11 @@ class _WarePageState extends State<WarePage> {
                               opacity: 1 - d.abs() * 0.55,
                               child: Transform(
                                 alignment: Alignment.bottomCenter,
-                                transform: Matrix4.translationValues(0, d.abs() * 26, 0)..rotateZ(d * 0.06),
+                                transform: Matrix4.translationValues(
+                                  0,
+                                  d.abs() * 26,
+                                  0,
+                                )..rotateZ(d * 0.06),
                                 child: child,
                               ),
                             );
@@ -187,9 +230,23 @@ class _WarePageState extends State<WarePage> {
                       },
                     ),
                     if (_index > 0)
-                      Positioned(left: 0, top: 236, child: _ShelfArrow(forward: false, onTap: () => _step(-1))),
+                      Positioned(
+                        left: 0,
+                        top: 236,
+                        child: _ShelfArrow(
+                          forward: false,
+                          onTap: () => _step(-1),
+                        ),
+                      ),
                     if (_index < _shelf.length - 1)
-                      Positioned(right: 0, top: 236, child: _ShelfArrow(forward: true, onTap: () => _step(1))),
+                      Positioned(
+                        right: 0,
+                        top: 236,
+                        child: _ShelfArrow(
+                          forward: true,
+                          onTap: () => _step(1),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -204,7 +261,9 @@ class _WarePageState extends State<WarePage> {
               busy: _controller.busy,
               onBuy: () => _buy(ware),
               onWear: (worn) => _setWorn(ware, worn),
-              onWish: () => _guarded(() => _controller.setWishlisted(ware.id, !ware.wishlisted)),
+              onWish: () => _guarded(
+                () => _controller.setWishlisted(ware.id, !ware.wishlisted),
+              ),
             ),
           ),
         );
@@ -240,10 +299,18 @@ class _ShelfArrow extends StatelessWidget {
                 color: GuildColors.indigoDeep,
                 shape: BoxShape.circle,
                 border: Border.all(color: GuildColors.chalk, width: 1.8),
-                boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(1.5, 2.5))],
+                boxShadow: [
+                  BoxShadow(
+                    color: GuildColors.shadow.withValues(alpha: 0.5),
+                    offset: const Offset(1.5, 2.5),
+                  ),
+                ],
               ),
               child: Center(
-                child: GuildIcon(forward ? GuildGlyph.chevronRight : GuildGlyph.chevronLeft, size: 18),
+                child: GuildIcon(
+                  forward ? GuildGlyph.chevronRight : GuildGlyph.chevronLeft,
+                  size: 18,
+                ),
               ),
             ),
           ),
@@ -254,7 +321,12 @@ class _ShelfArrow extends StatelessWidget {
 }
 
 class _WarePoster extends StatelessWidget {
-  const _WarePoster({required this.ware, required this.dye, required this.now, required this.onDye});
+  const _WarePoster({
+    required this.ware,
+    required this.dye,
+    required this.now,
+    required this.onDye,
+  });
 
   final Ware ware;
   final WareDye? dye;
@@ -264,7 +336,9 @@ class _WarePoster extends StatelessWidget {
   String get _mirrorLabel {
     if (ware.owned) return ware.worn ? 'In use' : 'In your chest';
     if (ware.tryOnAsset != null) return 'Trying it on';
-    return ware.category == WareCategory.avatar && ware.slot == 'hero' ? 'Your new look' : 'On display';
+    return ware.category == WareCategory.avatar && ware.slot == 'hero'
+        ? 'Your new look'
+        : 'On display';
   }
 
   @override
@@ -296,7 +370,10 @@ class _WarePoster extends StatelessWidget {
                           Text(
                             ware.name,
                             textAlign: TextAlign.center,
-                            style: GuildText.title(GuildType.xxl, color: GuildColors.brick),
+                            style: GuildText.title(
+                              GuildType.xxl,
+                              color: GuildColors.brick,
+                            ),
                           ),
                           const SizedBox(height: 2),
                           const InkUnderline(),
@@ -313,13 +390,28 @@ class _WarePoster extends StatelessWidget {
                   runSpacing: 2,
                   children: [
                     RarityMark(ware.rarity),
-                    Text('·', style: GuildText.hand(GuildType.sm, color: GuildColors.pencil)),
-                    Text('sold ${formatAmount(ware.sold)} times', style: GuildText.hand(GuildType.sm)),
+                    Text(
+                      '·',
+                      style: GuildText.hand(
+                        GuildType.sm,
+                        color: GuildColors.pencil,
+                      ),
+                    ),
+                    Text(
+                      'sold ${formatAmount(ware.sold)} times',
+                      style: GuildText.hand(GuildType.sm),
+                    ),
                   ],
                 ),
                 if (leaves != null && !ware.owned) ...[
                   const SizedBox(height: 4),
-                  Text(leavesLabel(leaves, now), style: GuildText.hand(GuildType.sm, color: GuildColors.brick)),
+                  Text(
+                    leavesLabel(leaves, now),
+                    style: GuildText.hand(
+                      GuildType.sm,
+                      color: GuildColors.brick,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 18),
                 Stack(
@@ -330,20 +422,29 @@ class _WarePoster extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 14),
                       child: MirrorFrame(
                         child: Padding(
-                          padding: fills ? const EdgeInsets.only(top: 10) : const EdgeInsets.all(26),
+                          padding: fills
+                              ? const EdgeInsets.only(top: 10)
+                              : const EdgeInsets.all(26),
                           child: Semantics(
                             image: true,
-                            label: dye == null ? ware.name : '${ware.name}, dyed ${dye!.label}',
+                            label: dye == null
+                                ? ware.name
+                                : '${ware.name}, dyed ${dye!.label}',
                             child: WareHero(
                               ware: ware,
                               dye: dye,
                               child: AnimatedSwitcher(
-                                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.quick,
+                                duration:
+                                    MediaQuery.disableAnimationsOf(context)
+                                    ? Duration.zero
+                                    : GuildMotion.quick,
                                 child: Image.asset(
                                   shown,
                                   key: ValueKey(shown),
                                   fit: BoxFit.contain,
-                                  alignment: fills ? Alignment.bottomCenter : Alignment.center,
+                                  alignment: fills
+                                      ? Alignment.bottomCenter
+                                      : Alignment.center,
                                   filterQuality: FilterQuality.medium,
                                   gaplessPlayback: true,
                                 ),
@@ -360,18 +461,35 @@ class _WarePoster extends StatelessWidget {
                       shadow: const Offset(1.5, 2),
                       seed: 19,
                       padding: const EdgeInsets.fromLTRB(12, 3, 12, 4),
-                      child: Text(_mirrorLabel, style: GuildText.hand(GuildType.sm)),
+                      child: Text(
+                        _mirrorLabel,
+                        style: GuildText.hand(GuildType.sm),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                Text(ware.description, textAlign: TextAlign.center, style: GuildText.hand(GuildType.lg)),
+                Text(
+                  ware.description,
+                  textAlign: TextAlign.center,
+                  style: GuildText.hand(GuildType.lg),
+                ),
                 if (ware.dyes.length > 1 && onDye != null) ...[
                   const SizedBox(height: 14),
-                  _DyePicker(dyes: ware.dyes, selected: dye ?? ware.dyes.first, onPick: onDye!),
+                  _DyePicker(
+                    dyes: ware.dyes,
+                    selected: dye ?? ware.dyes.first,
+                    onPick: onDye!,
+                  ),
                 ] else if (ware.owned && dye != null) ...[
                   const SizedBox(height: 10),
-                  Text('Dyed ${dye!.label.toLowerCase()}', style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft)),
+                  Text(
+                    'Dyed ${dye!.label.toLowerCase()}',
+                    style: GuildText.hand(
+                      GuildType.sm,
+                      color: GuildColors.inkSoft,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 14),
                 Row(
@@ -379,25 +497,47 @@ class _WarePoster extends StatelessWidget {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(top: 2),
-                      child: GuildIcon(GuildGlyph.check, size: 18, color: GuildColors.brick),
+                      child: GuildIcon(
+                        GuildGlyph.check,
+                        size: 18,
+                        color: GuildColors.brick,
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Expanded(child: Text(ware.perk, style: GuildText.hand(GuildType.sm))),
+                    Expanded(
+                      child: Text(
+                        ware.perk,
+                        style: GuildText.hand(GuildType.sm),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
         ),
-        const Positioned(top: -9, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape))),
-        Positioned(top: -16, right: -8, child: RoundBadge(asset: ware.artFor(dye), size: 62)),
+        const Positioned(
+          top: -9,
+          left: 0,
+          right: 0,
+          child: Center(child: Fastener(kind: FastenerKind.tape)),
+        ),
+        Positioned(
+          top: -16,
+          right: -8,
+          child: RoundBadge(asset: ware.artFor(dye), size: 62),
+        ),
       ],
     );
   }
 }
 
 class _DyePicker extends StatelessWidget {
-  const _DyePicker({required this.dyes, required this.selected, required this.onPick});
+  const _DyePicker({
+    required this.dyes,
+    required this.selected,
+    required this.onPick,
+  });
 
   final List<WareDye> dyes;
   final WareDye selected;
@@ -431,7 +571,9 @@ class _DyePicker extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: dye == selected ? GuildColors.brick : Colors.transparent,
+                        color: dye == selected
+                            ? GuildColors.brick
+                            : Colors.transparent,
                         width: 2.2,
                       ),
                     ),
@@ -471,10 +613,10 @@ class _BuyBar extends StatelessWidget {
   final VoidCallback onWish;
 
   static String _unwearLabel(Ware ware) => switch (ware.category) {
-        WareCategory.buddy => 'Send it to rest',
-        WareCategory.title => 'Set the title aside',
-        _ => 'Take it off',
-      };
+    WareCategory.buddy => 'Send it to rest',
+    WareCategory.title => 'Set the title aside',
+    _ => 'Take it off',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -485,23 +627,31 @@ class _BuyBar extends StatelessWidget {
     final Widget action;
     final String caption;
     if (ware.owned) {
-      caption = ware.worn ? 'In use. It stays in your chest when you take it off.' : 'Bought, and kept in your chest.';
+      caption = ware.worn
+          ? 'In use. It stays in your chest when you take it off.'
+          : 'Bought, and kept in your chest.';
       action = !ware.wearable
           ? const GuildButton(label: 'In your chest', onPressed: null)
           : ware.worn
-              ? GuildButton(
-                  label: _unwearLabel(ware),
-                  kind: GuildButtonKind.quiet,
-                  onPressed: busy ? null : () => onWear(false),
-                )
-              : GuildButton(label: wearLabel(ware), onPressed: busy ? null : () => onWear(true));
+          ? GuildButton(
+              label: _unwearLabel(ware),
+              kind: GuildButtonKind.quiet,
+              onPressed: busy ? null : () => onWear(false),
+            )
+          : GuildButton(
+              label: wearLabel(ware),
+              onPressed: busy ? null : () => onWear(true),
+            );
     } else {
       caption = affordable
           ? 'You have ${formatAmount(have)} ${price.currency.label}. '
-              '${formatAmount(have - price.amount)} left after this.'
+                '${formatAmount(have - price.amount)} left after this.'
           : 'You have ${formatAmount(have)} ${price.currency.label}. '
-              '${formatAmount(price.amount - have)} more to go.';
-      action = _BuyButton(price: price, onPressed: affordable && !busy ? onBuy : null);
+                '${formatAmount(price.amount - have)} more to go.';
+      action = _BuyButton(
+        price: price,
+        onPressed: affordable && !busy ? onBuy : null,
+      );
     }
 
     return Padding(
@@ -528,7 +678,9 @@ class _BuyBar extends StatelessWidget {
                       seed: 71,
                       child: SizedBox.square(
                         dimension: 56,
-                        child: Center(child: HeartMark(filled: ware.wishlisted)),
+                        child: Center(
+                          child: HeartMark(filled: ware.wishlisted),
+                        ),
                       ),
                     ),
                   ),
@@ -539,7 +691,11 @@ class _BuyBar extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(caption, textAlign: TextAlign.center, style: GuildText.aside(GuildType.sm)),
+          Text(
+            caption,
+            textAlign: TextAlign.center,
+            style: GuildText.aside(GuildType.sm),
+          ),
         ],
       ),
     );
@@ -555,7 +711,9 @@ class _BuyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onPressed != null;
-    final text = enabled ? GuildColors.cream : GuildColors.cream.withValues(alpha: 0.72);
+    final text = enabled
+        ? GuildColors.cream
+        : GuildColors.cream.withValues(alpha: 0.72);
     return Semantics(
       button: true,
       enabled: enabled,
@@ -572,7 +730,12 @@ class _BuyButton extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           child: Container(
             constraints: const BoxConstraints(minHeight: 46),
-            decoration: BoxDecoration(border: Border.all(color: text.withValues(alpha: text.a * 0.8), width: 1.2)),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: text.withValues(alpha: text.a * 0.8),
+                width: 1.2,
+              ),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             alignment: Alignment.center,
             child: FittedBox(
@@ -580,9 +743,19 @@ class _BuyButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Opacity(opacity: enabled ? 1 : 0.6, child: CurrencyIcon(price.currency, size: 24)),
+                  Opacity(
+                    opacity: enabled ? 1 : 0.6,
+                    child: CurrencyIcon(price.currency, size: 24),
+                  ),
                   const SizedBox(width: 10),
-                  Text('Buy for ${formatPrice(price)}', style: GuildText.label(GuildType.lg, color: text, spacing: 0.6)),
+                  Text(
+                    'Buy for ${formatPrice(price)}',
+                    style: GuildText.label(
+                      GuildType.lg,
+                      color: text,
+                      spacing: 0.6,
+                    ),
+                  ),
                 ],
               ),
             ),

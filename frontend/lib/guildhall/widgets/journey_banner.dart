@@ -27,7 +27,10 @@ class JourneyBanner extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: CustomPaint(
-            painter: _BannerPainter(notch: _notch, seed: stableSeed(journey.id)),
+            painter: _BannerPainter(
+              notch: _notch,
+              seed: stableSeed(journey.id),
+            ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(26, 22, 26, _notch + 22),
               child: Column(
@@ -47,7 +50,10 @@ class JourneyBanner extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: Semantics(
                             header: true,
-                            child: LetteredTitle(journey.name, size: GuildType.xl),
+                            child: LetteredTitle(
+                              journey.name,
+                              size: GuildType.xl,
+                            ),
                           ),
                         ),
                       ),
@@ -65,18 +71,35 @@ class JourneyBanner extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      SealProgress(total: journey.quests.length, done: journey.fulfilledCount, size: 20),
+                      SealProgress(
+                        total: journey.quests.length,
+                        done: journey.fulfilledCount,
+                        size: 20,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 14),
                   DashedBorder(
                     color: GuildColors.cream.withValues(alpha: 0.8),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     child: Row(
                       children: [
-                        ExcludeSemantics(child: Image.asset(GuildAssets.coinPouch, height: 26)),
+                        ExcludeSemantics(
+                          child: Image.asset(GuildAssets.coinPouch, height: 26),
+                        ),
                         const SizedBox(width: 10),
-                        Expanded(child: Text(bounty, style: GuildText.body(GuildType.md, color: GuildColors.cream))),
+                        Expanded(
+                          child: Text(
+                            bounty,
+                            style: GuildText.body(
+                              GuildType.md,
+                              color: GuildColors.cream,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -96,14 +119,14 @@ class _Rod extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget knob() => Container(
-          width: 22,
-          height: 22,
-          decoration: BoxDecoration(
-            color: GuildColors.gold,
-            shape: BoxShape.circle,
-            border: Border.all(color: GuildColors.bronze, width: 1.5),
-          ),
-        );
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(
+        color: GuildColors.gold,
+        shape: BoxShape.circle,
+        border: Border.all(color: GuildColors.bronze, width: 1.5),
+      ),
+    );
 
     return SizedBox(
       height: 44,
@@ -117,7 +140,10 @@ class _Rod extends StatelessWidget {
             bottom: 5,
             child: Container(
               height: 12,
-              decoration: BoxDecoration(color: GuildColors.shadow, borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(
+                color: GuildColors.shadow,
+                borderRadius: BorderRadius.circular(3),
+              ),
             ),
           ),
           Positioned(left: 0, bottom: 0, child: knob()),
@@ -156,12 +182,12 @@ class _BannerPainter extends CustomPainter {
   static final _cloths = <(int, Size, double), _Cloth>{};
 
   static List<Offset> _outline(Rect r, double notch) => [
-        r.topLeft,
-        r.topRight,
-        r.bottomRight,
-        Offset(r.center.dx, r.bottom - notch),
-        r.bottomLeft,
-      ];
+    r.topLeft,
+    r.topRight,
+    r.bottomRight,
+    Offset(r.center.dx, r.bottom - notch),
+    r.bottomLeft,
+  ];
 
   _Cloth _cloth(Size size) {
     final key = (seed, size, notch);
@@ -174,7 +200,10 @@ class _BannerPainter extends CustomPainter {
     final sheen = Path();
     final count = max(2, (size.width / 120).round());
     for (var i = 0; i < count; i++) {
-      final x = size.width * (i + 0.65 + (pen.nextDouble() - 0.5) * 0.4) / (count + 0.3);
+      final x =
+          size.width *
+          (i + 0.65 + (pen.nextDouble() - 0.5) * 0.4) /
+          (count + 0.3);
       final bottom = size.height * (0.5 + pen.nextDouble() * 0.35);
       var y = 4 + pen.nextDouble() * 8;
       var drift = 0.0;
@@ -197,7 +226,8 @@ class _BannerPainter extends CustomPainter {
         ..lineTo(x + (pen.nextDouble() - 0.5) * 2, 2 + length);
     }
 
-    final inner = Path()..addPolygon(_outline((Offset.zero & size).deflate(11), notch - 4), true);
+    final inner = Path()
+      ..addPolygon(_outline((Offset.zero & size).deflate(11), notch - 4), true);
     return _cloths[key] = (
       folds: folds,
       sheen: sheen,
@@ -215,9 +245,18 @@ class _BannerPainter extends CustomPainter {
 
     canvas.save();
     canvas.clipPath(sketch.shape);
-    canvas.drawPath(cloth.folds, Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.55), 2.6));
-    canvas.drawPath(cloth.sheen, Sketch.pen(GuildColors.cream.withValues(alpha: 0.12), 1.8));
-    canvas.drawPath(cloth.rodShade, Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.7), 1.3));
+    canvas.drawPath(
+      cloth.folds,
+      Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.55), 2.6),
+    );
+    canvas.drawPath(
+      cloth.sheen,
+      Sketch.pen(GuildColors.cream.withValues(alpha: 0.12), 1.8),
+    );
+    canvas.drawPath(
+      cloth.rodShade,
+      Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.7), 1.3),
+    );
     canvas.restore();
 
     sketch.paintShading(canvas, ink: GuildColors.brickDeep, strength: 2.2);
@@ -235,5 +274,6 @@ class _BannerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_BannerPainter old) => old.notch != notch || old.seed != seed;
+  bool shouldRepaint(_BannerPainter old) =>
+      old.notch != notch || old.seed != seed;
 }

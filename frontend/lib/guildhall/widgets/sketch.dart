@@ -41,7 +41,8 @@ Path traceByHand(
       final tangent = metric.getTangentForOffset(metric.length * at);
       if (tangent == null) continue;
       final normal = Offset(-tangent.vector.dy, tangent.vector.dx) * inward;
-      final point = tangent.position +
+      final point =
+          tangent.position +
           normal * (inset + (pen.nextDouble() - 0.5) * 2 * wobble) +
           tangent.vector * ((pen.nextDouble() - 0.5) * wobble);
       if (run.isNotEmpty && pen.nextDouble() < lift) {
@@ -68,7 +69,11 @@ Path _roughEdges(List<Offset> points, Random pen, {required double wobble}) {
     final pieces = max(1, (length / 28).round());
     final run = <Offset>[from - along * (pen.nextDouble() * 1.6)];
     for (var k = 1; k < pieces; k++) {
-      run.add(from + delta * (k / pieces) + across * ((pen.nextDouble() - 0.5) * 2 * wobble));
+      run.add(
+        from +
+            delta * (k / pieces) +
+            across * ((pen.nextDouble() - 0.5) * 2 * wobble),
+      );
     }
     run.add(to + along * (pen.nextDouble() * 1.6));
     _smooth(path, run);
@@ -99,14 +104,27 @@ Path _edgeHatch(Path source, Random pen) {
       final outward = Offset(-tangent.vector.dy, tangent.vector.dx) * -inward;
       final shade = outward.dx * 0.5 + outward.dy * 0.87;
       if (shade < 0.3) continue;
-      final swell = 0.55 + 0.45 * sin(d / metric.length * 2 * pi * waves + phase);
-      stroke(tangent.position, upLeft, (4 + shade * swell * 22 + pen.nextDouble() * 5) * scale);
+      final swell =
+          0.55 + 0.45 * sin(d / metric.length * 2 * pi * waves + phase);
+      stroke(
+        tangent.position,
+        upLeft,
+        (4 + shade * swell * 22 + pen.nextDouble() * 5) * scale,
+      );
     }
   }
 
   for (var i = 0; i < 6; i++) {
-    stroke(bounds.topLeft + Offset(5 + i * 5.0, 1), pi * 0.36, ((6 - i) * 3.4 + 3) * scale);
-    stroke(bounds.topLeft + Offset(1, 6 + i * 5.0), -pi * 0.1, ((6 - i) * 2.8 + 3) * scale);
+    stroke(
+      bounds.topLeft + Offset(5 + i * 5.0, 1),
+      pi * 0.36,
+      ((6 - i) * 3.4 + 3) * scale,
+    );
+    stroke(
+      bounds.topLeft + Offset(1, 6 + i * 5.0),
+      -pi * 0.1,
+      ((6 - i) * 2.8 + 3) * scale,
+    );
   }
   return path;
 }
@@ -189,12 +207,19 @@ class Sketch {
 
   void paintFill(Canvas canvas, Color color, {Offset? shadow}) {
     if (shadow != null) {
-      canvas.drawPath(shape.shift(shadow), Paint()..color = GuildColors.shadow.withValues(alpha: color.a * 0.5));
+      canvas.drawPath(
+        shape.shift(shadow),
+        Paint()..color = GuildColors.shadow.withValues(alpha: color.a * 0.5),
+      );
     }
     canvas.drawPath(shape, Paint()..color = color);
   }
 
-  void paintShading(Canvas canvas, {Color ink = GuildColors.ink, double strength = 1}) {
+  void paintShading(
+    Canvas canvas, {
+    Color ink = GuildColors.ink,
+    double strength = 1,
+  }) {
     canvas.save();
     canvas.clipPath(shape);
     canvas.drawPath(hatch, pen(ink.withValues(alpha: 0.22 * strength), 1.1));
@@ -203,7 +228,11 @@ class Sketch {
     canvas.restore();
   }
 
-  void paintBorder(Canvas canvas, {Color color = GuildColors.pencil, double width = 1.8}) {
+  void paintBorder(
+    Canvas canvas, {
+    Color color = GuildColors.pencil,
+    double width = 1.8,
+  }) {
     canvas.drawPath(border, pen(color, width));
     canvas.drawPath(echo, pen(color.withValues(alpha: color.a * 0.75), 1.1));
   }
@@ -266,7 +295,10 @@ class _SketchBoxPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final sketch = Sketch.of(Sketch.box(size, inset: borderWidth / 2, bevel: bevel), seed);
+    final sketch = Sketch.of(
+      Sketch.box(size, inset: borderWidth / 2, bevel: bevel),
+      seed,
+    );
     final dark = Sketch.isDark(color);
     sketch.paintFill(canvas, color, shadow: shadow);
     sketch.paintShading(
