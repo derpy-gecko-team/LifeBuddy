@@ -29,7 +29,15 @@ abstract final class BuddyAssets {
 
   static const forest = '$_dir/forest.png';
   static const campfire = '$_dir/campfire.png';
-  static const pip = '$_dir/pip.png';
+  // Pip, a layer per part that moves (see PipCat).
+  static const pipTail = '$_dir/pip_tail.png';
+  static const pipBody = '$_dir/pip_body.png';
+  static const pipEarLeft = '$_dir/pip_ear_left.png';
+  static const pipEarRight = '$_dir/pip_ear_right.png';
+  static const pipHead = '$_dir/pip_head.png';
+  static const pipEyes = '$_dir/pip_eyes.png';
+  static const pipEyesShut = '$_dir/pip_eyes_shut.png';
+  static const pipPaws = '$_dir/pip_paws.png';
   static const pawSeal = '$_dir/paw_seal.png';
   static const heyPipButton = '$_dir/hey_pip_button.png';
   static const quill = '$_dir/quill.png';

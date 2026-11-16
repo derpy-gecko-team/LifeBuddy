@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui' show lerpDouble;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,8 @@ import '../data/models.dart';
 import '../state/buddy_controller.dart';
 import '../state/hearing_controller.dart';
 import '../theme/buddy_theme.dart';
+import '../widgets/hearth_life.dart';
+import '../widgets/pip_cat.dart';
 import '../widgets/sky.dart';
 import '../widgets/smoke_puff.dart';
 import '../widgets/writing_scroll.dart';
@@ -77,12 +80,34 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
   final _sky = ScrollController();
   final _climb = ValueNotifier<double>(0);
 
-  // Seconds, for what drifts and twinkles up there. The clock only runs
-  // while the view is off the ground.
+  // One clock, in seconds, for everything that moves by itself. It feeds
+  // [_time] (the sky: stars, smoke) only while the view is off the ground,
+  // and [_hearthTime] (the fire, the fireflies, Pip) only while the ground
+  // is in view, so nothing is repainted where no one is looking. It stops
+  // altogether while another tab is showing.
   final _time = ValueNotifier<double>(0);
-  late final Ticker _clock = createTicker((elapsed) => _time.value = _clockBase + elapsed.inMicroseconds / 1e6);
+  final _hearthTime = ValueNotifier<double>(0);
+  late final Ticker _clock = createTicker(_tick);
   double _clockBase = 0;
+  double _now = 0;
   bool _still = false;
+
+  void _tick(Duration elapsed) {
+    _now = _clockBase + elapsed.inMicroseconds / 1e6;
+    final climb = _climb.value;
+    if (climb > 1) _time.value = _now;
+    if (climb < _fullHeight) _hearthTime.value = _now;
+  }
+
+  void _runClock(bool run) {
+    if (run == _clock.isActive) return;
+    if (run) {
+      _clock.start();
+    } else {
+      _clockBase = _now;
+      _clock.stop();
+    }
+  }
 
   @override
   void initState() {
@@ -95,16 +120,7 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
     _writing.addStatusListener((_) => setState(() {}));
   }
 
-  void _onClimb() {
-    _climb.value = _sky.offset;
-    final aloft = _sky.offset > 1 && !_still;
-    if (aloft && !_clock.isActive) {
-      _clock.start();
-    } else if (!aloft && _clock.isActive) {
-      _clockBase = _time.value;
-      _clock.stop();
-    }
-  }
+  void _onClimb() => _climb.value = _sky.offset;
 
   void _backToTheFire() {
     if (!_sky.hasClients) return;
@@ -129,6 +145,7 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _still = MediaQuery.disableAnimationsOf(context);
+    _runClock(!_still && Visibility.of(context));
     _writing.duration = _still ? Duration.zero : _unhurried;
     _writing.reverseDuration = _writing.duration;
   }
@@ -145,6 +162,7 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
     _sky.dispose();
     _climb.dispose();
     _time.dispose();
+    _hearthTime.dispose();
     super.dispose();
   }
 
@@ -263,6 +281,7 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
                         onOpenGuildHall: widget.onOpenGuildHall,
                         onOpenMap: widget.onOpenMap,
                         hearing: _hearing,
+                        time: _hearthTime,
                       ),
                     ),
                   ),
@@ -294,10 +313,17 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
                     left: (_width - _frameWidth * s) / 2 + 32 * s,
                     top: frameTop + 78 * s,
                     child: IgnorePointer(
-                      child: Image.asset(
-                        BuddyAssets.pip,
-                        width: 334 * s,
-                        semanticLabel: 'Pip, a black cat in a feathered cap',
+                      child: RepaintBoundary(
+                        child: ListenableBuilder(
+                          listenable: Listenable.merge([widget.controller, _hearing]),
+                          builder: (context, _) => PipCat(
+                            time: _hearthTime,
+                            s: s,
+                            mood: _hearing.active
+                                ? PipMood.listening
+                                : (widget.controller.replying ? PipMood.thinking : PipMood.idle),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -488,6 +514,7 @@ class _Scene extends StatelessWidget {
     this.onOpenGuildHall,
     this.onOpenMap,
     required this.hearing,
+    required this.time,
   });
 
   final double s;
@@ -504,6 +531,9 @@ class _Scene extends StatelessWidget {
   final VoidCallback? onOpenGuildHall;
   final VoidCallback? onOpenMap;
   final HearingController hearing;
+
+  /// Seconds, for the embers and the fireflies.
+  final ValueListenable<double> time;
 
   @override
   Widget build(BuildContext context) {
@@ -546,6 +576,30 @@ class _Scene extends StatelessWidget {
                       right: 0,
                       bottom: 32 * s,
                       child: ExcludeSemantics(child: Image.asset(BuddyAssets.campfire, width: 393 * s)),
+                    ),
+                    // Life around the fire, painted over the still artwork:
+                    // fireflies among the trunks, and the embers themselves.
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: RepaintBoundary(
+                          child: CustomPaint(
+                            painter: FirefliesPainter(time: time, s: s, top: top),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 32 * s,
+                      height: (226 + EmbersPainter.headroom) * s,
+                      child: IgnorePointer(
+                        child: RepaintBoundary(
+                          child: CustomPaint(
+                            painter: EmbersPainter(time: time, s: s),
+                          ),
+                        ),
+                      ),
                     ),
                     Positioned(
                       left: 0,
@@ -897,7 +951,7 @@ class _HornState extends State<_Horn> with SingleTickerProviderStateMixin {
                     Positioned(
                       left: 0,
                       right: 0,
-                      top: (137 + (24 - size) / 2) * k,
+                      top: (133 + (24 - size) / 2) * k,
                       child: Text(ribbon, textAlign: TextAlign.center, style: BuddyText.serif(size * k)),
                     ),
                   ],
