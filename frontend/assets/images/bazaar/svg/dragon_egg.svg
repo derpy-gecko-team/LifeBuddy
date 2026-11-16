@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><filter id="hand" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="15" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g filter="url(#hand)" stroke="#2C2F58" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="60" cy="104" rx="32" ry="8" fill="#DDB96E"/>
+<path d="M60 12 C82 12 96 58 93 78 C90 98 76 106 60 106 C44 106 30 98 27 78 C24 58 38 12 60 12 Z" fill="#F1E4CB"/>
+<circle cx="72" cy="56" r="6.5" fill="#B95A54" stroke-width="2.2"/><circle cx="46" cy="76" r="4" fill="#B95A54" stroke="none"/><circle cx="70" cy="86" r="3" fill="#B95A54" stroke="none"/><circle cx="56" cy="92" r="2.4" fill="#B95A54" stroke="none"/><circle cx="80" cy="74" r="2.4" fill="#B95A54" stroke="none"/>
+<path d="M54 26 L62 38 L53 46 L63 58" fill="none" stroke-width="2.8"/>
+<path d="M38 50 C40 40 44 32 48 28" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="2.6" fill="none"/>
+</g>
+</svg>

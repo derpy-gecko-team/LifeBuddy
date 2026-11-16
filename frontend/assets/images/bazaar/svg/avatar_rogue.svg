@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><filter id="hand" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g filter="url(#hand)" stroke="#2C2F58" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M46 54 C30 50 18 58 6 50 C12 62 26 66 46 62 Z" fill="#A990B8"/>
+<path d="M28 100 C18 72 30 50 44 44 H76 C92 50 102 74 92 104 L82 94 L74 106 L64 96 L54 106 L44 94 L36 104 Z" fill="#9E423C"/>
+<path d="M47 98 H58 L57 116 H44 Z" fill="#2C2F58"/><path d="M63 98 H74 L77 116 H64 Z" fill="#2C2F58"/>
+<path d="M44 62 C46 54 74 54 76 62 L80 98 H40 Z" fill="#7A5E44"/>
+<path d="M41 86 H79" stroke="#C4AC86" stroke-width="6"/><path d="M41 86 H79" stroke-width="1.4" stroke-dasharray="3 5"/>
+<rect x="55" y="82" width="9" height="8" rx="1.5" fill="#EBD197" stroke-width="2.2"/>
+<path d="M45 38 L26 28 L42 48 Z" fill="#8E93B8"/><path d="M75 38 L94 28 L78 48 Z" fill="#8E93B8"/>
+<path d="M38 46 C34 22 48 8 60 8 C72 8 86 22 82 46 C80 60 40 60 38 46 Z" fill="#B95A54"/>
+<ellipse cx="60" cy="39" rx="14.5" ry="14" fill="#8E93B8"/>
+<path d="M45.5 36 C48 22 72 22 74.5 36 C66 29 54 29 45.5 36 Z" fill="#2C2F58"/>
+<path d="M46 42 H74 C74 56 46 56 46 42 Z" fill="#7A5C8E"/>
+<path d="M50 37 h6 M64 37 h6" stroke-width="2.6"/>
+</g>
+</svg>
