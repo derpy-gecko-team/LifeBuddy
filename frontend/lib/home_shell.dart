@@ -38,38 +38,41 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // The keyboard slides over the page instead of squeezing it. All four
-      // tabs stay alive in the IndexedStack, so a resize would lay every one
-      // of them out again, and repaint the Guild Hall and Bazaar walls, on
-      // each frame of the keyboard's animation.
-      resizeToAvoidBottomInset: false,
-      body: IndexedStack(index: _index, children: _pages),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map),
-            label: 'Map',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.castle_outlined),
-            selectedIcon: Icon(Icons.castle),
-            label: 'Guild Hall',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
-            selectedIcon: Icon(Icons.storefront),
-            label: 'Bazaar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.pets_outlined),
-            selectedIcon: Icon(Icons.pets),
-            label: 'Buddy',
-          ),
-        ],
+    // The shell does not know the keyboard exists. The keyboard's inset is
+    // dropped, and so is its side effect: while it is up, the system takes
+    // the bottom safe-area padding away, which would shrink the tab bar and
+    // stretch every tab by that much, then snap back. [viewPadding] is the
+    // same padding with the keyboard left out of it, so nothing in any tab
+    // moves, is rebuilt or is laid out again; the keyboard simply slides
+    // over the foot of the screen.
+    final media = MediaQuery.of(context);
+    return MediaQuery(
+      data: media.copyWith(viewInsets: EdgeInsets.zero, padding: media.viewPadding),
+      child: Scaffold(
+        // The keyboard slides over the page instead of squeezing it. All four
+        // tabs stay alive in the IndexedStack, so a resize would lay every one
+        // of them out again, and repaint the Guild Hall and Bazaar walls, on
+        // each frame of the keyboard's animation.
+        resizeToAvoidBottomInset: false,
+        body: IndexedStack(index: _index, children: _pages),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _index,
+          onDestinationSelected: (i) => setState(() => _index = i),
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map), label: 'Map'),
+            NavigationDestination(
+              icon: Icon(Icons.castle_outlined),
+              selectedIcon: Icon(Icons.castle),
+              label: 'Guild Hall',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.storefront_outlined),
+              selectedIcon: Icon(Icons.storefront),
+              label: 'Bazaar',
+            ),
+            NavigationDestination(icon: Icon(Icons.pets_outlined), selectedIcon: Icon(Icons.pets), label: 'Buddy'),
+          ],
+        ),
       ),
     );
   }

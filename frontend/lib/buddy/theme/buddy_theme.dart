@@ -15,6 +15,13 @@ abstract final class BuddyColors {
 
   static const cream = Color(0xFFF4E3C3);
   static const leather = Color(0xFF8A5A3B);
+
+  // Old messages, up in the sky: Pip's in warm campfire smoke, the hero's in
+  // cooler night mist. Body, and the paler billowing edge.
+  static const smokeWarm = Color(0xFF453C56);
+  static const smokeRimWarm = Color(0xFFC9B79A);
+  static const smokeCool = Color(0xFF2E3A66);
+  static const smokeRimCool = Color(0xFF9DABD6);
 }
 
 abstract final class BuddyAssets {

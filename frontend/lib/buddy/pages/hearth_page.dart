@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../../guildhall/widgets/guild_feedback.dart';
@@ -10,6 +11,8 @@ import '../data/buddy_repository.dart';
 import '../data/models.dart';
 import '../state/buddy_controller.dart';
 import '../theme/buddy_theme.dart';
+import '../widgets/sky.dart';
+import '../widgets/smoke_puff.dart';
 import '../widgets/writing_scroll.dart';
 
 /// The Buddy's campfire: Pip lounging on a card with the last thing it said,
@@ -35,7 +38,7 @@ class HearthPage extends StatefulWidget {
   State<HearthPage> createState() => _HearthPageState();
 }
 
-class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateMixin {
+class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
   static const _frameWidth = 393.0;
   static const _frameHeight = 762.0;
 
@@ -50,23 +53,69 @@ class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateM
   // Writing: a tap on the line slowly unrolls it into a scroll in the place
   // of Pip's card, which fades to make room. The keyboard is only called once
   // the scroll lies open, and on the way back it leaves before the scroll
-  // rolls up: the two never animate at once, which stutters on real phones.
+  // rolls up: one thing moves at a time.
   static const _unhurried = Duration(milliseconds: 650);
   static const _keyboardLeaves = Duration(milliseconds: 240);
   final _focus = FocusNode();
   late final AnimationController _writing = AnimationController(vsync: this, duration: _unhurried);
   late final Animation<double> _open = CurvedAnimation(parent: _writing, curve: Curves.easeInOutCubic);
 
+  // The sky: pulling the scene down climbs above the trees, to where the old
+  // messages hang in the smoke. [_climb] is how far up the view is.
+  final _sky = ScrollController();
+  final _climb = ValueNotifier<double>(0);
+
+  // Seconds, for what drifts and twinkles up there. The clock only runs
+  // while the view is off the ground.
+  final _time = ValueNotifier<double>(0);
+  late final Ticker _clock = createTicker((elapsed) => _time.value = _clockBase + elapsed.inMicroseconds / 1e6);
+  double _clockBase = 0;
+  bool _still = false;
+
   @override
   void initState() {
     super.initState();
     _focus.addListener(_onFocus);
+    _sky.addListener(_onClimb);
+    // The sky cannot be pulled while the scroll is out for writing.
+    _writing.addStatusListener((_) => setState(() {}));
+  }
+
+  void _onClimb() {
+    _climb.value = _sky.offset;
+    final aloft = _sky.offset > 1 && !_still;
+    if (aloft && !_clock.isActive) {
+      _clock.start();
+    } else if (!aloft && _clock.isActive) {
+      _clockBase = _time.value;
+      _clock.stop();
+    }
+  }
+
+  void _backToTheFire() {
+    if (!_sky.hasClients) return;
+    final far = _sky.offset;
+    _sky.animateTo(
+      0,
+      duration: Duration(milliseconds: (350 + far / 6).clamp(350, 1400).round()),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  /// Let go just above the ground and the view settles back onto it.
+  bool _onSettled(ScrollEndNotification end) {
+    final offset = end.metrics.pixels;
+    if (end.depth == 0 && offset > 0 && offset < _fullHeight * 0.22) {
+      Future<void>.microtask(_backToTheFire);
+    }
+    return false;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _writing.duration = MediaQuery.disableAnimationsOf(context) ? Duration.zero : _unhurried;
+    _still = MediaQuery.disableAnimationsOf(context);
+    _writing.duration = _still ? Duration.zero : _unhurried;
     _writing.reverseDuration = _writing.duration;
   }
 
@@ -75,6 +124,10 @@ class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateM
     _focus.removeListener(_onFocus);
     _focus.dispose();
     _writing.dispose();
+    _clock.dispose();
+    _sky.dispose();
+    _climb.dispose();
+    _time.dispose();
     super.dispose();
   }
 
@@ -130,7 +183,7 @@ class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateM
             final unrolledTop = frameTop + 250 * s;
             final scrollHeight = 270 * s;
 
-            return GestureDetector(
+            final ground = GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: _stopWriting,
               child: Stack(
@@ -158,7 +211,8 @@ class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateM
                       left: (_width - _frameWidth * s) / 2 + 24 * s,
                       width: 345 * s,
                       top: lerpDouble(rolledTop, unrolledTop, _open.value),
-                      child: line!,
+                      // Typing repaints the scroll alone, not the forest behind it.
+                      child: RepaintBoundary(child: line),
                     ),
                     child: _WritingLine(
                       s: s,
@@ -167,6 +221,7 @@ class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateM
                       open: _open,
                       openHeight: scrollHeight,
                       onStart: _startWriting,
+                      onDone: _stopWriting,
                     ),
                   ),
                   // Pip lies on the card's top edge, paws and tail hanging
@@ -185,7 +240,175 @@ class _HearthPageState extends State<HearthPage> with SingleTickerProviderStateM
                 ],
               ),
             );
+
+            return NotificationListener<ScrollEndNotification>(
+              onNotification: _onSettled,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  RepaintBoundary(
+                    child: CustomPaint(
+                      painter: SkyPainter(climb: _climb, time: _time, s: s),
+                    ),
+                  ),
+                  // Bottom up: the ground, the treetops, then the messages,
+                  // newest lowest. Pulling down climbs.
+                  ListenableBuilder(
+                    listenable: widget.controller,
+                    builder: (context, _) {
+                      final messages = widget.controller.messages;
+                      return ListView.builder(
+                        controller: _sky,
+                        reverse: true,
+                        padding: EdgeInsets.zero,
+                        physics: _writing.isDismissed
+                            ? const ClampingScrollPhysics()
+                            : const NeverScrollableScrollPhysics(),
+                        itemCount: messages.length + 3,
+                        itemBuilder: (context, i) {
+                          if (i == 0) {
+                            return _KeptAlive(
+                              child: SizedBox(height: _fullHeight, child: ground),
+                            );
+                          }
+                          if (i == 1) {
+                            return SizedBox(
+                              height: 130 * s,
+                              child: CustomPaint(painter: TreetopsPainter(s: s)),
+                            );
+                          }
+                          if (i == messages.length + 2) {
+                            return _SkyNote(
+                              s: s,
+                              height: _fullHeight * 0.5,
+                              text: messages.isEmpty
+                                  ? 'Nothing has gone up in smoke yet. Go and tell Pip something.'
+                                  : 'This is where the smoke began.',
+                            );
+                          }
+                          final message = messages[messages.length + 1 - i];
+                          return Center(
+                            child: SizedBox(
+                              width: _frameWidth * s,
+                              child: SmokePuff(
+                                key: ValueKey(message.id),
+                                message: message,
+                                time: _time,
+                                s: s,
+                                onOpenGuildHall: widget.onOpenGuildHall,
+                                onOpenMap: widget.onOpenMap,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  ValueListenableBuilder<double>(
+                    valueListenable: _climb,
+                    builder: (context, climb, button) {
+                      final aloft = climb > _fullHeight * 0.5;
+                      return Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 14 * s,
+                        child: IgnorePointer(
+                          ignoring: !aloft,
+                          child: AnimatedOpacity(
+                            opacity: aloft ? 1 : 0,
+                            duration: const Duration(milliseconds: 220),
+                            child: button,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Center(
+                      child: _BackToTheFire(s: s, onTap: _backToTheFire),
+                    ),
+                  ),
+                ],
+              ),
+            );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// The ground stays built while the view is far above it, so that what the
+/// hero was writing is still there on the way back down.
+class _KeptAlive extends StatefulWidget {
+  const _KeptAlive({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_KeptAlive> createState() => _KeptAliveState();
+}
+
+class _KeptAliveState extends State<_KeptAlive> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+}
+
+/// A line written on the sky itself, above the oldest message.
+class _SkyNote extends StatelessWidget {
+  const _SkyNote({required this.s, required this.height, required this.text});
+
+  final double s;
+  final double height;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Align(
+        alignment: const Alignment(0, 0.5),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40 * s),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: BuddyText.hand(17 * s, color: BuddyColors.cream.withValues(alpha: 0.6)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BackToTheFire extends StatelessWidget {
+  const _BackToTheFire({required this.s, required this.onTap});
+
+  final double s;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Back to the fire',
+      excludeSemantics: true,
+      child: GuildPressable(
+        onTap: onTap,
+        haptic: true,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20 * s, vertical: 10 * s),
+          decoration: BoxDecoration(
+            color: BuddyColors.card,
+            borderRadius: BorderRadius.circular(24 * s),
+            border: Border.all(color: BuddyColors.outline, width: 3 * s),
+            boxShadow: [BoxShadow(color: BuddyColors.outline, offset: Offset(0, 4 * s))],
+          ),
+          child: Text('Back to the fire', style: BuddyText.hand(18 * s, height: 1.1)),
         ),
       ),
     );
@@ -564,6 +787,7 @@ class _WritingLine extends StatefulWidget {
     required this.open,
     required this.openHeight,
     required this.onStart,
+    required this.onDone,
   });
 
   final double s;
@@ -572,6 +796,9 @@ class _WritingLine extends StatefulWidget {
 
   /// A tap on the rolled-up line: unroll first, the keyboard comes after.
   final VoidCallback onStart;
+
+  /// The letter is sent: put the pen down and roll the scroll up.
+  final VoidCallback onDone;
 
   /// 0 rolled up (a one-line pill), 1 unrolled: a scroll [openHeight] tall
   /// and as wide as Pip's card, with the quill resting on its corner.
@@ -585,19 +812,41 @@ class _WritingLine extends StatefulWidget {
 class _WritingLineState extends State<_WritingLine> {
   final _text = TextEditingController();
 
+  // A sent letter is not wiped off the page: it stays on the scroll and
+  // fades as the scroll rolls up around it. Only then is the line cleared.
+  bool _sent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.open.addStatusListener(_onRolled);
+  }
+
   @override
   void dispose() {
+    widget.open.removeStatusListener(_onRolled);
     _text.dispose();
     super.dispose();
   }
 
+  void _onRolled(AnimationStatus status) {
+    if (!_sent || status == AnimationStatus.reverse) return;
+    // Rolled up, or opened again before it got that far: a fresh line.
+    _text.clear();
+    setState(() => _sent = false);
+  }
+
   void _send() {
     final text = _text.text;
-    if (!widget.controller.canSend(text)) return;
-    _text.clear();
-    // Put the pen down, so the card comes back with Pip's answer.
-    widget.focusNode.unfocus();
+    if (_sent || !widget.controller.canSend(text)) return;
     widget.controller.send(text);
+    if (widget.open.isDismissed) {
+      _text.clear();
+      return;
+    }
+    setState(() => _sent = true);
+    // Put the pen down, so the card comes back with Pip's answer.
+    widget.onDone();
   }
 
   BoxDecoration _box(Color color, double radius) => BoxDecoration(
@@ -667,7 +916,8 @@ class _WritingLineState extends State<_WritingLine> {
                         child: TextField(
                           controller: _text,
                           focusNode: widget.focusNode,
-                          style: style,
+                          readOnly: _sent,
+                          style: _sent ? style.copyWith(color: BuddyColors.ink.withValues(alpha: t)) : style,
                           cursorColor: BuddyColors.name,
                           expands: true,
                           maxLines: null,
@@ -685,7 +935,8 @@ class _WritingLineState extends State<_WritingLine> {
                             isCollapsed: true,
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(vertical: lerpDouble(16.5, 6, t)! * s),
-                            hintText: 'I feel mute today…',
+                            // The invitation is gone the moment the line is tapped.
+                            hintText: t == 0 ? 'I feel mute today…' : null,
                             hintStyle: style.copyWith(color: BuddyColors.inkFaded),
                           ),
                         ),
