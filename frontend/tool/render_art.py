@@ -24,8 +24,8 @@ SIZES = {
         "badge_flame": 144,
         "badge_skull": 144,
         "buddy_envelope": 144,
-        "questline_iron_body": 160,
-        "questline_scholar_tower": 160,
+        "journey_iron_body": 160,
+        "journey_scholar_tower": 160,
     },
     "bazaar": {
         "coin_lotus": 160,

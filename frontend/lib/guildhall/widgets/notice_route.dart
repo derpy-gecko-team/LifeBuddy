@@ -106,7 +106,7 @@ class _EdgeSwipeBackState extends State<EdgeSwipeBack> {
 
 typedef OpenQuest = Future<void> Function(String questId, {Rect? origin, double tilt});
 
-typedef OpenQuestline = void Function(String questlineId, {Rect? origin});
+typedef OpenJourney = void Function(String journeyId, {Rect? origin});
 
 Rect? globalRectOf(BuildContext context) {
   final box = context.findRenderObject();

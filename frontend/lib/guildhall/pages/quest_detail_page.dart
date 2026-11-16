@@ -38,7 +38,7 @@ class QuestDetailPage extends StatelessWidget {
       listenable: controller,
       builder: (context, _) {
         final quest = controller.questById(questId);
-        final line = quest == null ? null : controller.questlineById(quest.questlineId);
+        final line = quest == null ? null : controller.journeyById(quest.journeyId);
         if (quest == null || line == null) {
           return const GuildScaffold(wall: WallVariant.quest, body: SizedBox.shrink());
         }

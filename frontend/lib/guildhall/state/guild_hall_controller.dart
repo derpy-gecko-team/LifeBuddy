@@ -76,8 +76,8 @@ class GuildHallController extends ChangeNotifier {
     return null;
   }
 
-  Questline? questlineById(String id) {
-    for (final l in _data?.questlines ?? const <Questline>[]) {
+  Journey? journeyById(String id) {
+    for (final l in _data?.journeys ?? const <Journey>[]) {
       if (l.id == id) return l;
     }
     return null;

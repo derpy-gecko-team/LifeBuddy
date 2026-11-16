@@ -77,7 +77,7 @@ class MockQuestRepository implements QuestRepository {
     _replace(quest.copyWith(status: QuestStatus.fulfilled));
     _awardXp(quest.xp);
     _unsealDependentsOf(quest.id);
-    final line = _data.questlines.firstWhere((l) => l.id == quest.questlineId);
+    final line = _data.journeys.firstWhere((l) => l.id == quest.journeyId);
     if (line.isComplete) _awardXp(line.bountyXp);
     return _data;
   }
@@ -91,9 +91,9 @@ class MockQuestRepository implements QuestRepository {
     _data = GuildHallData(
       hero: _data.hero,
       newToday: _data.newToday,
-      questlines: [
-        for (final line in _data.questlines)
-          line.id == updated.questlineId
+      journeys: [
+        for (final line in _data.journeys)
+          line.id == updated.journeyId
               ? line.copyWith(quests: [
                   for (final q in line.quests) q.id == updated.id ? updated : q,
                 ])
@@ -105,7 +105,7 @@ class MockQuestRepository implements QuestRepository {
   void _setHero(HeroProgress hero) {
     _data = GuildHallData(
       hero: hero,
-      questlines: _data.questlines,
+      journeys: _data.journeys,
       newToday: _data.newToday,
     );
   }
@@ -144,8 +144,8 @@ class MockQuestRepository implements QuestRepository {
         xpToNext: 500,
         coins: 1240,
       ),
-      questlines: [
-        Questline(
+      journeys: [
+        Journey(
           id: 'iron-body',
           name: 'The Iron Body',
           emblemAsset: GuildAssets.emblemIronBody,
@@ -156,7 +156,7 @@ class MockQuestRepository implements QuestRepository {
           quests: [
             Quest(
               id: 'ten-thousand-steps',
-              questlineId: 'iron-body',
+              journeyId: 'iron-body',
               title: 'Walk the Ten Thousand Steps',
               flavor: 'March the city walls until your boots ache.',
               description: 'The city walls are long and your legs are '
@@ -174,7 +174,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'drink-spring',
-              questlineId: 'iron-body',
+              journeyId: 'iron-body',
               title: 'Drink from the Spring',
               flavor: 'Eight cups of water before the moon rises.',
               description: 'A hero who forgets to drink falls before any '
@@ -191,7 +191,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'barracks',
-              questlineId: 'iron-body',
+              journeyId: 'iron-body',
               title: 'Train at the Barracks',
               flavor: 'Three sessions with the drill sergeant this week.',
               description: 'The sergeant does not care for excuses. Show up '
@@ -210,7 +210,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'dawn-stretch',
-              questlineId: 'iron-body',
+              journeyId: 'iron-body',
               title: 'Greet the Dawn',
               flavor: 'Ten minutes of stretching at first light.',
               description: 'Loosen the joints before the day tightens them.',
@@ -225,7 +225,7 @@ class MockQuestRepository implements QuestRepository {
             ),
           ],
         ),
-        Questline(
+        Journey(
           id: 'scholar-tower',
           name: 'The Scholar’s Tower',
           emblemAsset: GuildAssets.emblemScholarTower,
@@ -236,7 +236,7 @@ class MockQuestRepository implements QuestRepository {
           quests: [
             Quest(
               id: 'lab-report',
-              questlineId: 'scholar-tower',
+              journeyId: 'scholar-tower',
               title: 'Forge the Lab Report',
               flavor: 'The professor’s raven awaits it.',
               description: 'Measurements gathered, conclusions pending. '
@@ -254,7 +254,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'algorithm-duel',
-              questlineId: 'scholar-tower',
+              journeyId: 'scholar-tower',
               title: 'Duel the Algorithm',
               flavor: 'Defeat three dynamic-programming beasts.',
               description: 'They hide in overlapping subproblems. Memoise '
@@ -273,7 +273,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'lecture-scrolls',
-              questlineId: 'scholar-tower',
+              journeyId: 'scholar-tower',
               title: 'Copy the Lecture Scrolls',
               flavor: 'Transcribe last week’s lessons.',
               description: 'The scribes will not do it for you.',
@@ -288,7 +288,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'morning-lecture',
-              questlineId: 'scholar-tower',
+              journeyId: 'scholar-tower',
               title: 'Attend the Morning Lecture',
               flavor: 'Arrive before the bell tolls eight.',
               description: 'Sit near the front. Stay awake.',
@@ -303,7 +303,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'exam-wyrm',
-              questlineId: 'scholar-tower',
+              journeyId: 'scholar-tower',
               title: 'The Exam Wyrm',
               flavor: 'It breathes deadlines.',
               description: 'The final exam of the semester has woken. It '
@@ -324,7 +324,7 @@ class MockQuestRepository implements QuestRepository {
             ),
           ],
         ),
-        Questline(
+        Journey(
           id: 'clean-hearth',
           name: 'The Clean Hearth',
           emblemAsset: GuildAssets.rankShield,
@@ -335,7 +335,7 @@ class MockQuestRepository implements QuestRepository {
           quests: [
             Quest(
               id: 'laundry-caves',
-              questlineId: 'clean-hearth',
+              journeyId: 'clean-hearth',
               title: 'Brave the Laundry Caves',
               flavor: 'The pile grows hungrier by the day.',
               description: 'Descend into the basement, feed the machines '
@@ -353,7 +353,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'dust-beasts',
-              questlineId: 'clean-hearth',
+              journeyId: 'clean-hearth',
               title: 'Tame the Dust Beasts',
               flavor: 'They lurk beneath the bed.',
               description: 'Sweep every chamber of the keep.',
@@ -371,7 +371,7 @@ class MockQuestRepository implements QuestRepository {
             ),
             Quest(
               id: 'tooth-healer',
-              questlineId: 'clean-hearth',
+              journeyId: 'clean-hearth',
               title: 'Visit the Tooth Healer',
               flavor: 'Book the dentist before the ache returns.',
               description: 'Send word to the healer and keep the appointment.',

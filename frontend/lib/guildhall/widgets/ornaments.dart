@@ -268,10 +268,10 @@ class RoundBadge extends StatelessWidget {
   }
 }
 
-class QuestlineEmblem extends StatelessWidget {
-  const QuestlineEmblem({super.key, required this.questline, required this.size});
+class JourneyEmblem extends StatelessWidget {
+  const JourneyEmblem({super.key, required this.journey, required this.size});
 
-  final Questline questline;
+  final Journey journey;
   final double size;
 
   @override
@@ -279,8 +279,8 @@ class QuestlineEmblem extends StatelessWidget {
     return HeroMode(
       enabled: !MediaQuery.disableAnimationsOf(context),
       child: Hero(
-        tag: 'questline-emblem-${questline.id}',
-        child: Image.asset(questline.emblemAsset, width: size, height: size, fit: BoxFit.contain),
+        tag: 'journey-emblem-${journey.id}',
+        child: Image.asset(journey.emblemAsset, width: size, height: size, fit: BoxFit.contain),
       ),
     );
   }

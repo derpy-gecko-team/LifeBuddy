@@ -34,7 +34,7 @@ class Trial {
 class Quest {
   const Quest({
     required this.id,
-    required this.questlineId,
+    required this.journeyId,
     required this.title,
     required this.flavor,
     required this.description,
@@ -52,7 +52,7 @@ class Quest {
   });
 
   final String id;
-  final String questlineId;
+  final String journeyId;
   final String title;
 
   final String flavor;
@@ -88,7 +88,7 @@ class Quest {
   }) =>
       Quest(
         id: id,
-        questlineId: questlineId,
+        journeyId: journeyId,
         title: title,
         flavor: flavor,
         description: description,
@@ -107,8 +107,8 @@ class Quest {
       );
 }
 
-class Questline {
-  const Questline({
+class Journey {
+  const Journey({
     required this.id,
     required this.name,
     required this.emblemAsset,
@@ -134,7 +134,7 @@ class Questline {
 
   bool get isComplete => quests.isNotEmpty && fulfilledCount == quests.length;
 
-  Questline copyWith({List<Quest>? quests}) => Questline(
+  Journey copyWith({List<Quest>? quests}) => Journey(
         id: id,
         name: name,
         emblemAsset: emblemAsset,
@@ -174,14 +174,14 @@ class HeroProgress {
 class GuildHallData {
   const GuildHallData({
     required this.hero,
-    required this.questlines,
+    required this.journeys,
     required this.newToday,
   });
 
   final HeroProgress hero;
-  final List<Questline> questlines;
+  final List<Journey> journeys;
 
   final int newToday;
 
-  Iterable<Quest> get allQuests => questlines.expand((l) => l.quests);
+  Iterable<Quest> get allQuests => journeys.expand((l) => l.quests);
 }

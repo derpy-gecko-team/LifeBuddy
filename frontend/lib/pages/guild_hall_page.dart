@@ -4,7 +4,7 @@ import '../guildhall/data/mock_quest_repository.dart';
 import '../guildhall/data/quest_repository.dart';
 import '../guildhall/pages/guild_board_page.dart';
 import '../guildhall/pages/quest_detail_page.dart';
-import '../guildhall/pages/questline_page.dart';
+import '../guildhall/pages/journey_page.dart';
 import '../guildhall/state/guild_hall_controller.dart';
 import '../guildhall/theme/guild_theme.dart';
 import '../guildhall/widgets/notice_route.dart';
@@ -36,12 +36,12 @@ class _GuildHallPageState extends State<GuildHallPage> {
     super.dispose();
   }
 
-  void _openQuestline(String questlineId, {Rect? origin}) {
+  void _openJourney(String journeyId, {Rect? origin}) {
     _navigatorKey.currentState!.push(PlaqueRoute<void>(
       origin: origin,
-      builder: (_) => QuestlinePage(
+      builder: (_) => JourneyPage(
         controller: _controller,
-        questlineId: questlineId,
+        journeyId: journeyId,
         onOpenQuest: _openQuest,
       ),
     ));
@@ -75,7 +75,7 @@ class _GuildHallPageState extends State<GuildHallPage> {
           MaterialPageRoute<void>(
             builder: (_) => GuildBoardPage(
               controller: _controller,
-              onOpenQuestline: _openQuestline,
+              onOpenJourney: _openJourney,
               onOpenQuest: _openQuest,
               onOpenBuddy: widget.onOpenBuddy,
             ),

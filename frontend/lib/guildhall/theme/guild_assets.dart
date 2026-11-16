@@ -15,8 +15,8 @@ abstract final class GuildAssets {
   static const iconHourglass = '$_dir/icon_hourglass.png';
   static const iconCrown = '$_dir/icon_crown.png';
 
-  static const emblemIronBody = '$_dir/questline_iron_body.png';
-  static const emblemScholarTower = '$_dir/questline_scholar_tower.png';
+  static const emblemIronBody = '$_dir/journey_iron_body.png';
+  static const emblemScholarTower = '$_dir/journey_scholar_tower.png';
 
   static const questBoot = '$_dir/quest_boot.png';
   static const questPotion = '$_dir/quest_potion.png';

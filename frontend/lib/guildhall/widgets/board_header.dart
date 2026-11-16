@@ -297,18 +297,18 @@ class _TagPainter extends CustomPainter {
   bool shouldRepaint(_TagPainter old) => old.selected != selected || old.seed != seed;
 }
 
-class QuestlinePlaque extends StatelessWidget {
-  const QuestlinePlaque({super.key, required this.questline, required this.onTap});
+class JourneyPlaque extends StatelessWidget {
+  const JourneyPlaque({super.key, required this.journey, required this.onTap});
 
-  final Questline questline;
+  final Journey journey;
   final ValueChanged<Rect?> onTap;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '${questline.name}, ${questline.fulfilledCount} of '
-          '${questline.quests.length} quests fulfilled. Open questline.',
+      label: '${journey.name}, ${journey.fulfilledCount} of '
+          '${journey.quests.length} quests fulfilled. Open journey.',
       excludeSemantics: true,
       child: GuildPressable(
         onTap: () => onTap(globalRectOf(context)),
@@ -319,7 +319,7 @@ class QuestlinePlaque extends StatelessWidget {
           borderWidth: 1.6,
           bevel: 10,
           shadow: const Offset(2, 4),
-          seed: stableSeed(questline.id),
+          seed: stableSeed(journey.id),
           padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
           child: Stack(
             clipBehavior: Clip.none,
@@ -339,21 +339,21 @@ class QuestlinePlaque extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: GuildColors.chalk, width: 1.8),
                     ),
-                    child: QuestlineEmblem(questline: questline, size: 35),
+                    child: JourneyEmblem(journey: journey, size: 35),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(questline.name, style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
+                        Text(journey.name, style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
                         const SizedBox(height: 2),
                         Text(
-                          '${questline.fulfilledCount} of ${questline.quests.length} quests fulfilled',
+                          '${journey.fulfilledCount} of ${journey.quests.length} quests fulfilled',
                           style: GuildText.aside(GuildType.sm),
                         ),
                         const SizedBox(height: 8),
-                        SealProgress(total: questline.quests.length, done: questline.fulfilledCount),
+                        SealProgress(total: journey.quests.length, done: journey.fulfilledCount),
                       ],
                     ),
                   ),

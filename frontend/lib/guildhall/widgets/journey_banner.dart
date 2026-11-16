@@ -8,18 +8,18 @@ import '../theme/guild_theme.dart';
 import 'ornaments.dart';
 import 'sketch.dart';
 
-class QuestlineBanner extends StatelessWidget {
-  const QuestlineBanner({super.key, required this.questline});
+class JourneyBanner extends StatelessWidget {
+  const JourneyBanner({super.key, required this.journey});
 
-  final Questline questline;
+  final Journey journey;
 
   static const _notch = 40.0;
 
   @override
   Widget build(BuildContext context) {
-    final bounty = questline.bountyTitle == null
-        ? 'Finish them all: +${questline.bountyXp} XP'
-        : 'Finish them all: +${questline.bountyXp} XP and the title “${questline.bountyTitle}”';
+    final bounty = journey.bountyTitle == null
+        ? 'Finish them all: +${journey.bountyXp} XP'
+        : 'Finish them all: +${journey.bountyXp} XP and the title “${journey.bountyTitle}”';
 
     return Column(
       children: [
@@ -27,7 +27,7 @@ class QuestlineBanner extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: CustomPaint(
-            painter: _BannerPainter(notch: _notch, seed: stableSeed(questline.id)),
+            painter: _BannerPainter(notch: _notch, seed: stableSeed(journey.id)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(26, 22, 26, _notch + 22),
               child: Column(
@@ -39,7 +39,7 @@ class QuestlineBanner extends StatelessWidget {
                         color: GuildColors.cream.withValues(alpha: 0.85),
                         strokeWidth: 2,
                         padding: const EdgeInsets.all(10),
-                        child: QuestlineEmblem(questline: questline, size: 42),
+                        child: JourneyEmblem(journey: journey, size: 42),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -47,25 +47,25 @@ class QuestlineBanner extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: Semantics(
                             header: true,
-                            child: LetteredTitle(questline.name, size: GuildType.xl),
+                            child: LetteredTitle(journey.name, size: GuildType.xl),
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Text(questline.quote, style: GuildText.aside(GuildType.md)),
+                  Text(journey.quote, style: GuildText.aside(GuildType.md)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: Text(
-                          '${questline.fulfilledCount} of ${questline.quests.length} quests fulfilled',
+                          '${journey.fulfilledCount} of ${journey.quests.length} quests fulfilled',
                           style: GuildText.label(GuildType.sm),
                         ),
                       ),
                       const SizedBox(width: 10),
-                      SealProgress(total: questline.quests.length, done: questline.fulfilledCount, size: 20),
+                      SealProgress(total: journey.quests.length, done: journey.fulfilledCount, size: 20),
                     ],
                   ),
                   const SizedBox(height: 14),

@@ -8,7 +8,7 @@ import '../theme/guild_theme.dart';
 
 enum WallVariant {
   board(7),
-  questline(23),
+  journey(23),
   quest(41),
   bazaar(59);
 
@@ -153,7 +153,7 @@ class _Doodler {
 
   List<Rect> get _quiet => switch (variant) {
         WallVariant.board => [Rect.fromLTWH(0, 0, size.width * 0.8, 200)],
-        WallVariant.questline => [Rect.fromLTWH(0, 0, size.width, 120)],
+        WallVariant.journey => [Rect.fromLTWH(0, 0, size.width, 120)],
         WallVariant.quest => [Rect.fromLTWH(0, 0, size.width, 150)],
         WallVariant.bazaar => [Rect.fromLTWH(0, 0, size.width, 215)],
       };

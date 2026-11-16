@@ -18,7 +18,7 @@ class ChestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GuildScaffold(
-      wall: WallVariant.questline,
+      wall: WallVariant.journey,
       body: ListenableBuilder(
         listenable: controller,
         builder: (context, _) {

@@ -23,7 +23,7 @@ int compareForBoard(Quest a, Quest b) {
   return compareByDeadline(a, b);
 }
 
-int compareForQuestline(Quest a, Quest b) {
+int compareForJourney(Quest a, Quest b) {
   int rank(QuestStatus s) => switch (s) {
         QuestStatus.open || QuestStatus.sworn => 0,
         QuestStatus.sealed => 1,
@@ -44,13 +44,13 @@ class GuildBoardPage extends StatefulWidget {
   const GuildBoardPage({
     super.key,
     required this.controller,
-    required this.onOpenQuestline,
+    required this.onOpenJourney,
     required this.onOpenQuest,
     this.onOpenBuddy,
   });
 
   final GuildHallController controller;
-  final OpenQuestline onOpenQuestline;
+  final OpenJourney onOpenJourney;
   final OpenQuest onOpenQuest;
   final VoidCallback? onOpenBuddy;
 
@@ -111,7 +111,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
           final now = DateTime.now();
           final filter = controller.filter;
           final sections = [
-            for (final line in data.questlines)
+            for (final line in data.journeys)
               (line: line, quests: line.quests.where(filter.matches).toList()..sort(compareForBoard)),
           ].where((s) => s.quests.isNotEmpty).toList();
 
@@ -197,11 +197,11 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                         for (final s in sections)
                           SliverToBoxAdapter(
                             key: ValueKey(s.line.id),
-                            child: _QuestlineSection(
-                              questline: s.line,
+                            child: _JourneySection(
+                              journey: s.line,
                               quests: s.quests,
                               now: now,
-                              onOpenQuestline: (origin) => widget.onOpenQuestline(s.line.id, origin: origin),
+                              onOpenJourney: (origin) => widget.onOpenJourney(s.line.id, origin: origin),
                               onOpenQuest: widget.onOpenQuest,
                             ),
                           ),
@@ -263,19 +263,19 @@ class _TagRailDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_TagRailDelegate old) => true;
 }
 
-class _QuestlineSection extends StatelessWidget {
-  const _QuestlineSection({
-    required this.questline,
+class _JourneySection extends StatelessWidget {
+  const _JourneySection({
+    required this.journey,
     required this.quests,
     required this.now,
-    required this.onOpenQuestline,
+    required this.onOpenJourney,
     required this.onOpenQuest,
   });
 
-  final Questline questline;
+  final Journey journey;
   final List<Quest> quests;
   final DateTime now;
-  final ValueChanged<Rect?> onOpenQuestline;
+  final ValueChanged<Rect?> onOpenJourney;
   final OpenQuest onOpenQuest;
 
   @override
@@ -285,7 +285,7 @@ class _QuestlineSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
           child: RepaintBoundary(
-            child: QuestlinePlaque(questline: questline, onTap: onOpenQuestline),
+            child: JourneyPlaque(journey: journey, onTap: onOpenJourney),
           ),
         ),
         SizedBox(

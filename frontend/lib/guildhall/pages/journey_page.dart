@@ -6,28 +6,28 @@ import '../widgets/guild_scaffold.dart';
 import '../widgets/notice_route.dart';
 import '../widgets/ornaments.dart';
 import '../widgets/quest_cards.dart';
-import '../widgets/questline_banner.dart';
+import '../widgets/journey_banner.dart';
 import '../widgets/sketch.dart';
 import '../widgets/painted_wall.dart';
 import 'guild_board_page.dart';
 
-class QuestlinePage extends StatefulWidget {
-  const QuestlinePage({
+class JourneyPage extends StatefulWidget {
+  const JourneyPage({
     super.key,
     required this.controller,
-    required this.questlineId,
+    required this.journeyId,
     required this.onOpenQuest,
   });
 
   final GuildHallController controller;
-  final String questlineId;
+  final String journeyId;
   final OpenQuest onOpenQuest;
 
   @override
-  State<QuestlinePage> createState() => _QuestlinePageState();
+  State<JourneyPage> createState() => _JourneyPageState();
 }
 
-class _QuestlinePageState extends State<QuestlinePage> {
+class _JourneyPageState extends State<JourneyPage> {
   final _collapsed = ValueNotifier<bool>(false);
   final _bannerKey = GlobalKey();
 
@@ -47,14 +47,14 @@ class _QuestlinePageState extends State<QuestlinePage> {
   @override
   Widget build(BuildContext context) {
     return GuildScaffold(
-      wall: WallVariant.questline,
+      wall: WallVariant.journey,
       body: ListenableBuilder(
         listenable: widget.controller,
         builder: (context, _) {
-          final line = widget.controller.questlineById(widget.questlineId);
+          final line = widget.controller.journeyById(widget.journeyId);
           if (line == null) return const SizedBox.shrink();
           final now = DateTime.now();
-          final quests = [...line.quests]..sort(compareForQuestline);
+          final quests = [...line.quests]..sort(compareForJourney);
 
           return Column(
             children: [
@@ -116,7 +116,7 @@ class _QuestlinePageState extends State<QuestlinePage> {
                         sliver: SliverToBoxAdapter(
                           child: RepaintBoundary(
                             key: _bannerKey,
-                            child: QuestlineBanner(questline: line),
+                            child: JourneyBanner(journey: line),
                           ),
                         ),
                       ),
