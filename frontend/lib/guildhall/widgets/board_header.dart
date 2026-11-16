@@ -185,7 +185,7 @@ class QuestTagRail extends StatelessWidget {
               for (final f in QuestFilter.values)
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: _Tag(
+                  child: HangingTag(
                     label: f.label,
                     count: f == QuestFilter.all ? null : controller.countFor(f),
                     selected: controller.filter == f,
@@ -200,8 +200,8 @@ class QuestTagRail extends StatelessWidget {
   }
 }
 
-class _Tag extends StatelessWidget {
-  const _Tag({required this.label, required this.selected, required this.onTap, this.count});
+class HangingTag extends StatelessWidget {
+  const HangingTag({super.key, required this.label, required this.selected, required this.onTap, this.count});
 
   final String label;
   final int? count;
