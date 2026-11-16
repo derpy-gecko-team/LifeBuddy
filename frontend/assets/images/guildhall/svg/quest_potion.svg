@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><clipPath id="flask"><path d="M50 30 V43.6 A32 32 0 1 0 70 43.6 V30 Z"/></clipPath></defs>
+<g stroke="#2C2F58" stroke-width="3.3" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M50 30 V43.6 A32 32 0 1 0 70 43.6 V30 Z" fill="#DADBE8"/>
+  <path clip-path="url(#flask)" d="M22 78 C34 70 44 84 58 77 C70 71 82 82 98 76 V114 H22 Z" fill="#4E5387" stroke-width="2.6"/>
+  <circle cx="49" cy="93" r="3.5" fill="#DADBE8" stroke="none"/>
+  <circle cx="68" cy="89" r="2.5" fill="#DADBE8" stroke="none"/>
+  <path d="M39 62 C41 56 45 52 50 50" stroke="#FFFFFF" stroke-width="2.6" fill="none"/>
+  <path d="M50 30 V43.6 A32 32 0 1 0 70 43.6 V30 Z" fill="none"/>
+  <rect x="44" y="24" width="32" height="9" rx="4" fill="#DADBE8"/>
+  <rect x="50" y="10" width="20" height="15" rx="3" fill="#DDB96E"/>
+</g>
+</svg>

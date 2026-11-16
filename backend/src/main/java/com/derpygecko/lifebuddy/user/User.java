@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Table(name="users")
@@ -33,5 +34,12 @@ public class User {
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
+    }
+
+    @PrePersist
+    private void setCreatedAtIfMissing() {
+        if (createdAt == null) {
+            createdAt = Timestamp.from(Instant.now());
+        }
     }
 }
