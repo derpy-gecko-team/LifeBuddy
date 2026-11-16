@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   google_fonts: ^9.0.0
   material_ui: ^1.11.1
+  speech_to_text: ^7.5.0
 
 dev_dependencies:
   flutter_test:
