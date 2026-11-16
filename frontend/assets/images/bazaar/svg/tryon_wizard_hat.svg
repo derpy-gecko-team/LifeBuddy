@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><filter id="hand" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="30" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g filter="url(#hand)" stroke="#2C2F58" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"><g transform="translate(9 20) scale(.85)">
+<path d="M22 118 C22 92 40 84 60 84 C80 84 98 92 98 118 Z" fill="#B95A54"/>
+<path d="M50 78 H70 V90 C66 96 54 96 50 90 Z" fill="#EBCFA8"/>
+<path d="M44 86 L60 98 L76 86" fill="none" stroke-width="3"/>
+<circle cx="60" cy="96" r="4.5" fill="#DDB96E" stroke-width="2.2"/>
+<circle cx="60" cy="62" r="24" fill="#EBCFA8"/>
+<circle cx="51" cy="62" r="3" fill="#2C2F58" stroke="none"/><circle cx="69" cy="62" r="3" fill="#2C2F58" stroke="none"/>
+<circle cx="45" cy="70" r="4.5" fill="#E5A39A" stroke="none"/><circle cx="75" cy="70" r="4.5" fill="#E5A39A" stroke="none"/>
+<path d="M54 72 C57 76 63 76 66 72" fill="none" stroke-width="2.6"/>
+<g transform="translate(18 -22) scale(.7)">
+<ellipse cx="60" cy="91" rx="47" ry="14" fill="#3B4071"/>
+<path d="M33 88 C42 62 52 36 63 15 C69 6 82 9 81 18 C77 14 72 16 70 21 C78 44 85 66 88 88 C72 96 48 96 33 88 Z" fill="#3B4071"/>
+<path d="M36 81 C50 88 72 88 86 81" stroke="#DDB96E" stroke-width="4.5" fill="none"/>
+<path d="M27 96 C46 104 74 104 93 96" stroke="#FFFFFF" stroke-opacity=".38" stroke-width="3.4" fill="none"/>
+<path d="M55 55 L57.6 61 L64 61.6 L59.2 65.8 L60.8 72 L55 68.6 L49.2 72 L50.8 65.8 L46 61.6 L52.4 61 Z" fill="#DDB96E" stroke-width="1.6"/>
+<circle cx="67" cy="42" r="3" fill="#F1E4CB" stroke="none"/><circle cx="71" cy="67" r="2.4" fill="#F1E4CB" stroke="none"/></g></g>
+</g>
+</svg>

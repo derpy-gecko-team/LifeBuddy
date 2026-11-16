@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pages/bazaar_page.dart';
 import 'pages/buddy_page.dart';
 import 'pages/guild_hall_page.dart';
 import 'pages/map_page.dart';
@@ -13,11 +14,12 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  static const _buddyIndex = 2;
+  static const _buddyIndex = 3;
 
   late final _pages = <Widget>[
     const MapPage(),
     GuildHallPage(onOpenBuddy: () => setState(() => _index = _buddyIndex)),
+    const BazaarPage(),
     const BuddyPage(),
   ];
 
@@ -38,6 +40,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.castle_outlined),
             selectedIcon: Icon(Icons.castle),
             label: 'Guild Hall',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.storefront_outlined),
+            selectedIcon: Icon(Icons.storefront),
+            label: 'Bazaar',
           ),
           NavigationDestination(
             icon: Icon(Icons.pets_outlined),

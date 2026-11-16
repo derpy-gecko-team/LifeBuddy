@@ -9,7 +9,8 @@ import '../theme/guild_theme.dart';
 enum WallVariant {
   board(7),
   questline(23),
-  quest(41);
+  quest(41),
+  bazaar(59);
 
   const WallVariant(this.seed);
   final int seed;
@@ -167,6 +168,7 @@ class _Doodler {
         WallVariant.board => [Rect.fromLTWH(0, 0, size.width * 0.8, 200)],
         WallVariant.questline => [Rect.fromLTWH(0, 0, size.width, 120)],
         WallVariant.quest => [Rect.fromLTWH(0, 0, size.width, 150)],
+        WallVariant.bazaar => [Rect.fromLTWH(0, 0, size.width, 215)],
       };
 
   bool _isQuiet(Offset p) => _quiet.any((r) => r.contains(p));

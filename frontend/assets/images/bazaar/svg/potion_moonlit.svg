@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><filter id="hand" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="23" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g filter="url(#hand)" stroke="#2C2F58" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<defs><clipPath id="m"><circle cx="62" cy="76" r="34"/></clipPath></defs>
+<circle cx="62" cy="76" r="34" fill="#D9E0EA"/>
+<g clip-path="url(#m)"><path d="M30 84 C46 104 84 104 92 70 C90 56 78 50 70 56 C84 66 72 88 30 84 Z" fill="#7A5C8E" stroke-width="2.2"/>
+<path d="M34 92 C50 108 80 104 90 84 C76 98 52 100 34 92 Z" fill="#A990B8" stroke="none"/>
+<circle cx="64" cy="64" r="2" fill="#A990B8" stroke="none"/><circle cx="56" cy="72" r="1.6" fill="#A990B8" stroke="none"/></g>
+<circle cx="62" cy="76" r="34" fill="none"/>
+<path d="M54 30 H70 V46 H54 Z" fill="#D9E0EA"/>
+<path d="M54 10 H70 L72 26 H52 Z" fill="#C9A877"/>
+<rect x="49" y="24" width="26" height="9" rx="4.5" fill="#D9E0EA"/>
+<path d="M50 40 C58 44 66 44 74 40 M50 45 C58 49 66 49 74 45" stroke="#C4AC86" stroke-width="4" fill="none"/>
+<path d="M50 40 C58 44 66 44 74 40 M50 45 C58 49 66 49 74 45" stroke-width="1.4" fill="none" stroke-opacity=".5"/>
+<path d="M50 42 C40 30 26 30 18 36 C26 46 40 48 50 42 Z" fill="#5F7D4E" stroke-width="2.2"/>
+<path d="M48 46 C40 48 34 56 34 62 C42 60 50 54 48 46 Z" fill="#7C9A68" stroke-width="2.2"/>
+<path d="M40 62 C42 54 46 50 50 48" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="2.6" fill="none"/>
+</g>
+</svg>

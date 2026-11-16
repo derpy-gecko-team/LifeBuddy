@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><filter id="hand" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="14" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g filter="url(#hand)" stroke="#2C2F58" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M58 8 L88 40 L82 90 L56 112 L32 84 L36 36 Z" fill="#D9736C"/>
+<path d="M58 8 L62 46 L36 36 Z" fill="#E5A39A" stroke="none"/><path d="M62 46 L56 112 L32 84 L36 36 Z" fill="#E28B84" stroke="none"/>
+<path d="M62 46 L88 40 L82 90 L56 112 Z" fill="#B95A54" stroke="none"/>
+<g stroke-width="2.2" fill="none"><path d="M58 8 L62 46 L56 112 M36 36 L62 46 L88 40 M32 84 L62 46 L82 90"/></g>
+<path d="M58 8 L88 40 L82 90 L56 112 L32 84 L36 36 Z" fill="none"/>
+<path d="M92 76 L104 90 L98 108 L84 100 Z" fill="#E5A39A" stroke-width="3"/><path d="M92 76 L94 94 L84 100 M94 94 L98 108" stroke-width="2.2" fill="none"/>
+<path d="M44 44 L48 62" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="2.6" fill="none"/>
+</g>
+</svg>

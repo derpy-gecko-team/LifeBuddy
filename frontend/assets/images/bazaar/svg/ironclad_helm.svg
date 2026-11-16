@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<defs><filter id="hand" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g filter="url(#hand)" stroke="#2C2F58" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M30 100 V54 C30 22 90 22 90 54 V100 Z" fill="#B9B7C2"/>
+<path d="M30 60 H90" stroke-width="2.2"/>
+<rect x="54" y="30" width="12" height="70" fill="#DDB96E" stroke-width="2.2"/>
+<rect x="36" y="48" width="14" height="7" rx="3" fill="#2C2F58" stroke="none"/><rect x="70" y="48" width="14" height="7" rx="3" fill="#2C2F58" stroke="none"/>
+<g fill="#F1E4CB" stroke="none"><circle cx="40" cy="72" r="2.4"/><circle cx="47" cy="80" r="2.4"/><circle cx="40" cy="88" r="2.4"/><circle cx="80" cy="72" r="2.4"/><circle cx="73" cy="80" r="2.4"/><circle cx="80" cy="88" r="2.4"/></g>
+<path d="M30 100 V54 C30 22 90 22 90 54 V100 Z" fill="none"/>
+<path d="M38 46 C40 38 46 34 50 32" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="2.6" fill="none"/>
+</g>
+</svg>
