@@ -7,19 +7,11 @@ import 'package:flutter/services.dart';
 import '../theme/guild_theme.dart';
 import 'ornaments.dart';
 
-/// Motion in the hall follows what things are made of: paper hangs from its
-/// pin, pencil lines get drawn, wax and ink are stamped. Every piece here
-/// stands still when the system asks for reduced motion.
-
-/// Lands its child the way a stamp comes down: large and faint, then pressed
-/// flat with a small rebound and a tap of haptics on contact.
 class StampIn extends StatefulWidget {
   const StampIn({super.key, required this.child, required this.animate, this.delay = Duration.zero});
 
   final Widget child;
 
-  /// Whether to play the landing when this is first shown. False shows the
-  /// stamp already in place.
   final bool animate;
   final Duration delay;
 
@@ -72,14 +64,9 @@ class _StampInState extends State<StampIn> with SingleTickerProviderStateMixin {
   }
 }
 
-/// Paper held to the wall by one fastener at its top edge. It rests at
-/// [rest]; while [held] it hangs straight, and when let go it swings back
-/// around the fastener and settles. Each time [nudges] changes it is set
-/// swinging again, as when the paper has just been pinned back up.
 class PinnedSwing extends StatefulWidget {
   const PinnedSwing({super.key, required this.rest, required this.held, required this.child, this.nudges = 0});
 
-  /// Resting angle, in radians.
   final double rest;
   final bool held;
   final int nudges;
@@ -92,12 +79,9 @@ class PinnedSwing extends StatefulWidget {
 class _PinnedSwingState extends State<PinnedSwing> with SingleTickerProviderStateMixin {
   late final AnimationController _angle = AnimationController.unbounded(vsync: this, value: widget.rest);
 
-  // Taken in the hand, the paper is steadied at once. Let go, it is light
-  // and loose: a couple of swings before it is still.
   static final _steady = SpringDescription.withDampingRatio(mass: 1, stiffness: 420, ratio: 0.85);
   static final _loose = SpringDescription.withDampingRatio(mass: 1, stiffness: 170, ratio: 0.3);
 
-  // The push, in radians a second, that paper gets from being let go of.
   static const _push = 1.5;
 
   @override
@@ -110,8 +94,6 @@ class _PinnedSwingState extends State<PinnedSwing> with SingleTickerProviderStat
       _angle.value = target;
       return;
     }
-    // Let go or pinned back, the paper is thrown past where it rests and
-    // swings there before it is still.
     final released = !widget.held && (nudged || old.held);
     final away = widget.rest < 0 ? -1.0 : 1.0;
     _angle.animateWith(
@@ -144,15 +126,12 @@ class _PinnedSwingState extends State<PinnedSwing> with SingleTickerProviderStat
   }
 }
 
-/// Something hanging from a thread. Each time [nudged] turns true it sways
-/// about the top of the thread and comes to rest.
 class HangingSway extends StatefulWidget {
   const HangingSway({super.key, required this.nudged, required this.child, this.reach = 0.11});
 
   final bool nudged;
   final Widget child;
 
-  /// How far the first swing goes, in radians.
   final double reach;
 
   @override
@@ -183,7 +162,6 @@ class _HangingSwayState extends State<HangingSway> with SingleTickerProviderStat
       animation: _c,
       builder: (context, child) {
         final t = _c.value;
-        // A swing that dies away: two and a bit swings inside the duration.
         final angle = t >= 1 ? 0.0 : widget.reach * exp(-4.4 * t) * sin(t * 2 * pi * 2.2);
         return Transform.rotate(angle: angle, alignment: Alignment.topCenter, child: child);
       },
@@ -192,8 +170,6 @@ class _HangingSwayState extends State<HangingSway> with SingleTickerProviderStat
   }
 }
 
-/// Text that is crossed out by hand: when [struck] turns true a pencil line
-/// is drawn through the words, one line of text after the next.
 class StruckText extends StatelessWidget {
   const StruckText(this.text, {super.key, required this.style, required this.struck, this.lineColor});
 
@@ -213,7 +189,6 @@ class StruckText extends StatelessWidget {
           : struck
               ? const Duration(milliseconds: 460)
               : const Duration(milliseconds: 160),
-      // The line starts once the tick beside it has been drawn.
       curve: struck ? const Interval(0.35, 1, curve: Curves.easeInOutCubic) : Curves.easeOut,
       builder: (context, t, child) => CustomPaint(
         foregroundPainter: _StrikePainter(
@@ -299,12 +274,6 @@ class _StrikePainter extends CustomPainter {
       old.textScaler != textScaler;
 }
 
-/// The seal on a quest. While [sealed] it shows what [builder] lays out,
-/// intact; when the quest unlocks, the same pieces are driven from 0 to 1 so
-/// the ribbon can part and the seal fall away, and then nothing is shown.
-///
-/// Goes inside a [Stack] and fills it, so [builder] may return [Positioned]
-/// children placed against the card.
 class SealBreak extends StatefulWidget {
   const SealBreak({super.key, required this.sealed, required this.builder});
 
@@ -359,8 +328,6 @@ class _SealBreakState extends State<SealBreak> with SingleTickerProviderStateMix
   }
 }
 
-/// The ribbon under a seal. As [breaking] runs, it comes apart at the middle
-/// and each half is drawn back toward its own end.
 class PartingRibbon extends StatelessWidget {
   const PartingRibbon({super.key, required this.breaking, this.axis = Axis.horizontal});
 
@@ -400,8 +367,6 @@ class PartingRibbon extends StatelessWidget {
   }
 }
 
-/// The wax seal itself. As [breaking] runs it is knocked loose, then drops
-/// and tips over as it falls out of sight.
 class FallingSeal extends StatelessWidget {
   const FallingSeal({super.key, required this.breaking, required this.size});
 

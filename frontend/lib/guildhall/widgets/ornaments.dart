@@ -185,8 +185,6 @@ class SealProgress extends StatelessWidget {
             for (var i = 0; i < total; i++)
               SizedBox.square(
                 dimension: size,
-                // A dot that turns from open to fulfilled while on screen
-                // rises once: the disc fills, then the rays reach out.
                 child: TweenAnimationBuilder<double>(
                   tween: Tween(end: i < done ? 1 : 0),
                   duration: MediaQuery.disableAnimationsOf(context)
@@ -205,18 +203,13 @@ class SealProgress extends StatelessWidget {
 class _SealDotPainter extends CustomPainter {
   _SealDotPainter(this.risen);
 
-  /// 0 is a quest still to do, 1 one fulfilled; between, the sun is rising.
   final double risen;
 
-  // Held back a moment so it plays after the page it sits on has come back
-  // into view.
   static const _disc = Interval(0.35, 0.68, curve: Curves.easeOutCubic);
   static const _rays = Interval(0.6, 1, curve: Curves.easeOutCubic);
 
   @override
   void paint(Canvas canvas, Size size) {
-    // A quest fulfilled is a sun that has risen: a full disc with rays.
-    // One still to do is only its outline.
     final c = size.center(Offset.zero);
     final r = size.width / 2;
     final disc = _disc.transform(risen);
@@ -428,7 +421,6 @@ class SealRibbon extends StatelessWidget {
   }
 }
 
-/// A word stamped in red ink, a little askew.
 class InkStamp extends StatelessWidget {
   const InkStamp(this.label, {super.key, this.fontSize = GuildType.xs});
 
@@ -590,8 +582,6 @@ class _InkCheckPainter extends CustomPainter {
   bool shouldRepaint(_InkCheckPainter old) => old.t != t || old.enabled != enabled;
 }
 
-/// A heading in the manner of the login title: an outsized first letter and
-/// a stroke of the brush under the words.
 class LetteredTitle extends StatelessWidget {
   const LetteredTitle(
     this.text, {
@@ -608,8 +598,6 @@ class LetteredTitle extends StatelessWidget {
   final Color color;
   final TextAlign textAlign;
 
-  /// Draws the stroke under the words from left to right when first shown,
-  /// instead of showing it already there.
   final bool drawIn;
   final VoidCallback? onDrawn;
 
@@ -617,8 +605,6 @@ class LetteredTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = GuildText.title(size, color: color);
     final initial = text.characters.first;
-    // The hall is built behind the other tabs before it is ever looked at,
-    // so the stroke waits, undrawn, until the title is actually on screen.
     final Widget swash;
     if (!drawIn || MediaQuery.disableAnimationsOf(context)) {
       swash = CustomPaint(painter: _SwashPainter(color, 1));
@@ -662,14 +648,12 @@ class _SwashPainter extends CustomPainter {
   _SwashPainter(this.color, this.drawn);
   final Color color;
 
-  /// How much of the stroke has been laid down, from its left end.
   final double drawn;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (drawn <= 0) return;
     if (drawn < 1) canvas.clipRect(Rect.fromLTWH(0, -size.height, size.width * drawn, size.height * 3));
-    // One stroke, pressed harder in the middle, rising a little to the right.
     final from = Offset(size.width * 0.02, size.height * 0.85);
     final to = Offset(size.width * 0.99, size.height * 0.2);
     final bow = Offset(size.width * 0.45, size.height * 0.95);
@@ -686,7 +670,6 @@ class _SwashPainter extends CustomPainter {
   bool shouldRepaint(_SwashPainter old) => old.color != color || old.drawn != drawn;
 }
 
-/// A small four-pointed star, as chalked along the login border.
 class ChalkStar extends StatelessWidget {
   const ChalkStar({super.key, this.size = 15, this.seed = 0, this.color = GuildColors.chalk});
 

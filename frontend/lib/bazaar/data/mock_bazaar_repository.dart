@@ -2,7 +2,6 @@ import '../theme/bazaar_assets.dart';
 import 'bazaar_repository.dart';
 import 'models.dart';
 
-/// Stands in for the backend: a stocked stall kept in memory.
 class MockBazaarRepository implements BazaarRepository {
   MockBazaarRepository({DateTime? now, this.latency = const Duration(milliseconds: 280)})
       : _data = _seed(now ?? DateTime.now());

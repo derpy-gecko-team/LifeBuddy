@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../theme/guild_theme.dart';
 import 'sketch.dart';
 
-/// A strip of parchment hung on the wall by two threads, ruled like the
-/// login page: one heavy pencil line with a fine one inside it.
 class HangingSlip extends StatelessWidget {
   const HangingSlip({
     super.key,

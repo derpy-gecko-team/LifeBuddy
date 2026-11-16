@@ -7,13 +7,9 @@ import '../data/models.dart';
 import '../theme/bazaar_assets.dart';
 import 'bazaar_widgets.dart';
 
-/// The way into the shop: velvet curtains drawn back to either side, the
-/// shop's sign hung between them, and the purse and the chest on carved
-/// plaques hung either side of it.
 class ShopEntrance extends StatelessWidget {
   const ShopEntrance({super.key, this.purse, this.onOpenChest});
 
-  /// Left out while the wares are still being fetched.
   final Purse? purse;
   final VoidCallback? onOpenChest;
 
@@ -23,8 +19,6 @@ class ShopEntrance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The curtain's picture is a box that overlaps the slips; it must not
-    // take their taps.
     Widget curtain({required bool mirrored}) => IgnorePointer(
       child: ExcludeSemantics(
         child: Transform.flip(
@@ -43,7 +37,6 @@ class ShopEntrance extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final signWidth = _signHeight * ShopSign.aspect;
-        // What is left beside the sign, clear of the curtain's tail.
         final slipWidth = ((constraints.maxWidth - signWidth) / 2 - 24).clamp(52.0, 120.0);
 
         return SizedBox(
@@ -81,8 +74,6 @@ class ShopEntrance extends StatelessWidget {
   }
 }
 
-/// A small carved board in the manner of the shop's sign, hung by a gilt
-/// cord from a rosette like the ones that hold the curtains.
 class _Plaque extends StatelessWidget {
   const _Plaque({required this.child});
 
@@ -90,7 +81,6 @@ class _Plaque extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The drawing is 128 by 142; its pale panel sits low in the frame.
     return AspectRatio(
       aspectRatio: 128 / 142,
       child: Stack(
@@ -114,7 +104,6 @@ class _Plaque extends StatelessWidget {
   }
 }
 
-/// What the adventurer has to spend, on a plaque hung by the sign.
 class _PurseSlip extends StatelessWidget {
   const _PurseSlip({required this.purse});
 
@@ -152,7 +141,6 @@ class _PurseSlip extends StatelessWidget {
   }
 }
 
-/// The way to the chest where bought wares are kept.
 class _ChestSlip extends StatelessWidget {
   const _ChestSlip({required this.onOpen});
 
@@ -189,14 +177,11 @@ class _ChestSlip extends StatelessWidget {
   }
 }
 
-/// The shop's sign: a carved board on two chains, a griffin keeping watch
-/// from the bar it hangs on. The lettering is laid over the painted board.
 class ShopSign extends StatelessWidget {
   const ShopSign({super.key, required this.height});
 
   final double height;
 
-  // The drawing is 260 by 340; everything on it is placed in those units.
   static const _artWidth = 260.0;
   static const _artHeight = 340.0;
   static const aspect = _artWidth / _artHeight;

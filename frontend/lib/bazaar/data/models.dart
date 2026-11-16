@@ -30,8 +30,6 @@ enum Currency {
   final String label;
 }
 
-/// The colours a dyeable ware comes in. Each has its own rendering of the
-/// art; keep in step with DYES in tool/render_art.py.
 enum WareDye {
   indigo('Midnight', Color(0xFF3B4071)),
   brick('Crimson', Color(0xFFB95A54)),
@@ -96,31 +94,23 @@ class Ware {
   final String name;
   final WareCategory category;
 
-  /// What sort of thing it is within its category: "Head", "Cape", "Hero".
   final String kind;
   final Rarity rarity;
   final Price price;
 
-  /// One line, for the featured card.
   final String blurb;
   final String description;
 
-  /// What owning it does, in a sentence.
   final String perk;
 
   final String asset;
 
-  /// The ware being worn, shown in the mirror in place of the ware alone.
   final String? tryOnAsset;
 
-  /// Wares that share a slot replace each other when worn. Null for wares
-  /// that are only kept, never worn.
   final String? slot;
 
-  /// The colours it can be had in; the first is the one [asset] is drawn in.
   final List<WareDye> dyes;
 
-  /// The colour it was bought in.
   final WareDye? dye;
 
   final int sold;
@@ -128,7 +118,6 @@ class Ware {
   final bool worn;
   final bool wishlisted;
 
-  /// When a passing ware is taken off the stall.
   final DateTime? leavesAt;
 
   bool get wearable => slot != null;
@@ -173,7 +162,6 @@ class BazaarData {
   final Purse purse;
   final List<Ware> wares;
 
-  /// The passing ware given pride of place above the table.
   final String? featuredId;
 
   Ware? get featured {

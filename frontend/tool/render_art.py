@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""Renders the hand-written SVG art in assets/images/*/svg to the PNGs the app ships.
-
-    python3 tool/render_art.py               # everything
-    python3 tool/render_art.py wizard_hat    # only the named pieces
-"""
 import pathlib
 import re
 import subprocess
@@ -15,7 +10,6 @@ from PIL import Image
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 IMAGES = pathlib.Path(__file__).resolve().parent.parent / "assets/images"
 
-# Longest side of each PNG, in pixels.
 SIZES = {
     "guildhall": {
         "boss_dragon": 720,
@@ -45,9 +39,6 @@ SIZES = {
 DEFAULT_SIZE = {"guildhall": 360, "bazaar": 480}
 SUPERSAMPLE = 960
 
-# Wares that can be dyed are drawn once in their own colour; every other dye
-# is the same drawing with that colour swapped. Keep in step with WareDye in
-# lib/bazaar/data/models.dart.
 DYES = {"indigo": "#3B4071", "brick": "#B95A54", "moss": "#5F7D4E", "umber": "#8A6240"}
 DYED = {
     "wizard_hat": "indigo",

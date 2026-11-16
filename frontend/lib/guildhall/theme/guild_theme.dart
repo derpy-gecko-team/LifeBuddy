@@ -1,40 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// The Guildhall shares its palette with the login screens: the indigo of
-/// their painted border is the wall here, their parchment is the paper pinned
-/// on it, and the cream line their doodles are drawn in is the "chalk" that
-/// everything on the wall is written with. Nothing is outlined in black.
 abstract final class GuildColors {
-  // The painted wall.
   static const indigo = Color(0xFF4E5387);
   static const indigoDeep = Color(0xFF3B4071);
   static const indigoLight = Color(0xFF6268A0);
   static const shadow = Color(0xFF272B55);
   static const torchlight = Color(0xFFF3CF8A);
 
-  // Chalk on the wall: text, doodles and outlines.
   static const cream = Color(0xFFEFE0BC);
   static const chalk = Color(0xFFDEC99E);
   static const chalkLine = Color(0xB8DEC99E);
   static const dangerText = Color(0xFFF4BDB2);
 
-  // Paper.
   static const parchment = Color(0xFFE9D4B5);
   static const parchmentDark = Color(0xFFD9C19C);
   static const vellum = Color(0xFFF1E4CB);
   static const mist = Color(0xFFDADBE8);
   static const mistDark = Color(0xFFBFC2D8);
 
-  // Pencil rules on paper.
   static const tan = Color(0xFFC4AC86);
   static const pencil = Color(0xFF9A8463);
 
-  // Writing on paper.
   static const ink = Color(0xFF2C2F58);
   static const inkSoft = Color(0xFF4F517C);
 
-  // The red of the hand lettering.
   static const brick = Color(0xFFB95A54);
   static const brickDeep = Color(0xFF9E423C);
 
@@ -88,8 +78,6 @@ abstract final class GuildText {
     );
   }
 
-  /// Headings, in the heavy hand lettering of the login title. Brick red on
-  /// paper; pass [GuildColors.cream] for headings chalked on the wall.
   static TextStyle title(double size, {Color color = GuildColors.brickDeep}) => _lettering.copyWith(
         fontSize: size * 0.9,
         color: color,

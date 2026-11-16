@@ -24,8 +24,6 @@ class WarePage extends StatefulWidget {
   final BazaarController controller;
   final String wareId;
 
-  /// The wares this one stands among, in shelf order. The buyer moves along
-  /// them by swiping, as if walking down the shelf.
   final List<String> shelf;
 
   @override
@@ -96,7 +94,6 @@ class _WarePageState extends State<WarePage> {
     }
   }
 
-  /// How far page [i] is from the middle of the view, in pages.
   double _offsetOf(int i) {
     if (!_pages.hasClients || !_pages.position.haveDimensions) return (i - _index).toDouble();
     return i - (_pages.page ?? _index.toDouble());
@@ -172,9 +169,6 @@ class _WarePageState extends State<WarePage> {
                           ),
                         );
                         if (still) return poster;
-                        // A sheet being slid along the counter: it dips and
-                        // turns a little as it leaves, and straightens as it
-                        // arrives.
                         return AnimatedBuilder(
                           animation: _pages,
                           builder: (context, child) {
@@ -219,7 +213,6 @@ class _WarePageState extends State<WarePage> {
   }
 }
 
-/// Steps to the ware before or after this one on the shelf.
 class _ShelfArrow extends StatelessWidget {
   const _ShelfArrow({required this.forward, required this.onTap});
 
@@ -553,7 +546,6 @@ class _BuyBar extends StatelessWidget {
   }
 }
 
-/// "Buy for 450 gold", with the coin itself in the label.
 class _BuyButton extends StatelessWidget {
   const _BuyButton({required this.price, required this.onPressed});
 

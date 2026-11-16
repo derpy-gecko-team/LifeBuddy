@@ -14,8 +14,6 @@ enum WareSort {
   WareSort get next => values[(index + 1) % values.length];
 }
 
-/// What one moonstone is counted as when wares priced in different coin are
-/// put in order of price.
 const _moonstoneInGold = 100;
 
 int _worth(Price p) => p.currency == Currency.gold ? p.amount : p.amount * _moonstoneInGold;
@@ -33,7 +31,6 @@ class BazaarController extends ChangeNotifier {
   Object? _error;
   Object? get error => _error;
 
-  /// Null shows every ware.
   WareCategory? _category;
   WareCategory? get category => _category;
 
@@ -77,9 +74,6 @@ class BazaarController extends ChangeNotifier {
     return null;
   }
 
-  /// The wares laid out on the table: the chosen category, in the chosen
-  /// order, with what is already owned moved to the end. The featured ware
-  /// has its own card while every category is shown.
   List<Ware> get table {
     final data = _data;
     if (data == null) return const [];

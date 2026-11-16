@@ -85,7 +85,6 @@ class QuestCard extends StatefulWidget {
 }
 
 class _QuestCardState extends State<QuestCard> {
-  /// Counts the times this notice has been put back on the board.
   int _pinnedBack = 0;
 
   Future<void> _open() async {

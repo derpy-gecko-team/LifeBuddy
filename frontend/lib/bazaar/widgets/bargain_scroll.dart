@@ -17,8 +17,6 @@ String wearLabel(Ware ware) => switch (ware.category) {
       _ => 'Wear it now',
     };
 
-/// The receipt for a purchase, unrolled over the stall. Completes with what
-/// the buyer chose to do next, or null if the scroll was simply dismissed.
 Future<BargainChoice?> showBargainSealed(
   BuildContext context, {
   required Ware ware,

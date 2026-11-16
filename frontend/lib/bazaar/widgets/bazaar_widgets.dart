@@ -12,7 +12,6 @@ import '../data/models.dart';
 import '../theme/bazaar_assets.dart';
 import 'shop_shelves.dart' show WareHero;
 
-/// 1240 -> "1,240".
 String formatAmount(int n) {
   final digits = n.abs().toString();
   final out = StringBuffer(n < 0 ? '-' : '');
@@ -69,8 +68,6 @@ class WareArt extends StatelessWidget {
       );
 }
 
-/// The little diamond that marks how rare a ware is: an outline for common,
-/// inked in for rare, gilded for legendary.
 class RarityMark extends StatelessWidget {
   const RarityMark(this.rarity, {super.key, this.size = GuildType.sm, this.color = GuildColors.ink});
 
@@ -119,8 +116,6 @@ class _DiamondPainter extends CustomPainter {
   bool shouldRepaint(_DiamondPainter old) => old.rarity != rarity || old.ink != ink;
 }
 
-/// A merchant's tag: pointed where the string goes through, with the price
-/// written on it.
 class PriceTag extends StatelessWidget {
   const PriceTag(this.price, {super.key, this.size = GuildType.md});
 
@@ -169,7 +164,6 @@ class _PriceTagPainter extends CustomPainter {
   bool shouldRepaint(_PriceTagPainter old) => old.seed != seed;
 }
 
-/// "OWNED", stamped in red ink across the corner of a note.
 class OwnedStamp extends StatelessWidget {
   const OwnedStamp({super.key, this.label = 'OWNED'});
 
@@ -201,7 +195,6 @@ class OwnedStamp extends StatelessWidget {
   }
 }
 
-/// A pencil line with a finer one inside it, as paper is ruled in the hall.
 class RuledFrame extends StatelessWidget {
   const RuledFrame({super.key, required this.child, this.padding = const EdgeInsets.all(12), this.color});
 
@@ -224,7 +217,6 @@ class RuledFrame extends StatelessWidget {
   }
 }
 
-/// A stroke of red ink under a heading on paper.
 class InkUnderline extends StatelessWidget {
   const InkUnderline({super.key, this.color = GuildColors.brick});
 
@@ -258,7 +250,6 @@ class _UnderlinePainter extends CustomPainter {
   bool shouldRepaint(_UnderlinePainter old) => old.color != color;
 }
 
-/// The ware's art in a dashed ring, as it is sketched on the notes.
 class _RingedArt extends StatelessWidget {
   const _RingedArt({required this.ware, required this.size});
 
@@ -282,15 +273,12 @@ class _RingedArt extends StatelessWidget {
   }
 }
 
-/// Opens a ware's page. [shelf] is the run of wares it stands among, in
-/// order, so the buyer can move along it from one to the next.
 typedef OpenWare = void Function(String wareId, {List<String> shelf});
 
 String wareSemantics(Ware ware) => ware.owned
     ? '${ware.name}, ${ware.shelf}, ${ware.rarity.label}, in your chest'
     : '${ware.name}, ${ware.shelf}, ${ware.rarity.label}, ${formatPrice(ware.price)}';
 
-/// One ware on the table: a scrap of paper with a sketch, a name and a tag.
 class WareNote extends StatelessWidget {
   const WareNote({super.key, required this.ware, required this.onOpen, this.tilt = 0, this.markOwned = true});
 
@@ -298,8 +286,6 @@ class WareNote extends StatelessWidget {
   final VoidCallback onOpen;
   final double tilt;
 
-  /// Whether a ware already bought is faded and stamped, as on the stall.
-  /// In the chest everything is owned, so nothing is.
   final bool markOwned;
 
   @override
@@ -372,8 +358,6 @@ class WareNote extends StatelessWidget {
   }
 }
 
-/// The stallkeeper's looking-glass: an oval of brass with the ware shown in
-/// it.
 class MirrorFrame extends StatelessWidget {
   const MirrorFrame({super.key, required this.child, this.width = 196, this.height = 214});
 
@@ -443,7 +427,6 @@ class _MirrorShinePainter extends CustomPainter {
   bool shouldRepaint(_MirrorShinePainter old) => false;
 }
 
-/// A heart drawn in outline, inked in once the ware is wished for.
 class HeartMark extends StatelessWidget {
   const HeartMark({super.key, required this.filled, this.size = 26});
 
@@ -477,7 +460,6 @@ class _HeartPainter extends CustomPainter {
   bool shouldRepaint(_HeartPainter old) => old.filled != filled;
 }
 
-/// The wares of a table or a chest, two to a row on a dark cloth.
 class WareTable extends StatelessWidget {
   const WareTable({super.key, required this.wares, required this.onOpen, this.markOwned = true});
 

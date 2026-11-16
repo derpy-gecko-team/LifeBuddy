@@ -9,7 +9,6 @@ import '../state/bazaar_controller.dart';
 import '../theme/bazaar_assets.dart';
 import '../widgets/bazaar_widgets.dart';
 
-/// Everything bought so far.
 class ChestPage extends StatelessWidget {
   const ChestPage({super.key, required this.controller, required this.onOpenWare});
 

@@ -295,8 +295,6 @@ class _QuestlineSection extends StatelessWidget {
             clipBehavior: Clip.none,
             padding: const EdgeInsets.fromLTRB(26, 34, 26, 18),
             itemCount: quests.length,
-            // Keeps each card's state with its quest when the order changes,
-            // so a seal that breaks is seen breaking.
             findItemIndexCallback: (key) {
               final index = quests.indexWhere((q) => ValueKey(q.id) == key);
               return index < 0 ? null : index;

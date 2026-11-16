@@ -30,8 +30,6 @@ class _BazaarPageState extends State<BazaarPage> {
   }
 
   void _openWare(String wareId, {List<String> shelf = const []}) {
-    // The ware itself is carried from its shelf to the page; the page only
-    // has to fade in around it.
     Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
       builder: (_) => WarePage(controller: _controller, wareId: wareId, shelf: shelf),
     ));

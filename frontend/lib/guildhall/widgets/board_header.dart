@@ -35,7 +35,6 @@ class BoardHeader extends StatelessWidget {
 
   final int newToday;
 
-  /// Draws the stroke under the title in, the first time the hall is shown.
   final bool drawTitle;
   final VoidCallback? onTitleDrawn;
 

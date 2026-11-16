@@ -16,21 +16,15 @@ enum WallVariant {
   final int seed;
 }
 
-/// The wall of the hall: the indigo band of the login border, grown to fill
-/// the screen, with the same chalk vines, stars and suns drawn across it.
 class PaintedWall extends StatelessWidget {
   const PaintedWall({super.key, this.variant = WallVariant.board, this.scroll});
 
   final WallVariant variant;
 
-  /// How far the page in front has been scrolled. Given this, the wall
-  /// follows at a fraction of the speed, so the paper reads as pinned in
-  /// front of it rather than printed on it.
   final ValueListenable<double>? scroll;
 
   static const _rate = 0.12;
 
-  /// Extra wall painted below the screen for it to drift into.
   static const _reach = 200.0;
 
   @override
@@ -91,9 +85,6 @@ abstract final class _WallCache {
   }
 }
 
-/// A flat coat of indigo, then the unevenness of paint laid on by hand:
-/// cloudy patches where it pooled or thinned, and long streaks left by the
-/// brush.
 void _paintWash(Canvas canvas, Size size, int seed) {
   final rnd = Random(seed);
   final area = Offset.zero & size;
@@ -144,8 +135,6 @@ void _paintWash(Canvas canvas, Size size, int seed) {
   canvas.restore();
 }
 
-/// Draws the chalk doodles. Every shape is traced a little unsteadily and
-/// gone over twice, the way a line drawn by hand never quite repeats.
 class _Doodler {
   _Doodler(this.canvas, this.size, this.variant) : pen = Random(variant.seed * 13 + 1);
 
@@ -162,8 +151,6 @@ class _Doodler {
   double _r(double from, double to) => from + pen.nextDouble() * (to - from);
   double _jitter(double amount) => (pen.nextDouble() - 0.5) * 2 * amount;
 
-  /// Where headings are chalked straight onto the wall, so the doodles there
-  /// stay out from under the words.
   List<Rect> get _quiet => switch (variant) {
         WallVariant.board => [Rect.fromLTWH(0, 0, size.width * 0.8, 200)],
         WallVariant.questline => [Rect.fromLTWH(0, 0, size.width, 120)],
@@ -234,7 +221,6 @@ class _Doodler {
     _line.lineTo(points.last.dx, points.last.dy);
   }
 
-  /// A coil wound inward from [start], turning to the [side] it is given.
   List<Offset> _coil(Offset start, double heading, double radius, {required double side, double turns = 1.6}) {
     final center = start + Offset(cos(heading + side * pi / 2), sin(heading + side * pi / 2)) * radius;
     final from = heading - side * pi / 2;
@@ -316,7 +302,6 @@ class _Doodler {
     _curve(_coil(at, heading, radius, side: pen.nextBool() ? 1 : -1, turns: _r(1.5, 2.3)));
   }
 
-  /// A filled star with four or five uneven points.
   void _star(Offset at, double radius) {
     final points = pen.nextDouble() < 0.4 ? 4 : 5;
     final turn = _r(0, 2 * pi);
@@ -330,7 +315,6 @@ class _Doodler {
     _solid.close();
   }
 
-  /// A spiky starburst: rays of uneven length thrown out from one point.
   void _burst(Offset at, double radius) {
     final rays = 9 + pen.nextInt(5);
     final turn = _r(0, 2 * pi);
@@ -345,8 +329,6 @@ class _Doodler {
     _solid.addOval(Rect.fromCircle(center: at, radius: radius * 0.22));
   }
 
-  /// A round sun or moon: a ring drawn twice over, then either scribbled in
-  /// or left with a curl inside.
   void _sun(Offset at, double radius) {
     for (var pass = 0; pass < 2; pass++) {
       final from = _r(0, 2 * pi);

@@ -44,8 +44,6 @@ class _StallPageState extends State<StallPage> {
     super.dispose();
   }
 
-  /// A new category is a new table: if the old one had been scrolled down,
-  /// start the new one from its first row, just under the rail.
   void _onControllerChanged() {
     final category = widget.controller.category;
     if (category == _shownCategory) return;

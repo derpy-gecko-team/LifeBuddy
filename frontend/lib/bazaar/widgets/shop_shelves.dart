@@ -12,8 +12,6 @@ import '../../guildhall/widgets/torn_paper.dart';
 import '../data/models.dart';
 import 'bazaar_widgets.dart';
 
-/// The shop's woodwork: old walnut picked out in gilt, outlined in the same
-/// ink as everything else and drawn as unsteadily.
 abstract final class ShopWood {
   static const pale = Color(0xFFC9A57A);
   static const light = Color(0xFFB08A63);
@@ -27,8 +25,6 @@ Paint _ink([double width = 2, double alpha = 1]) => Sketch.pen(GuildColors.ink.w
 
 Paint _gilt([double width = 1.6, double alpha = 1]) => Sketch.pen(ShopWood.brass.withValues(alpha: alpha), width);
 
-/// A line ruled without a ruler: it wanders a little on the way and runs
-/// slightly past where it was meant to stop.
 Path _handLine(Offset a, Offset b, Random pen, {double wobble = 1, double over = 1.5}) {
   final d = b - a;
   final length = d.distance;
@@ -49,7 +45,6 @@ Path _handLine(Offset a, Offset b, Random pen, {double wobble = 1, double over =
   return path;
 }
 
-/// A shape filled, then gone round twice in ink: once firmly, once loosely.
 void _handPoly(Canvas canvas, List<Offset> points, Color fill, Random pen, {double width = 2, double wobble = 1}) {
   final p = [
     for (final o in points) o + Offset((pen.nextDouble() - 0.5) * wobble * 1.4, (pen.nextDouble() - 0.5) * wobble * 1.4),
@@ -92,7 +87,6 @@ void _knot(Canvas canvas, Offset c, double r, Random pen, {bool vertical = false
   canvas.drawCircle(c, 0.9, Paint()..color = GuildColors.ink.withValues(alpha: 0.5));
 }
 
-/// Shading laid in with quick slanted strokes, heaviest at one edge.
 void _hatch(Canvas canvas, Rect area, Random pen, {Color color = GuildColors.ink, double alpha = 0.24, double gap = 4.5}) {
   canvas.save();
   canvas.clipRect(area);
@@ -116,8 +110,6 @@ void _nail(Canvas canvas, Offset at) {
   canvas.drawCircle(at + const Offset(-0.5, -0.6), 0.6, Paint()..color = GuildColors.cream.withValues(alpha: 0.7));
 }
 
-/// One plank: outlined by hand, with its grain, its knots, a worn highlight
-/// along the lit edge and pencil shading along the other.
 void _board(
   Canvas canvas,
   Rect rect,
@@ -220,7 +212,6 @@ void _candle(Canvas canvas, double x, double foot, double height, Random pen) {
     width: 1.5,
     wobble: 0.6,
   );
-  // Wax that has run down one side.
   final drip = Path()
     ..moveTo(x + 3.6, foot - 2 - height)
     ..quadraticBezierTo(x + 6.5, foot - height + 3, x + 4.2, foot - height + 8 + pen.nextDouble() * 4);
@@ -236,7 +227,6 @@ void _candle(Canvas canvas, double x, double foot, double height, Random pen) {
   canvas.drawPath(flame, _ink(1.3));
 }
 
-/// A ware picked up off its shelf flies to wherever it is shown next.
 class WareHero extends StatelessWidget {
   const WareHero({super.key, required this.ware, required this.child, this.dye});
 
@@ -261,16 +251,12 @@ class WareHero extends StatelessWidget {
   }
 }
 
-/// The shop's cabinet: every ware of the chosen kind stood on its shelves,
-/// three to a board, each with its price hung from the shelf below it.
 class ShopShelves extends StatelessWidget {
   const ShopShelves({super.key, required this.wares, required this.onOpen, required this.restockKey});
 
   final List<Ware> wares;
   final OpenWare onOpen;
 
-  /// Changes whenever the shelves are stocked afresh (another category,
-  /// another order), so the wares are seen being set out again.
   final Object restockKey;
 
   static const perShelf = 3;
@@ -340,8 +326,6 @@ class _Cornice extends StatelessWidget {
       const SizedBox(height: 98, child: ExcludeSemantics(child: CustomPaint(painter: _CornicePainter())));
 }
 
-/// The cabinet's crown: a carved crest with a gilt moon, a candle or two and
-/// an hourglass left standing on top.
 class _CornicePainter extends CustomPainter {
   const _CornicePainter();
 
@@ -353,7 +337,6 @@ class _CornicePainter extends CustomPainter {
 
     canvas.drawRect(Rect.fromLTWH(3, base + 4, w, 18), Paint()..color = GuildColors.shadow.withValues(alpha: 0.4));
 
-    // What has been left on top of the cabinet.
     _candle(canvas, w * 0.075, base, 24, pen);
     _candle(canvas, w * 0.135, base, 14, pen);
     _hourglass(canvas, Offset(w * 0.9, base), pen);
@@ -385,7 +368,6 @@ class _CornicePainter extends CustomPainter {
     canvas.drawPath(outer, _ink(2.2));
     canvas.drawPath(outer.shift(const Offset(-0.9, 0.8)), _ink(1, 0.4));
 
-    // Gilt: a moon in a ring, and a scroll curling away to either side.
     final moon = Offset(w / 2, base - 27);
     canvas.drawCircle(moon, 14.5, _gilt(1.5));
     canvas.drawCircle(moon + const Offset(0.6, 0.4), 15.6, _gilt(0.9, 0.5));
@@ -404,11 +386,9 @@ class _CornicePainter extends CustomPainter {
       canvas.drawCircle(Offset(w / 2 + side * w * 0.225, base - 9), 1.5, Paint()..color = ShopWood.brass);
       canvas.drawCircle(Offset(w / 2 + side * 21, base - 42), 1.3, Paint()..color = ShopWood.brass);
     }
-    // The finial.
     canvas.drawCircle(Offset(w / 2, 8), 4.4, Paint()..color = ShopWood.brass);
     canvas.drawCircle(Offset(w / 2, 8), 4.4, _ink(1.5));
 
-    // The top of the cabinet, and the frieze under its lip.
     _board(canvas, Rect.fromLTWH(5, base + 9, w - 10, 9), ShopWood.dark, pen, grain: 2, shade: false);
     for (var x = 22.0; x < w - 16; x += 22 + pen.nextDouble() * 5) {
       final c = Offset(x, base + 13.5 + (pen.nextDouble() - 0.5));
@@ -480,8 +460,6 @@ class _CornicePainter extends CustomPainter {
   bool shouldRepaint(_CornicePainter old) => false;
 }
 
-/// The cabinet's back and its two carved uprights, behind however many
-/// shelves there are.
 class _CabinetPainter extends CustomPainter {
   const _CabinetPainter(this.post);
   final double post;
@@ -493,8 +471,6 @@ class _CabinetPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTWH(3, 0, w, h + 4), Paint()..color = GuildColors.shadow.withValues(alpha: 0.4));
     canvas.drawRect(Offset.zero & size, Paint()..color = ShopWood.alcove);
 
-    // The boards of the back: uneven widths, seams that wander, the odd
-    // knot and scratch.
     for (var x = post + 26 + pen.nextDouble() * 14; x < w - post - 14; x += 28 + pen.nextDouble() * 18) {
       final lean = (pen.nextDouble() - 0.5) * 3;
       canvas.drawPath(
@@ -516,7 +492,6 @@ class _CabinetPainter extends CustomPainter {
         canvas.drawPath(_handLine(at, at + Offset(pen.nextDouble() * 8 - 4, 14 + pen.nextDouble() * 22), pen, over: 0), faint);
       }
     }
-    // The uprights keep the edges of the back in shade.
     _hatch(canvas, Rect.fromLTWH(w - post - 11, 0, 11, h), pen, color: GuildColors.shadow, alpha: 0.75, gap: 5);
     canvas.save();
     canvas.translate(post * 2 + 9, 0);
@@ -536,7 +511,6 @@ class _CabinetPainter extends CustomPainter {
         grain: (h / 46).ceil(),
         knots: (h / 260).ceil(),
       );
-      // Gilt carving down the face of the upright.
       final x = left + post / 2;
       for (var y = 54.0; y < h - 30; y += 157) {
         final c = Offset(x + (pen.nextDouble() - 0.5), y + (pen.nextDouble() - 0.5) * 6);
@@ -565,7 +539,6 @@ class _CabinetPainter extends CustomPainter {
     }
   }
 
-  /// A web in the top corner, and the spider that keeps it.
   void _cobweb(Canvas canvas, Offset corner, Random pen) {
     final silk = Sketch.pen(GuildColors.cream.withValues(alpha: 0.3), 1);
     const spokes = [0.06, 0.5, 1.0, 1.5];
@@ -604,7 +577,6 @@ class _CabinetPainter extends CustomPainter {
   bool shouldRepaint(_CabinetPainter old) => old.post != post;
 }
 
-/// A string of gilt moons and stars, looped under the cabinet's top.
 class _GarlandPainter extends CustomPainter {
   const _GarlandPainter(this.post);
   final double post;
@@ -674,11 +646,9 @@ class _ShelfRowPainter extends CustomPainter {
     final pen = Random(seed);
     final w = size.width;
     const top = _ShelfRow.bay, thick = _ShelfRow.plank;
-    // No shelf here was hung with a level.
     final l = (pen.nextDouble() - 0.5) * 2.6, r = (pen.nextDouble() - 0.5) * 2.6;
     double sag(double x) => l + (r - l) * (x / w);
 
-    // The shelf above keeps the top of the bay in shade.
     canvas.drawRect(
       Rect.fromLTWH(0, 0, w, 16),
       Paint()
@@ -689,12 +659,10 @@ class _ShelfRowPainter extends CustomPainter {
         ).createShader(Rect.fromLTWH(0, 0, w, 16)),
     );
 
-    // Its own shadow on the back, laid in with the side of the pencil.
     final under = top + thick + max(l, r);
     canvas.drawRect(Rect.fromLTWH(0, under - 3, w, 8), Paint()..color = GuildColors.shadow.withValues(alpha: 0.4));
     _hatch(canvas, Rect.fromLTWH(0, under - 3, w, 15), pen, color: GuildColors.shadow, alpha: 0.8, gap: 5);
 
-    // A carved bracket under either end.
     for (final right in const [false, true]) {
       final x = right ? w : 0.0;
       final d = right ? -1.0 : 1.0;
@@ -710,7 +678,6 @@ class _ShelfRowPainter extends CustomPainter {
       canvas.drawPath(_spiral(Offset(x + d * 6, y + 6), 3.4, turns: 1.2, clockwise: right), _gilt(1.1, 0.9));
     }
 
-    // The top of the plank, seen a little from above, then its front edge.
     _handPoly(
       canvas,
       [Offset(-1, top - 3.5 + l), Offset(w + 1, top - 3.5 + r), Offset(w + 1, top + r), Offset(-1, top + l)],
@@ -736,7 +703,6 @@ class _ShelfRowPainter extends CustomPainter {
       _knot(canvas, Offset(x, top + thick * 0.5 + sag(x)), 3.4, pen);
     }
     _hatch(canvas, Rect.fromLTWH(0, top + thick - 4.5 + min(l, r), w, 6 + (l - r).abs()), pen, alpha: 0.26);
-    // A split running in from one end.
     final fromRight = pen.nextBool();
     var crack = Offset(fromRight ? w : 0, top + thick * (0.3 + pen.nextDouble() * 0.4) + (fromRight ? r : l));
     final split = Path()..moveTo(crack.dx, crack.dy);
@@ -747,7 +713,6 @@ class _ShelfRowPainter extends CustomPainter {
     canvas.drawPath(split, _ink(1, 0.55));
     canvas.restore();
 
-    // Worn bright along the front, where hands have been.
     final worn = Sketch.pen(Colors.white.withValues(alpha: 0.24), 1.3);
     for (var x = 6 + pen.nextDouble() * 30; x < w - 20; x += 50 + pen.nextDouble() * 70) {
       final length = 14 + pen.nextDouble() * 30;
@@ -757,7 +722,6 @@ class _ShelfRowPainter extends CustomPainter {
       );
     }
 
-    // A chip out of the bottom edge, between two wares.
     final chipAt = w * (pen.nextBool() ? 1 / 3 : 2 / 3) + (pen.nextDouble() - 0.5) * 26;
     final chipY = top + thick + sag(chipAt);
     final chip = Path()
@@ -784,8 +748,6 @@ class _ShelfRowPainter extends CustomPainter {
   bool shouldRepaint(_ShelfRowPainter old) => old.seed != seed;
 }
 
-/// One ware stood on a shelf, its price hung under it and its name chalked
-/// on the back of the cabinet.
 class _ShelfWare extends StatelessWidget {
   const _ShelfWare({required this.ware, required this.onOpen});
 
@@ -809,7 +771,6 @@ class _ShelfWare extends StatelessWidget {
               height: _ShelfRow.bay,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                // Picked up a little off the shelf while it is held.
                 child: AnimatedContainer(
                   duration: still ? Duration.zero : GuildMotion.press,
                   curve: Curves.easeOut,
@@ -817,8 +778,6 @@ class _ShelfWare extends StatelessWidget {
                   transform: Matrix4.translationValues(0, pressed ? -7 : 0, 0)
                     ..rotateZ(pressed ? (stableSeed(ware.id).isEven ? 0.05 : -0.05) : 0),
                   padding: const EdgeInsets.only(bottom: 1),
-                  // A little candlelight behind it, so dark wares still
-                  // stand out from the back of the cabinet.
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
                       radius: 0.5,
@@ -878,8 +837,6 @@ class _PaperChip extends StatelessWidget {
   }
 }
 
-/// Sets a ware down on its shelf: it drops the last little way and settles.
-/// The further along the shelves it stands, the later it is set down.
 class _HopIn extends StatefulWidget {
   const _HopIn({super.key, required this.order, required this.child});
 
@@ -933,8 +890,6 @@ class _HopInState extends State<_HopIn> with SingleTickerProviderStateMixin {
   }
 }
 
-/// The cupboard the shelves stand on: a bank of labelled drawers either
-/// side of two carved doors.
 class _CabinetBase extends StatelessWidget {
   const _CabinetBase();
 
@@ -968,7 +923,6 @@ class _BasePainter extends CustomPainter {
           drawerH,
         );
         _board(canvas, drawer, ShopWood.light, pen, grain: 2, knots: pen.nextDouble() < 0.3 ? 1 : 0);
-        // A brass plate with whatever was once written on it.
         final plate = Rect.fromCenter(
           center: drawer.center + Offset(0, -drawerH * 0.14),
           width: min(34.0, drawer.width * 0.56),
@@ -1026,7 +980,6 @@ class _BasePainter extends CustomPainter {
           canvas.drawLine(c + Offset(cos(a), sin(a)) * 16, c + Offset(cos(a), sin(a)) * (19.5 + (k.isEven ? 2.5 : 0)), _gilt(1.1, 0.9));
         }
       }
-      // Hinges on the outer edge, a knob by the inner one.
       final hingeX = right ? door.right - 1.5 : door.left + 1.5;
       for (final f in const [0.2, 0.8]) {
         final hinge = Rect.fromCenter(center: Offset(hingeX, door.top + door.height * f), width: 5, height: 11);
@@ -1039,7 +992,6 @@ class _BasePainter extends CustomPainter {
       canvas.drawCircle(knob + const Offset(-1, -1.1), 0.9, Paint()..color = Colors.white70);
     }
 
-    // The keys, left hanging from a drawer pull.
     if (keyPull != null) {
       final ring = keyPull + const Offset(0, 6);
       canvas.drawCircle(ring, 5, _ink(2.6));
@@ -1054,7 +1006,6 @@ class _BasePainter extends CustomPainter {
       }
     }
 
-    // The counter the shelves stand on, the moulding under it, the plinth.
     _board(canvas, Rect.fromLTWH(3, 14, w - 6, 7), ShopWood.dark, pen, grain: 1, shade: false);
     _board(canvas, Rect.fromLTWH(-4, 0, w + 8, 15), ShopWood.light, pen, grain: 7, knots: 2);
     _nail(canvas, const Offset(8, 7.5));
@@ -1066,8 +1017,6 @@ class _BasePainter extends CustomPainter {
   bool shouldRepaint(_BasePainter old) => false;
 }
 
-/// The passing ware, stood in a candle-lit alcove with its notice pinned
-/// beside it.
 class FeaturedNiche extends StatelessWidget {
   const FeaturedNiche({super.key, required this.ware, required this.now, required this.onOpen});
 
@@ -1224,7 +1173,6 @@ class _NichePainter extends CustomPainter {
     canvas.restore();
     canvas.drawPath(inner, ink);
 
-    // The sill the ware stands on, and a candle at either end of it.
     final sill = Rect.fromLTWH(6, size.height - 27, size.width - 12, 13);
     _board(canvas, sill, ShopWood.light, pen, grain: 3);
     for (final x in [inside.left + 9, inside.right - 9]) {
@@ -1241,7 +1189,6 @@ class _NichePainter extends CustomPainter {
       canvas.drawPath(flame, Sketch.pen(GuildColors.ink, 1.4));
     }
 
-    // A brass stud for a keystone.
     final key = Offset(size.width / 2, 7.5);
     canvas.drawCircle(key, 4.5, Paint()..color = ShopWood.brass);
     canvas.drawCircle(key, 4.5, Sketch.pen(GuildColors.ink, 1.5));

@@ -121,8 +121,6 @@ class _QuestPosterState extends State<_QuestPoster> {
     }
   }
 
-  /// Brings the trials into view, if they are not already, so the oath is
-  /// seen being stamped beside them.
   void _showTrials() {
     final target = _trialsEnd.currentContext;
     if (target == null) return;
@@ -321,7 +319,6 @@ class _DoubleRule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The frame of the login page: one heavy pencil rule, a fine one inside.
     return Container(
       decoration: BoxDecoration(border: Border.all(color: GuildColors.tan, width: 3)),
       padding: const EdgeInsets.all(5),
