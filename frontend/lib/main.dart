@@ -11,6 +11,6 @@ class LifeBuddyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: 'LifeBuddy', home: const HomeShell());
+    return const MaterialApp(title: 'LifeBuddy', home: HomeShell());
   }
 }

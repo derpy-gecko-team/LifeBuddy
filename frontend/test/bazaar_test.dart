@@ -63,8 +63,11 @@ void main() {
   });
 
   test('a category shows only its wares, the featured one included', () {
-    controller.setCategory(WareCategory.buddy);
+    controller.setCategory(WareCategory.creature);
     expect(controller.table.map((w) => w.id), unorderedEquals(['moon-owl', 'dragon-egg']));
+
+    controller.setCategory(WareCategory.buddy);
+    expect(controller.table.map((w) => w.id), ['old-wizard']);
   });
 
   test('amounts and deadlines are written out for reading', () {

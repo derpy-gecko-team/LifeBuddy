@@ -41,21 +41,21 @@ class JourneyBanner extends StatelessWidget {
                         padding: const EdgeInsets.all(10),
                         child: JourneyEmblem(journey: journey, size: 42),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: GuildSpace.md),
                       Expanded(
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Semantics(
                             header: true,
-                            child: LetteredTitle(journey.name, size: GuildType.xl),
+                            child: LetteredTitle(journey.name, size: GuildTitle.xl),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: GuildSpace.md),
                   Text(journey.quote, style: GuildText.aside(GuildType.md)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: GuildSpace.lg),
                   Row(
                     children: [
                       Expanded(
@@ -64,19 +64,19 @@ class JourneyBanner extends StatelessWidget {
                           style: GuildText.label(GuildType.sm),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: GuildSpace.sm),
                       SealProgress(total: journey.quests.length, done: journey.fulfilledCount, size: 20),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: GuildSpace.lg),
                   DashedBorder(
                     color: GuildColors.cream.withValues(alpha: 0.8),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child: Row(
                       children: [
                         ExcludeSemantics(child: Image.asset(GuildAssets.coinPouch, height: 26)),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(bounty, style: GuildText.body(GuildType.md, color: GuildColors.cream))),
+                        const SizedBox(width: GuildSpace.sm),
+                        Expanded(child: Text(bounty, style: GuildText.aside(GuildType.md))),
                       ],
                     ),
                   ),
@@ -211,17 +211,17 @@ class _BannerPainter extends CustomPainter {
     final sketch = Sketch.of(_outline(Offset.zero & size, notch), seed);
     final cloth = _cloth(size);
 
-    sketch.paintFill(canvas, GuildColors.brick, shadow: const Offset(3, 5));
+    sketch.paintFill(canvas, GuildColors.brickDeep, shadow: GuildShadow.paper);
 
     canvas.save();
     canvas.clipPath(sketch.shape);
-    canvas.drawPath(cloth.folds, Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.55), 2.6));
+    canvas.drawPath(cloth.folds, Sketch.pen(GuildColors.brickShade.withValues(alpha: 0.55), 2.6));
     canvas.drawPath(cloth.sheen, Sketch.pen(GuildColors.cream.withValues(alpha: 0.12), 1.8));
-    canvas.drawPath(cloth.rodShade, Sketch.pen(GuildColors.brickDeep.withValues(alpha: 0.7), 1.3));
+    canvas.drawPath(cloth.rodShade, Sketch.pen(GuildColors.brickShade.withValues(alpha: 0.7), 1.3));
     canvas.restore();
 
-    sketch.paintShading(canvas, ink: GuildColors.brickDeep, strength: 2.2);
-    sketch.paintBorder(canvas, color: GuildColors.brickDeep, width: 1.8);
+    sketch.paintShading(canvas, ink: GuildColors.brickShade, strength: 2.2);
+    sketch.paintBorder(canvas, color: GuildColors.brickShade, width: 1.8);
 
     drawDashedPath(
       canvas,

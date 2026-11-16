@@ -11,6 +11,8 @@ abstract final class GuildAssets {
   static const badgeFlame = '$_dir/badge_flame.png';
   static const badgeSkull = '$_dir/badge_skull.png';
   static const buddyEnvelope = '$_dir/buddy_envelope.png';
+  static const buddyWizard = '$_dir/buddy_wizard.png';
+  static const buddyWizardFace = '$_dir/buddy_wizard_face.png';
   static const iconSkull = '$_dir/icon_skull.png';
   static const iconHourglass = '$_dir/icon_hourglass.png';
   static const iconCrown = '$_dir/icon_crown.png';

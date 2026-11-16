@@ -6,7 +6,6 @@ import '../../guildhall/theme/guild_assets.dart';
 import '../../guildhall/theme/guild_theme.dart';
 import '../../guildhall/widgets/ornaments.dart';
 import '../../guildhall/widgets/pressable.dart';
-import '../../guildhall/widgets/quest_cards.dart' show Fastener, FastenerKind;
 import '../../guildhall/widgets/sketch.dart';
 import '../../guildhall/widgets/torn_paper.dart';
 import '../data/models.dart';
@@ -19,6 +18,7 @@ abstract final class ShopWood {
   static const dark = Color(0xFF6C4F3B);
   static const alcove = Color(0xFF2B2A55);
   static const brass = GuildColors.gold;
+  static const glass = Color(0xFFA990B8);
 }
 
 Paint _ink([double width = 2, double alpha = 1]) => Sketch.pen(GuildColors.ink.withValues(alpha: alpha), width);
@@ -186,6 +186,12 @@ void _star(Canvas canvas, Offset c, double r, Random pen) {
   canvas.drawPath(path, _ink(1.1));
 }
 
+Path _flamePath(Offset tip) => Path()
+  ..moveTo(tip.dx, tip.dy)
+  ..cubicTo(tip.dx + 5, tip.dy + 6, tip.dx + 4, tip.dy + 11, tip.dx, tip.dy + 11)
+  ..cubicTo(tip.dx - 4, tip.dy + 11, tip.dx - 5, tip.dy + 6, tip.dx, tip.dy)
+  ..close();
+
 void _candle(Canvas canvas, double x, double foot, double height, Random pen) {
   final glowAt = Offset(x, foot - height - 8);
   canvas.drawCircle(
@@ -217,12 +223,7 @@ void _candle(Canvas canvas, double x, double foot, double height, Random pen) {
     ..quadraticBezierTo(x + 6.5, foot - height + 3, x + 4.2, foot - height + 8 + pen.nextDouble() * 4);
   canvas.drawPath(drip, _ink(1.3));
   canvas.drawLine(Offset(x, foot - 3 - height), Offset(x + 0.6, foot - 6 - height), _ink(1.2));
-  final tip = Offset(x + 0.8, foot - 17 - height);
-  final flame = Path()
-    ..moveTo(tip.dx, tip.dy)
-    ..cubicTo(tip.dx + 5, tip.dy + 6, tip.dx + 3.6, tip.dy + 11, tip.dx - 0.4, tip.dy + 11)
-    ..cubicTo(tip.dx - 4.4, tip.dy + 11, tip.dx - 4.4, tip.dy + 6, tip.dx, tip.dy)
-    ..close();
+  final flame = _flamePath(Offset(x + 0.8, foot - 17 - height));
   canvas.drawPath(flame, Paint()..color = GuildColors.goldBright);
   canvas.drawPath(flame, _ink(1.3));
 }
@@ -279,7 +280,7 @@ class ShopShelves extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: _post),
               child: AnimatedSwitcher(
-                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 160),
+                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.swift,
                 switchInCurve: Curves.easeOut,
                 layoutBuilder: (current, previous) => Stack(
                   alignment: Alignment.topCenter,
@@ -445,7 +446,7 @@ class _CornicePainter extends CustomPainter {
 
   void _bottle(Canvas canvas, Offset foot, Random pen) {
     final c = foot + const Offset(0, -8);
-    canvas.drawCircle(c, 7.5, Paint()..color = const Color(0xFFA990B8));
+    canvas.drawCircle(c, 7.5, Paint()..color = ShopWood.glass);
     canvas.drawCircle(c, 7.5, _ink(1.5));
     final neck = Rect.fromLTWH(c.dx - 2.6, c.dy - 13, 5.2, 6.5);
     canvas.drawRect(neck, Paint()..color = GuildColors.mist);
@@ -757,62 +758,58 @@ class _ShelfWare extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final still = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: true,
-      label: wareSemantics(ware),
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onOpen,
-        haptic: true,
-        pressedScale: 1,
-        builder: (context, pressed) => Column(
-          children: [
-            SizedBox(
-              height: _ShelfRow.bay,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: AnimatedContainer(
-                  duration: still ? Duration.zero : GuildMotion.press,
-                  curve: Curves.easeOut,
-                  transformAlignment: Alignment.bottomCenter,
-                  transform: Matrix4.translationValues(0, pressed ? -7 : 0, 0)
-                    ..rotateZ(pressed ? (stableSeed(ware.id).isEven ? 0.05 : -0.05) : 0),
-                  padding: const EdgeInsets.only(bottom: 1),
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      radius: 0.5,
-                      colors: [
-                        GuildColors.torchlight.withValues(alpha: ware.owned ? 0.08 : 0.2),
-                        GuildColors.torchlight.withValues(alpha: 0),
-                      ],
-                    ),
+    return GuildPressable(
+      semanticLabel: wareSemantics(ware),
+      onTap: onOpen,
+      haptic: true,
+      pressedScale: 1,
+      builder: (context, pressed) => Column(
+        children: [
+          SizedBox(
+            height: _ShelfRow.bay,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedContainer(
+                duration: still ? Duration.zero : GuildMotion.press,
+                curve: Curves.easeOut,
+                transformAlignment: Alignment.bottomCenter,
+                transform: Matrix4.translationValues(0, pressed ? -7 : 0, 0)
+                  ..rotateZ(pressed ? (stableSeed(ware.id).isEven ? 0.05 : -0.05) : 0),
+                padding: const EdgeInsets.only(bottom: 1),
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    radius: 0.5,
+                    colors: [
+                      GuildColors.torchlight.withValues(alpha: ware.owned ? 0.08 : 0.2),
+                      GuildColors.torchlight.withValues(alpha: 0),
+                    ],
                   ),
-                  child: Opacity(
-                    opacity: ware.owned ? 0.5 : 1,
-                    child: WareHero(ware: ware, child: WareArt(ware.artFor(ware.dye), size: 84)),
-                  ),
+                ),
+                child: Opacity(
+                  opacity: ware.owned ? 0.5 : 1,
+                  child: WareHero(ware: ware, child: WareArt(ware.artFor(ware.dye), size: 84)),
                 ),
               ),
             ),
-            const SizedBox(height: _ShelfRow.plank),
-            Container(width: 1.4, height: 8, color: GuildColors.chalkLine),
-            if (ware.owned)
-              const _PaperChip('Yours')
-            else
-              FittedBox(fit: BoxFit.scaleDown, child: PriceTag(ware.price, size: 12)),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 5, 4, 14),
-              child: Text(
-                ware.name,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: GuildText.label(GuildType.xs, color: GuildColors.cream.withValues(alpha: ware.owned ? 0.6 : 0.92), spacing: 0.3)
-                    .copyWith(height: 1.05),
-              ),
+          ),
+          const SizedBox(height: _ShelfRow.plank),
+          Container(width: 1.4, height: 8, color: GuildColors.chalkLine),
+          if (ware.owned)
+            const _PaperChip('Yours')
+          else
+            FittedBox(fit: BoxFit.scaleDown, child: PriceTag(ware.price, size: 12)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 5, 4, 14),
+            child: Text(
+              ware.name,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: GuildText.label(GuildType.xs, color: GuildColors.cream.withValues(alpha: 0.92), spacing: 0.3)
+                  .copyWith(height: 1.05),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -827,12 +824,12 @@ class _PaperChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return SketchBox(
       color: GuildColors.vellum,
-      borderColor: GuildColors.brick,
+      borderColor: GuildColors.brickDeep,
       borderWidth: 1.5,
-      shadow: const Offset(1.5, 2),
+      shadow: GuildShadow.small,
       seed: 13,
       padding: const EdgeInsets.fromLTRB(9, 2, 9, 3),
-      child: Text(label.toUpperCase(), style: GuildText.title(GuildType.xs, color: GuildColors.brick).copyWith(letterSpacing: 1.6)),
+      child: Text(label.toUpperCase(), style: GuildText.title(GuildTitle.xs, color: GuildColors.brickDeep).copyWith(letterSpacing: 1.6)),
     );
   }
 }
@@ -848,7 +845,7 @@ class _HopIn extends StatefulWidget {
 }
 
 class _HopInState extends State<_HopIn> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 380));
+  late final AnimationController _c = AnimationController(vsync: this, duration: GuildMotion.slide);
   bool _started = false;
 
   @override
@@ -1027,102 +1024,92 @@ class FeaturedNiche extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final leaves = ware.leavesAt;
-    return Semantics(
-      button: true,
-      label: '${wareSemantics(ware)}. ${ware.blurb}${leaves == null ? '' : ' ${leavesLabel(leaves, now)}.'}',
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onOpen,
-        pressedScale: 0.98,
-        haptic: true,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 132,
-              height: 196,
-              child: CustomPaint(
-                painter: const _NichePainter(),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 25),
-                    child: Opacity(
-                      opacity: ware.owned ? 0.55 : 1,
-                      child: WareHero(ware: ware, child: WareArt(ware.artFor(ware.dye), size: 92)),
-                    ),
+    return GuildPressable(
+      semanticLabel: '${wareSemantics(ware)}. ${ware.blurb}${leaves == null ? '' : ' ${leavesLabel(leaves, now)}.'}',
+      onTap: onOpen,
+      pressedScale: 0.98,
+      haptic: true,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 132,
+            height: 196,
+            child: CustomPaint(
+              painter: const _NichePainter(),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: Opacity(
+                    opacity: ware.owned ? 0.55 : 1,
+                    child: WareHero(ware: ware, child: WareArt(ware.artFor(ware.dye), size: 92)),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  TornPaper(
-                    seed: 37,
-                    tear: 4,
-                    tearBottom: 10,
-                    padding: const EdgeInsets.fromLTRB(14, 20, 12, 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (leaves != null) ...[
-                          Row(
-                            children: [
-                              ExcludeSemantics(
-                                child: Image.asset(
-                                  GuildAssets.iconHourglass,
-                                  height: 14,
-                                  color: GuildColors.brick,
-                                  colorBlendMode: BlendMode.srcIn,
-                                ),
+          ),
+          const SizedBox(width: GuildSpace.md),
+          Expanded(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                TornPaper(
+                  seed: 37,
+                  tear: 4,
+                  tearBottom: 10,
+                  padding: const EdgeInsets.fromLTRB(14, 20, 12, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (leaves != null) ...[
+                        Row(
+                          children: [
+                            ExcludeSemantics(
+                              child: Image.asset(
+                                GuildAssets.iconHourglass,
+                                height: 14,
+                                color: GuildColors.brickDeep,
+                                colorBlendMode: BlendMode.srcIn,
                               ),
-                              const SizedBox(width: 5),
-                              Flexible(
-                                child: Text(
-                                  leavesLabel(leaves, now),
-                                  style: GuildText.hand(GuildType.sm, color: GuildColors.brick),
-                                ),
+                            ),
+                            const SizedBox(width: GuildSpace.xs),
+                            Flexible(
+                              child: Text(
+                                leavesLabel(leaves, now),
+                                style: GuildText.hand(GuildType.sm, color: GuildColors.brickDeep),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                        ],
-                        Text(
-                          leaves == null ? ware.shelf : 'Rare find · ${ware.category.label}',
-                          style: GuildText.label(GuildType.xs, color: GuildColors.pencil, spacing: 0.4),
+                            ),
+                          ],
                         ),
-                        Text(ware.name, style: GuildText.title(GuildType.xl, color: GuildColors.brick)),
-                        const SizedBox(height: 2),
-                        Text(ware.blurb, style: GuildText.hand(GuildType.sm)),
-                        const SizedBox(height: 6),
-                        RarityMark(ware.rarity),
-                        const SizedBox(height: 8),
-                        if (ware.owned)
-                          Text('In your chest', style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft))
-                        else
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: PriceTag(ware.price),
-                          ),
+                        const SizedBox(height: GuildSpace.xs),
                       ],
-                    ),
+                      Text(
+                        leaves == null ? ware.shelf : 'Rare find · ${ware.category.label}',
+                        style: GuildText.label(GuildType.xs, color: GuildColors.inkSoft, spacing: 0.4),
+                      ),
+                      Text(ware.name, style: GuildText.title(GuildTitle.xl, color: GuildColors.brickDeep)),
+                      const SizedBox(height: GuildSpace.hair),
+                      Text(ware.blurb, style: GuildText.hand(GuildType.sm)),
+                      const SizedBox(height: GuildSpace.sm),
+                      RarityMark(ware.rarity),
+                      const SizedBox(height: GuildSpace.sm),
+                      if (ware.owned)
+                        Text('In your chest', style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft))
+                      else
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: PriceTag(ware.price),
+                        ),
+                    ],
                   ),
-                  const Positioned(top: -9, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape))),
-                  if (leaves != null)
-                    const Positioned(
-                      top: -16,
-                      right: -8,
-                      child: RoundBadge(asset: GuildAssets.iconHourglass, size: 40),
-                    ),
-                ],
-              ),
+                ),
+                const Positioned(top: -9, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape))),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1179,12 +1166,7 @@ class _NichePainter extends CustomPainter {
       final candle = Rect.fromLTWH(x - 3.5, sill.top - 17, 7, 17);
       canvas.drawRect(candle, Paint()..color = GuildColors.vellum);
       canvas.drawRect(candle, Sketch.pen(GuildColors.ink, 1.5));
-      final tip = Offset(x, candle.top - 12);
-      final flame = Path()
-        ..moveTo(tip.dx, tip.dy)
-        ..cubicTo(tip.dx + 5, tip.dy + 6, tip.dx + 4, tip.dy + 11, tip.dx, tip.dy + 11)
-        ..cubicTo(tip.dx - 4, tip.dy + 11, tip.dx - 5, tip.dy + 6, tip.dx, tip.dy)
-        ..close();
+      final flame = _flamePath(Offset(x, candle.top - 12));
       canvas.drawPath(flame, Paint()..color = GuildColors.goldBright);
       canvas.drawPath(flame, Sketch.pen(GuildColors.ink, 1.4));
     }

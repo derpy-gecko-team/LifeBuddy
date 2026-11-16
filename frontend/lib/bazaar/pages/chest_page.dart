@@ -18,7 +18,7 @@ class ChestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GuildScaffold(
-      wall: WallVariant.journey,
+      wall: WallVariant.chest,
       body: ListenableBuilder(
         listenable: controller,
         builder: (context, _) {
@@ -27,27 +27,24 @@ class ChestPage extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 6, 16, 0),
-                child: GuildBackLink(label: 'Bazaar', onTap: () => Navigator.of(context).maybePop()),
-              ),
+              GuildTopBar(back: GuildBackLink(label: 'Bazaar', onTap: () => Navigator.of(context).maybePop())),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(14, 6, 14, 32),
+                  padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.sm, GuildSpace.gutter, GuildSpace.huge),
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(6, 0, 6, 18),
+                      padding: const EdgeInsets.only(bottom: GuildSpace.lg),
                       child: Row(
                         children: [
                           const GuildArt(BazaarAssets.chestPouch, height: 50),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: GuildSpace.md),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Semantics(
                                   header: true,
-                                  child: Text('My chest', style: GuildText.title(GuildType.xxl, color: GuildColors.cream)),
+                                  child: Text('My chest', style: GuildText.title(GuildTitle.xxl, color: GuildColors.cream)),
                                 ),
                                 Text(
                                   chest.isEmpty
@@ -63,7 +60,7 @@ class ChestPage extends StatelessWidget {
                     ),
                     if (chest.isEmpty)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(14, 30, 14, 0),
+                        padding: const EdgeInsets.only(top: GuildSpace.huge),
                         child: Center(
                           child: GuildNote(
                             title: 'Your chest is empty',

@@ -65,7 +65,7 @@ class _DashedLinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DashedLinePainter old) => old.color != color;
+  bool shouldRepaint(_DashedLinePainter old) => old.color != color || old.thickness != thickness;
 }
 
 class DashedBorder extends StatelessWidget {
@@ -74,7 +74,6 @@ class DashedBorder extends StatelessWidget {
     required this.child,
     this.color = GuildColors.pencil,
     this.circle = false,
-    this.radius = 4,
     this.strokeWidth = 1.5,
     this.padding = EdgeInsets.zero,
   });
@@ -82,22 +81,20 @@ class DashedBorder extends StatelessWidget {
   final Widget child;
   final Color color;
   final bool circle;
-  final double radius;
   final double strokeWidth;
   final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-        painter: _DashedBorderPainter(color, circle, radius, strokeWidth),
+        painter: _DashedBorderPainter(color, circle, strokeWidth),
         child: Padding(padding: padding, child: child),
       );
 }
 
 class _DashedBorderPainter extends CustomPainter {
-  _DashedBorderPainter(this.color, this.circle, this.radius, this.strokeWidth);
+  _DashedBorderPainter(this.color, this.circle, this.strokeWidth);
   final Color color;
   final bool circle;
-  final double radius;
   final double strokeWidth;
 
   @override
@@ -105,7 +102,7 @@ class _DashedBorderPainter extends CustomPainter {
     final rect = (Offset.zero & size).deflate(strokeWidth / 2 + 1);
     final outline = circle
         ? (Path()..addOval(rect))
-        : (Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius))));
+        : (Path()..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(4))));
     final path = traceByHand(outline, Random(size.width.round() * 31 + size.height.round()), wobble: 0.8, step: 9);
     drawDashedPath(
       canvas,
@@ -117,24 +114,33 @@ class _DashedBorderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DashedBorderPainter old) => old.color != color;
+  bool shouldRepaint(_DashedBorderPainter old) =>
+      old.color != color || old.circle != circle || old.strokeWidth != strokeWidth;
 }
 
 class GuildProgressBar extends StatelessWidget {
   const GuildProgressBar({
     super.key,
     required this.value,
-    this.height = 8,
     this.track = GuildColors.shadow,
     this.fill = GuildColors.gold,
     this.edge = GuildColors.chalkLine,
+    this.animate = true,
   });
 
+  const GuildProgressBar.onPaper({super.key, required this.value, this.animate = true})
+      : track = GuildColors.parchmentDark,
+        fill = GuildColors.brickDeep,
+        edge = GuildColors.pencil;
+
+  static const height = 8.0;
+
   final double value;
-  final double height;
   final Color track;
   final Color fill;
   final Color edge;
+
+  final bool animate;
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +156,9 @@ class GuildProgressBar extends StatelessWidget {
         alignment: Alignment.centerLeft,
         child: TweenAnimationBuilder<double>(
           tween: Tween(end: value.clamp(0, 1)),
-          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 500),
+          duration: !animate || MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 500),
           curve: Curves.easeOutCubic,
           builder: (context, v, _) => FractionallySizedBox(
             widthFactor: v,
@@ -216,7 +224,7 @@ class _SealDotPainter extends CustomPainter {
     final rays = _rays.transform(risen);
 
     if (disc < 1) {
-      canvas.drawCircle(c, r * 0.52, Sketch.pen(GuildColors.cream.withValues(alpha: 0.7 * (1 - disc)), 1.4));
+      canvas.drawCircle(c, r * 0.52, Sketch.pen(GuildColors.cream.withValues(alpha: 0.9 * (1 - disc)), 1.4));
     }
     if (disc > 0) {
       canvas.drawCircle(c, r * 0.52 * disc, Paint()..color = GuildColors.goldBright);
@@ -242,12 +250,14 @@ class _SealDotPainter extends CustomPainter {
 class RoundBadge extends StatelessWidget {
   const RoundBadge({
     super.key,
-    required this.asset,
+    this.asset,
+    this.child,
     this.size = 44,
     this.color = GuildColors.brick,
-  });
+  }) : assert(asset != null || child != null);
 
-  final String asset;
+  final String? asset;
+  final Widget? child;
   final double size;
   final Color color;
 
@@ -261,9 +271,9 @@ class RoundBadge extends StatelessWidget {
         color: color,
         shape: BoxShape.circle,
         border: Border.all(color: GuildColors.cream, width: size >= 56 ? 2.2 : 1.8),
-        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
+        boxShadow: const [BoxShadow(color: GuildShadow.color, offset: GuildShadow.box)],
       ),
-      child: Image.asset(asset, fit: BoxFit.contain),
+      child: child != null ? Center(child: child) : Image.asset(asset!, fit: BoxFit.contain),
     );
   }
 }
@@ -635,7 +645,7 @@ class LetteredTitle extends StatelessWidget {
             style: style,
           ),
           SizedBox(
-            height: size * 0.22,
+            height: size * 0.24,
             child: ExcludeSemantics(child: swash),
           ),
         ],
@@ -706,4 +716,148 @@ class _ChalkStarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ChalkStarPainter old) => old.seed != seed || old.color != color;
+}
+
+class RuledFrame extends StatelessWidget {
+  const RuledFrame({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(12),
+    this.color = GuildColors.tan,
+    this.outerWidth = 1.6,
+    this.innerWidth = 1,
+    this.gap = 3,
+  });
+
+  final Widget child;
+  final EdgeInsets padding;
+  final Color color;
+  final double outerWidth;
+  final double innerWidth;
+  final double gap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(gap),
+      decoration: BoxDecoration(border: Border.all(color: color, width: outerWidth)),
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(border: Border.all(color: color.withValues(alpha: color.a * 0.7), width: innerWidth)),
+        child: child,
+      ),
+    );
+  }
+}
+
+enum FastenerKind { tape, pin, nail }
+
+class Fastener extends StatelessWidget {
+  const Fastener({super.key, required this.kind});
+
+  final FastenerKind kind;
+
+  static const _shadow = [BoxShadow(color: GuildShadow.color, offset: GuildShadow.small)];
+
+  @override
+  Widget build(BuildContext context) {
+    switch (kind) {
+      case FastenerKind.tape:
+        return Transform.rotate(
+          angle: -0.06,
+          child: Container(
+            width: 62,
+            height: 18,
+            decoration: BoxDecoration(
+              color: GuildColors.chalk.withValues(alpha: 0.82),
+              border: Border.all(color: GuildColors.tan, width: 1),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        );
+      case FastenerKind.pin:
+        return Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: GuildColors.brick,
+            border: Border.all(color: GuildColors.brickDeep, width: 1),
+            boxShadow: _shadow,
+          ),
+          alignment: const Alignment(-0.3, -0.3),
+          child: Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white54),
+          ),
+        );
+      case FastenerKind.nail:
+        return Container(
+          width: 15,
+          height: 15,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: GuildColors.gold,
+            border: Border.all(color: GuildColors.bronze, width: 1),
+            boxShadow: _shadow,
+          ),
+        );
+    }
+  }
+}
+
+class BuddyPortrait extends StatelessWidget {
+  const BuddyPortrait({super.key, this.width = 62, this.asset = GuildAssets.buddyWizard});
+
+  final double width;
+  final String asset;
+
+  static const aspect = 457 / 683;
+
+  @override
+  Widget build(BuildContext context) {
+    final height = width / aspect;
+    Widget art([Color? tint]) => Image.asset(
+          asset,
+          width: width,
+          height: height,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          gaplessPlayback: true,
+          color: tint,
+          colorBlendMode: tint == null ? null : BlendMode.srcIn,
+        );
+    return ExcludeSemantics(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(left: GuildShadow.box.dx, top: GuildShadow.box.dy, child: art(GuildShadow.color)),
+          art(),
+        ],
+      ),
+    );
+  }
+}
+
+class BuddyCameo extends StatelessWidget {
+  const BuddyCameo({super.key, this.size = 32, this.asset = GuildAssets.buddyWizardFace});
+
+  final double size;
+  final String asset;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: GuildColors.ink, width: 1.5),
+          image: DecorationImage(image: AssetImage(asset), fit: BoxFit.cover, filterQuality: FilterQuality.medium),
+        ),
+      ),
+    );
+  }
 }
