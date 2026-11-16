@@ -35,8 +35,17 @@ SIZES = {
         "curtain": 912,
         "side_plaque": 426,
     },
+    "buddy": {
+        "forest": 1704,
+        "pip": 1020,
+        "campfire": 1179,
+        "hey_pip_button": 588,
+        "paw_seal": 150,
+        "quill": 120,
+        "cloud": 72,
+    },
 }
-DEFAULT_SIZE = {"guildhall": 360, "bazaar": 480}
+DEFAULT_SIZE = {"guildhall": 360, "bazaar": 480, "buddy": 480}
 SUPERSAMPLE = 960
 
 DYES = {"indigo": "#3B4071", "brick": "#B95A54", "moss": "#5F7D4E", "umber": "#8A6240"}

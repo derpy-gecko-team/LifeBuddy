@@ -1,0 +1,28 @@
+<svg width="196" height="178" viewBox="0 0 196 178" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Shield" transform="translate(12 0)">
+<circle cx="86" cy="92" r="84" fill="#15142A"/>
+<circle cx="86" cy="84" r="84" fill="#B98A3A" stroke="#15142A" stroke-width="3"/>
+<path d="M22 50A74 74 0 0 1 150 50" stroke="#E6C470" stroke-opacity="0.7" stroke-width="3" stroke-linecap="round"/>
+<circle cx="158.1" cy="113.8" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="115.8" cy="156.1" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="56.2" cy="156.1" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="13.9" cy="113.8" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="13.9" cy="54.2" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="56.2" cy="11.9" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="115.8" cy="11.9" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/><circle cx="158.1" cy="54.2" r="3.6" fill="#EBD9AE" stroke="#15142A" stroke-width="1.6"/>
+<circle cx="86" cy="84" r="72" fill="#963733" stroke="#15142A" stroke-width="2.5"/>
+<path d="M38 32.3V135.7" stroke="#74292A" stroke-width="2"/><path d="M62 18.1V149.9" stroke="#74292A" stroke-width="2"/><path d="M110 18.1V149.9" stroke="#74292A" stroke-width="2"/><path d="M134 32.3V135.7" stroke="#74292A" stroke-width="2"/>
+<path d="M32 60A62 62 0 0 1 140 60" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="10" stroke-linecap="round"/>
+<g transform="translate(26 38) scale(1.2)">
+<path d="M20 40Q38 62 58 44" stroke="#5E1F1D" stroke-width="5" stroke-linecap="round"/>
+<path d="M20 40Q38 62 58 44" stroke="#C9A25A" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M10 30Q36 30 66 6V46Q36 34 10 38Z" fill="#E2B85A" stroke="#15142A" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M14 31.5Q36 31 60 14" stroke="#F6E2A6" stroke-width="2" stroke-linecap="round"/>
+<path d="M25 27.5V39.5M45 18.5V42" stroke="#15142A" stroke-width="2.2"/>
+<rect x="2" y="29" width="9" height="10" rx="2" fill="#B98A3A" stroke="#15142A" stroke-width="2.2"/>
+<ellipse cx="66" cy="26" rx="9" ry="20.5" fill="#EAC873" stroke="#15142A" stroke-width="2.5"/>
+<ellipse cx="67.5" cy="26" rx="5" ry="14" fill="#5E3F18"/>
+<path d="M83 15Q90 26 83 37M92 7Q103 26 92 45" stroke="#F4E3C3" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+</g>
+<g id="Ribbon" transform="translate(0 128)">
+<path d="M22 12L2 14L11 25L2 38L22 38Z" fill="#B49D74" stroke="#15142A" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M174 12L194 14L185 25L194 38L174 38Z" fill="#B49D74" stroke="#15142A" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M18 8Q98 1 178 8V36Q98 29 18 36Z" fill="#DCC6A0" stroke="#15142A" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M28 11Q98 5 168 11" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round"/>
+</g>
+</svg>

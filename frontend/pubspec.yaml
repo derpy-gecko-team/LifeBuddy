@@ -24,6 +24,7 @@ flutter:
     - assets/images/
     - assets/images/guildhall/
     - assets/images/bazaar/
+    - assets/images/buddy/
 
   fonts:
     - family: MySoul
