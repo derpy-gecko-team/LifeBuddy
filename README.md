@@ -45,3 +45,6 @@ If your local database gets out of sync, reset it:
 
 > [!NOTE]
 > iOS builds need a Mac with Xcode. On Windows, develop and test on Android.
+
+> [!IMPORTANT]
+> Use Flutter 3.50.0 with Dart 3.14.0
