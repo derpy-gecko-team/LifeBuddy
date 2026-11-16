@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:lifebuddy/theme/app_colors.dart';
 import 'package:lifebuddy/widgets/nine_patch_box.dart';
 
@@ -81,7 +81,7 @@ class HandDrawnTextField extends FormField<String> {
                               ),
                             ),
                           ),
-                          if (suffix != null) suffix,
+                          ?suffix,
                         ],
                       ),
                     ),

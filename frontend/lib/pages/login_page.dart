@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:lifebuddy/auth/login_form.dart';
 import 'package:lifebuddy/home_shell.dart';
 import 'package:lifebuddy/theme/app_colors.dart';

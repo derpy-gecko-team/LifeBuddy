@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:lifebuddy/auth/validators.dart';
 import 'package:lifebuddy/widgets/hand_drawn_text_field.dart';
@@ -295,14 +295,14 @@ class _Reveal extends StatelessWidget {
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (child, animation) => SizeTransition(
         sizeFactor: animation,
-        axisAlignment: -1, // grow downward from the top edge
+        alignment: Alignment.topCenter, // grow downward from the top edge
         child: FadeTransition(opacity: animation, child: child),
       ),
       // Keep full width while animating (the default layout shrink-wraps).
       layoutBuilder: (current, previous) => Stack(
         fit: StackFit.passthrough,
         alignment: Alignment.topCenter,
-        children: [...previous, if (current != null) current],
+        children: [...previous, ?current],
       ),
       child: show
           ? KeyedSubtree(key: const ValueKey('shown'), child: child)
