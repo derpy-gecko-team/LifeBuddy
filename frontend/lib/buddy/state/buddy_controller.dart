@@ -6,9 +6,13 @@ import '../data/models.dart';
 /// Holds the conversation with the Buddy. The backend keeps no chat history
 /// yet, so the conversation lives here for as long as the app is open.
 class BuddyController extends ChangeNotifier {
-  BuddyController(this._repository);
+  BuddyController(this._repository, {this.onQuestsChanged});
 
   final BuddyRepository _repository;
+
+  /// Called when an answer says quests were posted or fulfilled, so whoever
+  /// shows quests (the Guild Hall) can fetch them again.
+  final void Function(List<QuestUpdate> changed)? onQuestsChanged;
 
   final _messages = <ChatMessage>[];
   List<ChatMessage> get messages => List.unmodifiable(_messages);
@@ -76,6 +80,7 @@ class BuddyController extends ChangeNotifier {
           newMapTile: reply.newMapTile,
         ),
       );
+      if (reply.updatedQuests.isNotEmpty) onQuestsChanged?.call(reply.updatedQuests);
     } catch (_) {
       _mark(message.id, DeliveryStatus.failed);
     } finally {

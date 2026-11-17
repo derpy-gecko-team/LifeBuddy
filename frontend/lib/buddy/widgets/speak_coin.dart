@@ -23,6 +23,7 @@ class SpeakCoin extends StatefulWidget {
     required this.hearing,
     required this.time,
     required this.hush,
+    required this.cheer,
     required this.enabled,
     required this.s,
   });
@@ -35,6 +36,9 @@ class SpeakCoin extends StatefulWidget {
   /// 0..1 as the writing scroll comes out. The coin steps back for it,
   /// unless it is the coin that called the scroll out.
   final Animation<double> hush;
+
+  /// 0..1 over the reward for a fulfilled quest: the fire flares with it.
+  final Animation<double> cheer;
 
   /// False while Pip is answering: one thing at a time.
   final bool enabled;
@@ -189,6 +193,7 @@ class _SpeakCoinState extends State<SpeakCoin> with TickerProviderStateMixin {
                           toss: _toss,
                           blaze: _blaze,
                           back: _back,
+                          cheer: widget.cheer,
                           voice: _voice,
                           tossed: _tossed,
                           present: present,
@@ -280,17 +285,19 @@ class _CoinPainter extends CustomPainter {
     required this.toss,
     required this.blaze,
     required this.back,
+    required this.cheer,
     required this.voice,
     required this.tossed,
     required this.present,
     required this.dim,
     required this.s,
-  }) : super(repaint: Listenable.merge([time, toss, blaze, back]));
+  }) : super(repaint: Listenable.merge([time, toss, blaze, back, cheer]));
 
   final ValueListenable<double> time;
   final Animation<double> toss;
   final Animation<double> blaze;
   final Animation<double> back;
+  final Animation<double> cheer;
 
   /// How loud the hero is speaking, 0..1, already eased.
   final ValueListenable<double> voice;
@@ -311,7 +318,10 @@ class _CoinPainter extends CustomPainter {
     double up(double units) => size.height - units * s;
     final heart = Offset(centre, up(SpeakCoin._heart));
 
-    _flames(canvas, heart, Curves.easeOutBack.transform(blaze.value).clamp(0.0, 1.2), blaze.value, t);
+    // The fire is up while Pip listens, and leaps for a moment at a reward.
+    final flare = cheer.value <= 0 || cheer.value >= 0.55 ? 0.0 : sin(cheer.value / 0.55 * pi);
+    final burning = max(blaze.value, flare);
+    _flames(canvas, heart, max(Curves.easeOutBack.transform(blaze.value).clamp(0.0, 1.2), flare * 1.15), burning, t);
 
     if (tossed) {
       final p = toss.value;

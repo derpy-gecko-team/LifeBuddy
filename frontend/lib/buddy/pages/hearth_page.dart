@@ -16,6 +16,7 @@ import '../state/hearing_controller.dart';
 import '../theme/buddy_theme.dart';
 import '../widgets/hearth_life.dart';
 import '../widgets/pip_cat.dart';
+import '../widgets/quest_moments.dart';
 import '../widgets/sky.dart';
 import '../widgets/smoke_puff.dart';
 import '../widgets/speak_coin.dart';
@@ -28,14 +29,14 @@ import '../widgets/writing_scroll.dart';
 /// the tab bar). Every number below is in that frame's units and multiplied
 /// by the scale that fits the frame to the screen.
 class HearthPage extends StatefulWidget {
-  const HearthPage({super.key, required this.controller, required this.ears, this.onOpenGuildHall, this.onOpenMap});
+  const HearthPage({super.key, required this.controller, required this.ears, this.onOpenQuest, this.onOpenMap});
 
   final BuddyController controller;
 
   /// What Pip listens with.
   final BuddyEars ears;
 
-  final VoidCallback? onOpenGuildHall;
+  final void Function(String questId)? onOpenQuest;
   final VoidCallback? onOpenMap;
 
   static const greeting = 'Oh, look who finally crawled out of bed. So… dragons or dishes today?';
@@ -90,6 +91,20 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
   final _time = ValueNotifier<double>(0);
   final _hearthTime = ValueNotifier<double>(0);
   late final Ticker _clock = createTicker(_tick);
+
+  // The two moments worth a little ceremony (see QuestMoments): a quest
+  // fulfilled, and a new one posted.
+  late final AnimationController _cheer = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  );
+  late final AnimationController _arrival = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2100),
+  );
+  QuestUpdate? _fulfilled;
+  QuestUpdate? _posted;
+  String? _lastAnswer;
   double _clockBase = 0;
   double _now = 0;
   bool _still = false;
@@ -161,6 +176,8 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
     _focus.dispose();
     _writing.dispose();
     _clock.dispose();
+    _cheer.dispose();
+    _arrival.dispose();
     _sky.dispose();
     _climb.dispose();
     _time.dispose();
@@ -216,6 +233,31 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
   /// Once a message is on its way, an old "I could not hear you" is stale.
   void _onTalk() {
     if (widget.controller.replying) _hearing.clearTrouble();
+
+    // A fresh answer that did something about a quest gets its moment.
+    final answer = widget.controller.latestFromBuddy;
+    if (answer == null || answer.id == _lastAnswer) return;
+    _lastAnswer = answer.id;
+    final fulfilled = answer.updatedQuests.where((q) => q.fulfilled).firstOrNull;
+    final posted = answer.updatedQuests.where((q) => !q.fulfilled).firstOrNull;
+    if (fulfilled == null && posted == null) return;
+    setState(() {
+      _fulfilled = fulfilled ?? _fulfilled;
+      _posted = posted ?? _posted;
+    });
+    if (_still) return;
+    // Once the card is back with the answer on it.
+    Future<void>.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      if (fulfilled != null) {
+        HapticFeedback.heavyImpact();
+        _cheer.forward(from: 0);
+      }
+      if (posted != null) {
+        HapticFeedback.lightImpact();
+        _arrival.forward(from: 0);
+      }
+    });
   }
 
   void _stopWriting() {
@@ -284,10 +326,11 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
                         top: frameTop,
                         hush: _open,
                         controller: widget.controller,
-                        onOpenGuildHall: widget.onOpenGuildHall,
+                        onOpenQuest: widget.onOpenQuest,
                         onOpenMap: widget.onOpenMap,
                         hearing: _hearing,
                         time: _hearthTime,
+                        cheer: _cheer,
                       ),
                     ),
                   ),
@@ -321,15 +364,30 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
                     child: IgnorePointer(
                       child: RepaintBoundary(
                         child: ListenableBuilder(
-                          listenable: Listenable.merge([widget.controller, _hearing]),
+                          listenable: Listenable.merge([widget.controller, _hearing, _cheer]),
                           builder: (context, _) => PipCat(
                             time: _hearthTime,
                             s: s,
                             mood: _hearing.active
                                 ? PipMood.listening
-                                : (widget.controller.replying ? PipMood.thinking : PipMood.idle),
+                                : widget.controller.replying
+                                ? PipMood.thinking
+                                : (_cheer.isAnimating ? PipMood.pleased : PipMood.idle),
                           ),
                         ),
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: QuestMoments(
+                        cheer: _cheer,
+                        arrival: _arrival,
+                        s: s,
+                        frameTop: frameTop,
+                        fulfilled: _fulfilled?.title,
+                        reward: _fulfilled?.xp,
+                        posted: _posted?.title,
                       ),
                     ),
                   ),
@@ -391,7 +449,7 @@ class _HearthPageState extends State<HearthPage> with TickerProviderStateMixin {
                                 message: message,
                                 time: _time,
                                 s: s,
-                                onOpenGuildHall: widget.onOpenGuildHall,
+                                onOpenQuest: widget.onOpenQuest,
                                 onOpenMap: widget.onOpenMap,
                               ),
                             ),
@@ -517,10 +575,11 @@ class _Scene extends StatelessWidget {
     required this.top,
     required this.hush,
     required this.controller,
-    this.onOpenGuildHall,
+    this.onOpenQuest,
     this.onOpenMap,
     required this.hearing,
     required this.time,
+    required this.cheer,
   });
 
   final double s;
@@ -534,12 +593,15 @@ class _Scene extends StatelessWidget {
   final Animation<double> hush;
 
   final BuddyController controller;
-  final VoidCallback? onOpenGuildHall;
+  final void Function(String questId)? onOpenQuest;
   final VoidCallback? onOpenMap;
   final HearingController hearing;
 
   /// Seconds, for the embers and the fireflies.
   final ValueListenable<double> time;
+
+  /// 0..1 over the reward for a fulfilled quest.
+  final Animation<double> cheer;
 
   @override
   Widget build(BuildContext context) {
@@ -628,7 +690,7 @@ class _Scene extends StatelessWidget {
                           hearing: hearing,
                           maxHeight: cardRoom,
                           controller: controller,
-                          onOpenGuildHall: onOpenGuildHall,
+                          onOpenQuest: onOpenQuest,
                           onOpenMap: onOpenMap,
                         ),
                       ),
@@ -642,8 +704,14 @@ class _Scene extends StatelessWidget {
                       child: ListenableBuilder(
                         listenable: controller,
                         // One thing at a time: no calling Pip while it is answering.
-                        builder: (context, _) =>
-                            SpeakCoin(hearing: hearing, time: time, hush: hush, enabled: !controller.replying, s: s),
+                        builder: (context, _) => SpeakCoin(
+                          hearing: hearing,
+                          time: time,
+                          hush: hush,
+                          cheer: cheer,
+                          enabled: !controller.replying,
+                          s: s,
+                        ),
                       ),
                     ),
                   ],
@@ -693,7 +761,7 @@ class _SpeechCard extends StatelessWidget {
     required this.maxHeight,
     required this.controller,
     required this.hearing,
-    this.onOpenGuildHall,
+    this.onOpenQuest,
     this.onOpenMap,
   });
 
@@ -701,7 +769,7 @@ class _SpeechCard extends StatelessWidget {
   final double maxHeight;
   final BuddyController controller;
   final HearingController hearing;
-  final VoidCallback? onOpenGuildHall;
+  final void Function(String questId)? onOpenQuest;
   final VoidCallback? onOpenMap;
 
   @override
@@ -736,7 +804,10 @@ class _SpeechCard extends StatelessWidget {
             links: [(label: 'Say it again', onTap: () => controller.retry(undelivered.id))],
           );
         } else {
-          mood = 'smug as ever';
+          final quests = latest?.updatedQuests ?? const <QuestUpdate>[];
+          mood = quests.any((q) => q.fulfilled)
+              ? 'rather pleased'
+              : (quests.isNotEmpty ? 'ink still wet' : 'smug as ever');
           turn = latest?.id ?? 'greeting';
           final tile = latest?.newMapTile;
           body = _Lines(
@@ -744,7 +815,7 @@ class _SpeechCard extends StatelessWidget {
             text: latest?.text ?? HearthPage.greeting,
             links: [
               for (final quest in latest?.updatedQuests ?? const <QuestUpdate>[])
-                (label: 'On the board: ${quest.title}', onTap: onOpenGuildHall),
+                (label: quest.linkLabel, onTap: onOpenQuest == null ? null : () => onOpenQuest!(quest.id)),
               if (tile != null) (label: 'New on your map: a ${tile.typeLabel} tile', onTap: onOpenMap),
             ],
           );

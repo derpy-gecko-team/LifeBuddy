@@ -7,14 +7,28 @@ enum DeliveryStatus { sending, sent, failed }
 /// A quest the Buddy touched while answering (`QuestSummary` on the backend).
 @immutable
 class QuestUpdate {
-  const QuestUpdate({required this.id, required this.title, required this.status});
+  const QuestUpdate({required this.id, required this.title, required this.status, this.xp});
 
-  factory QuestUpdate.fromJson(Map<String, dynamic> json) =>
-      QuestUpdate(id: '${json['id']}', title: json['title'] as String, status: json['status'] as String? ?? '');
+  factory QuestUpdate.fromJson(Map<String, dynamic> json) => QuestUpdate(
+    id: '${json['id']}',
+    title: json['title'] as String,
+    status: json['status'] as String? ?? '',
+    xp: (json['xp'] as num?)?.toInt(),
+  );
 
   final String id;
   final String title;
   final String status;
+
+  /// What the quest is worth, when the answer says. (The server's
+  /// `QuestSummary` does not carry it yet.)
+  final int? xp;
+
+  /// Whether the Buddy is reporting this quest as finished.
+  bool get fulfilled => const {'COMPLETED', 'FULFILLED', 'DONE'}.contains(status.toUpperCase());
+
+  /// How the quest is named in the Buddy's answer.
+  String get linkLabel => fulfilled ? 'Fulfilled: $title' : 'On the board: $title';
 
   /// "IN_PROGRESS" -> "in progress".
   String get statusLabel => status.replaceAll('_', ' ').toLowerCase();

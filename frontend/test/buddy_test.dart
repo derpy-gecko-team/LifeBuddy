@@ -30,7 +30,7 @@ void main() {
     expect(controller.messages.map((m) => m.author), [ChatAuthor.hero, ChatAuthor.buddy]);
     expect(controller.messages.first.text, 'I want to get fit');
     expect(controller.messages.first.status, DeliveryStatus.sent);
-    expect(controller.latestFromBuddy!.updatedQuests.single.title, startsWith('Morning run'));
+    expect(controller.latestFromBuddy!.updatedQuests.single.title, 'Get fit');
     expect(controller.replying, isFalse);
   });
 

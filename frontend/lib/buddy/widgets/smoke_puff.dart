@@ -18,7 +18,7 @@ class SmokePuff extends StatelessWidget {
     required this.message,
     required this.time,
     required this.s,
-    this.onOpenGuildHall,
+    this.onOpenQuest,
     this.onOpenMap,
   });
 
@@ -30,7 +30,7 @@ class SmokePuff extends StatelessWidget {
   /// The scale of the scene (see `HearthPage`).
   final double s;
 
-  final VoidCallback? onOpenGuildHall;
+  final void Function(String questId)? onOpenQuest;
   final VoidCallback? onOpenMap;
 
   @override
@@ -82,7 +82,8 @@ class SmokePuff extends StatelessWidget {
                 SizedBox(height: 4 * s),
               ],
               Text(message.text, style: words),
-              for (final quest in message.updatedQuests) link('On the board: ${quest.title}', onOpenGuildHall),
+              for (final quest in message.updatedQuests)
+                link(quest.linkLabel, onOpenQuest == null ? null : () => onOpenQuest!(quest.id)),
               if (tile != null) link('New on your map: a ${tile.typeLabel} tile', onOpenMap),
               if (message.status == DeliveryStatus.failed)
                 Padding(

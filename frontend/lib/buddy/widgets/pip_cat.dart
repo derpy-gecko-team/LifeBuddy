@@ -15,6 +15,9 @@ enum PipMood {
 
   /// Working on an answer: the tail lashes.
   thinking,
+
+  /// A quest fulfilled: eyes shut in a smile, ears up, tail high.
+  pleased,
 }
 
 /// Pip, alive: it breathes, blinks, swishes its tail and flicks an ear.
@@ -81,69 +84,83 @@ class PipCat extends StatelessWidget {
       child: ExcludeSemantics(
         // The mood eases in and out rather than snapping.
         child: TweenAnimationBuilder<double>(
-          tween: Tween(end: mood == PipMood.listening ? 1 : 0),
+          tween: Tween(end: mood == PipMood.listening || mood == PipMood.pleased ? 1 : 0),
           duration: const Duration(milliseconds: 450),
           curve: Curves.easeOutCubic,
           builder: (context, alert, _) => TweenAnimationBuilder<double>(
             tween: Tween(end: mood == PipMood.thinking ? 1 : 0),
             duration: const Duration(milliseconds: 600),
             curve: Curves.easeInOut,
-            builder: (context, restless, _) => AnimatedBuilder(
-              animation: time,
-              builder: (context, _) {
-                final t = time.value;
-                final breath = sin(t * 1.5);
+            // Which way the head is cocked: one way to listen, the other when
+            // pleased with itself. Eased on its own, so that going from one
+            // mood to another turns the head instead of snapping it across.
+            builder: (context, restless, _) => TweenAnimationBuilder<double>(
+              tween: Tween(
+                end: switch (mood) {
+                  PipMood.listening => -0.055,
+                  PipMood.pleased => 0.05,
+                  _ => 0,
+                },
+              ),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOutCubic,
+              builder: (context, cocked, _) => AnimatedBuilder(
+                animation: time,
+                builder: (context, _) {
+                  final t = time.value;
+                  final breath = sin(t * 1.5);
 
-                // The tail: a lazy sway, a lash when thinking, held when listening.
-                final sway = 0.075 * sin(t * 1.1) + 0.03 * sin(t * 2.3 + 1);
-                final lash = 0.15 * sin(t * 4.4);
-                final tailAngle = (sway * (1 - restless) + lash * restless) * (1 - 0.8 * alert);
+                  // The tail: a lazy sway, a lash when thinking, held when listening.
+                  final sway = 0.075 * sin(t * 1.1) + 0.03 * sin(t * 2.3 + 1);
+                  final lash = 0.15 * sin(t * 4.4);
+                  final tailAngle = (sway * (1 - restless) + lash * restless) * (1 - 0.8 * alert);
 
-                // A blink every few seconds, sometimes two in a row.
-                final blink = _now(t, every: 4.3, lasting: 0.14, salt: 1);
-                final again = _now(t - 0.3, every: 4.3, lasting: 0.12, salt: 1);
-                final twice = _chance((t / 4.3).floor() * 3 + 5) > 0.7;
-                final shut = blink >= 0 || (twice && again >= 0);
+                  // A blink every few seconds, sometimes two in a row.
+                  final blink = _now(t, every: 4.3, lasting: 0.14, salt: 1);
+                  final again = _now(t - 0.3, every: 4.3, lasting: 0.12, salt: 1);
+                  final twice = _chance((t / 4.3).floor() * 3 + 5) > 0.7;
+                  final shut = mood == PipMood.pleased || blink >= 0 || (twice && again >= 0);
 
-                // An ear flicks, as at a midge; the other one less often.
-                double flick(double progress) => progress < 0 ? 0 : sin(progress * pi * 2) * (1 - progress);
-                final rightFlick = flick(_now(t, every: 6.1, lasting: 0.45, salt: 11));
-                final leftFlick = flick(_now(t, every: 9.7, lasting: 0.4, salt: 23));
+                  // An ear flicks, as at a midge; the other one less often.
+                  double flick(double progress) => progress < 0 ? 0 : sin(progress * pi * 2) * (1 - progress);
+                  final rightFlick = flick(_now(t, every: 6.1, lasting: 0.45, salt: 11));
+                  final leftFlick = flick(_now(t, every: 9.7, lasting: 0.4, salt: 23));
 
-                return SizedBox(
-                  width: _width * s,
-                  height: _height * s,
-                  child: Stack(
-                    children: [
-                      hinged(_tailRoot, tailAngle, tail),
-                      // Breathing: the back rises and falls from the ground up.
-                      Transform(
-                        transform: Matrix4.diagonal3Values(1, 1 + 0.016 * breath, 1),
-                        origin: _belly * s,
-                        child: body,
-                      ),
-                      // The head rides the breath, and cocks to one side to listen.
-                      Transform.translate(
-                        offset: Offset(0, -1.5 * breath * s),
-                        child: hinged(
-                          _neck,
-                          -0.055 * alert,
-                          Stack(
-                            children: [
-                              hinged(_leftEarRoot, -0.16 * leftFlick - 0.07 * alert, leftEar),
-                              hinged(_rightEarRoot, 0.2 * rightFlick + 0.07 * alert, rightEar),
-                              head,
-                              Opacity(opacity: shut ? 0 : 1, child: eyes),
-                              Opacity(opacity: shut ? 1 : 0, child: eyesShut),
-                            ],
+                  return SizedBox(
+                    width: _width * s,
+                    height: _height * s,
+                    child: Stack(
+                      children: [
+                        hinged(_tailRoot, tailAngle, tail),
+                        // Breathing: the back rises and falls from the ground up.
+                        Transform(
+                          transform: Matrix4.diagonal3Values(1, 1 + 0.016 * breath, 1),
+                          origin: _belly * s,
+                          child: body,
+                        ),
+                        // The head rides the breath, and cocks to one side to listen.
+                        Transform.translate(
+                          offset: Offset(0, -1.5 * breath * s),
+                          child: hinged(
+                            _neck,
+                            cocked,
+                            Stack(
+                              children: [
+                                hinged(_leftEarRoot, -0.16 * leftFlick - 0.07 * alert, leftEar),
+                                hinged(_rightEarRoot, 0.2 * rightFlick + 0.07 * alert, rightEar),
+                                head,
+                                Opacity(opacity: shut ? 0 : 1, child: eyes),
+                                Opacity(opacity: shut ? 1 : 0, child: eyesShut),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      paws,
-                    ],
-                  ),
-                );
-              },
+                        paws,
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
