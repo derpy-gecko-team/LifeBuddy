@@ -4,6 +4,7 @@ import 'package:lifebuddy/bazaar/data/mock_bazaar_repository.dart';
 import 'package:lifebuddy/bazaar/data/models.dart';
 import 'package:lifebuddy/bazaar/state/bazaar_controller.dart';
 import 'package:lifebuddy/bazaar/widgets/bazaar_widgets.dart';
+import 'package:lifebuddy/buddy/active_buddy.dart';
 
 void main() {
   late BazaarController controller;
@@ -67,7 +68,29 @@ void main() {
     expect(controller.table.map((w) => w.id), unorderedEquals(['moon-owl', 'dragon-egg']));
 
     controller.setCategory(WareCategory.buddy);
-    expect(controller.table.map((w) => w.id), ['old-wizard']);
+    expect(controller.table.map((w) => w.id), ['tower-princess', 'old-wizard']);
+  });
+
+  test('a bought Buddy can become your guide, and the old one steps back', () async {
+    expect(controller.activeBuddyId, 'old-wizard');
+
+    await controller.buy('tower-princess');
+    expect(controller.data!.purse.gold, 1240 - 600);
+    expect(controller.activeBuddyId, 'old-wizard');
+
+    await controller.setWorn('tower-princess', true);
+    expect(controller.activeBuddyId, 'tower-princess');
+    expect(controller.wareById('old-wizard')!.worn, isFalse);
+
+    await controller.setWorn('old-wizard', true);
+    expect(controller.activeBuddyId, 'old-wizard');
+    expect(controller.wareById('tower-princess')!.worn, isFalse);
+  });
+
+  test('each Buddy ware has its own portrait and cameo', () {
+    expect(BuddyLook.forWare('tower-princess'), BuddyLook.towerPrincess);
+    expect(BuddyLook.forWare('tower-princess').portrait, controller.wareById('tower-princess')!.asset);
+    expect(BuddyLook.forWare(null), BuddyLook.oldWizard);
   });
 
   test('amounts and deadlines are written out for reading', () {

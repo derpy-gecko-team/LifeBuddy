@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'bazaar/state/bazaar_controller.dart';
 import 'pages/bazaar_page.dart';
 import 'pages/buddy_page.dart';
 import 'pages/guild_hall_page.dart';
 import 'pages/map_page.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  const HomeShell({super.key, this.bazaar});
+
+  final BazaarController? bazaar;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -19,7 +22,7 @@ class _HomeShellState extends State<HomeShell> {
   late final _pages = <Widget>[
     const MapPage(),
     GuildHallPage(onOpenBuddy: () => setState(() => _index = _buddyIndex)),
-    const BazaarPage(),
+    BazaarPage(controller: widget.bazaar),
     const BuddyPage(),
   ];
 

@@ -113,6 +113,22 @@ class MockBazaarRepository implements BazaarRepository {
           worn: true,
         ),
         const Ware(
+          id: 'tower-princess',
+          name: 'The Tower Princess',
+          category: WareCategory.buddy,
+          kind: 'Guide',
+          rarity: Rarity.rare,
+          price: Price(600),
+          blurb: 'Sends your quests down from the tower window.',
+          description: 'She has read every book in the tower twice and has opinions about all of '
+              'them. Tell her what you mean to do and she will write it out neatly, then check '
+              'that you did it.',
+          perk: 'Your guide. She posts your quests and answers your letters.',
+          asset: BazaarAssets.towerPrincess,
+          slot: 'buddy',
+          sold: 87,
+        ),
+        const Ware(
           id: 'wizards-hat',
           name: 'Wizard’s Hat',
           category: WareCategory.avatar,

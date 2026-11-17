@@ -74,6 +74,13 @@ class BazaarController extends ChangeNotifier {
     return null;
   }
 
+  String? get activeBuddyId {
+    for (final w in _data?.wares ?? const <Ware>[]) {
+      if (w.category == WareCategory.buddy && w.worn) return w.id;
+    }
+    return null;
+  }
+
   List<Ware> get table {
     final data = _data;
     if (data == null) return const [];

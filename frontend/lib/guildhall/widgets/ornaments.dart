@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../buddy/active_buddy.dart';
 import '../data/models.dart';
 import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
@@ -808,18 +809,20 @@ class Fastener extends StatelessWidget {
 }
 
 class BuddyPortrait extends StatelessWidget {
-  const BuddyPortrait({super.key, this.width = 62, this.asset = GuildAssets.buddyWizard});
+  const BuddyPortrait({super.key, this.width = 62, this.asset});
 
   final double width;
-  final String asset;
+
+  final String? asset;
 
   static const aspect = 457 / 683;
 
   @override
   Widget build(BuildContext context) {
+    final shown = asset ?? ActiveBuddy.of(context).portrait;
     final height = width / aspect;
     Widget art([Color? tint]) => Image.asset(
-          asset,
+          shown,
           width: width,
           height: height,
           fit: BoxFit.contain,
@@ -829,33 +832,47 @@ class BuddyPortrait extends StatelessWidget {
           colorBlendMode: tint == null ? null : BlendMode.srcIn,
         );
     return ExcludeSemantics(
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(left: GuildShadow.box.dx, top: GuildShadow.box.dy, child: art(GuildShadow.color)),
-          art(),
-        ],
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: AnimatedSwitcher(
+          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.quick,
+          child: Stack(
+            key: ValueKey(shown),
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(left: GuildShadow.box.dx, top: GuildShadow.box.dy, child: art(GuildShadow.color)),
+              art(),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
 class BuddyCameo extends StatelessWidget {
-  const BuddyCameo({super.key, this.size = 32, this.asset = GuildAssets.buddyWizardFace});
+  const BuddyCameo({super.key, this.size = 32, this.asset});
 
   final double size;
-  final String asset;
+
+  final String? asset;
 
   @override
   Widget build(BuildContext context) {
+    final shown = asset ?? ActiveBuddy.of(context).face;
     return ExcludeSemantics(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: GuildColors.ink, width: 1.5),
-          image: DecorationImage(image: AssetImage(asset), fit: BoxFit.cover, filterQuality: FilterQuality.medium),
+      child: AnimatedSwitcher(
+        duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.quick,
+        child: Container(
+          key: ValueKey(shown),
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: GuildColors.ink, width: 1.5),
+            image: DecorationImage(image: AssetImage(shown), fit: BoxFit.cover, filterQuality: FilterQuality.medium),
+          ),
         ),
       ),
     );

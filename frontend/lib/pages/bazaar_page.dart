@@ -10,9 +10,11 @@ import '../guildhall/theme/guild_theme.dart';
 import '../guildhall/widgets/notice_route.dart';
 
 class BazaarPage extends StatefulWidget {
-  const BazaarPage({super.key, this.repository});
+  const BazaarPage({super.key, this.repository, this.controller});
 
   final BazaarRepository? repository;
+
+  final BazaarController? controller;
 
   @override
   State<BazaarPage> createState() => _BazaarPageState();
@@ -20,12 +22,12 @@ class BazaarPage extends StatefulWidget {
 
 class _BazaarPageState extends State<BazaarPage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  late final BazaarController _controller =
-      BazaarController(widget.repository ?? MockBazaarRepository(), beforeFirstLoad: GuildText.preload)..load();
+  late final BazaarController _controller = widget.controller ??
+      (BazaarController(widget.repository ?? MockBazaarRepository(), beforeFirstLoad: GuildText.preload)..load());
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 

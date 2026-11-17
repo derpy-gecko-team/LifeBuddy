@@ -17,6 +17,7 @@ abstract final class BazaarAssets {
   static const titleScroll = '$_dir/title_scroll.png';
   static const moonOwl = '$_dir/moon_owl.png';
   static const oldWizard = 'assets/images/guildhall/buddy_wizard.png';
+  static const towerPrincess = 'assets/images/guildhall/buddy_princess.png';
 
   static const avatarRogue = '$_dir/avatar_rogue.png';
   static const avatarForager = '$_dir/avatar_forager.png';
