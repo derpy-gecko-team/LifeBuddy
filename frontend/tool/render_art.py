@@ -35,8 +35,23 @@ SIZES = {
         "curtain": 912,
         "side_plaque": 426,
     },
+    "buddy": {
+        "forest": 1704,
+        "pip_tail": 1020,
+        "pip_body": 1020,
+        "pip_ear_left": 1020,
+        "pip_ear_right": 1020,
+        "pip_head": 1020,
+        "pip_eyes": 1020,
+        "pip_eyes_shut": 1020,
+        "pip_paws": 1020,
+        "campfire": 1179,
+        "paw_seal": 150,
+        "quill": 120,
+        "cloud": 72,
+    },
 }
-DEFAULT_SIZE = {"guildhall": 360, "bazaar": 480}
+DEFAULT_SIZE = {"guildhall": 360, "bazaar": 480, "buddy": 480}
 SUPERSAMPLE = 960
 
 DYES = {"indigo": "#3B4071", "brick": "#B95A54", "moss": "#5F7D4E", "umber": "#8A6240"}

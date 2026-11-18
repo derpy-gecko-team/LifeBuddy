@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifebuddy/home_shell.dart';
 import 'package:lifebuddy/pages/login_page.dart';
 import 'package:lifebuddy/theme/app_theme.dart';
 
@@ -9,6 +10,13 @@ import 'guildhall/theme/guild_theme.dart';
 import 'pages/bazaar_page.dart';
 
 void main() => runApp(const LifeBuddyApp());
+
+/// Developer shortcut: skip the login and open straight on one tab.
+///
+///     flutter run --dart-define=START_TAB=buddy
+///
+/// Empty unless that flag is passed, so a normal build still starts at the login.
+const _startTab = String.fromEnvironment('START_TAB');
 
 class LifeBuddyApp extends StatefulWidget {
   const LifeBuddyApp({super.key});
@@ -47,7 +55,7 @@ class _LifeBuddyAppState extends State<LifeBuddyApp> {
           child: child,
         ),
       ),
-      home: const LoginPage(),
+      home: _startTab.isEmpty ? const LoginPage() : const HomeShell(initialTab: _startTab),
     );
   }
 }
