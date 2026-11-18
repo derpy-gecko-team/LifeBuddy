@@ -119,7 +119,7 @@ class GuildNote extends StatelessWidget {
                 ],
                 if (busy) ...[
                   const SizedBox(height: 16),
-                  const _InkDots(),
+                  const InkDots(),
                 ],
                 if (action != null) ...[
                   const SizedBox(height: 20),
@@ -151,14 +151,14 @@ class _Nail extends StatelessWidget {
       );
 }
 
-class _InkDots extends StatefulWidget {
-  const _InkDots();
+class InkDots extends StatefulWidget {
+  const InkDots({super.key});
 
   @override
-  State<_InkDots> createState() => _InkDotsState();
+  State<InkDots> createState() => _InkDotsState();
 }
 
-class _InkDotsState extends State<_InkDots> with SingleTickerProviderStateMixin {
+class _InkDotsState extends State<InkDots> with SingleTickerProviderStateMixin {
   late final AnimationController _c =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
 

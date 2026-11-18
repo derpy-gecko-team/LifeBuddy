@@ -1,0 +1,10 @@
+<svg width="36" height="39" viewBox="0 0 36 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(-2020 -710)">
+<path d="M2049 729H2042C2041.45 729 2041 729.448 2041 730V733C2041 733.552 2041.45 734 2042 734H2049C2049.55 734 2050 733.552 2050 733V730C2050 729.448 2049.55 729 2049 729Z" fill="#2A2C57" stroke-width="2" stroke="#F4E3C3"/>
+<path d="M2039 734H2052L2054 738V745C2054 745.53 2053.79 746.039 2053.41 746.414C2053.04 746.789 2052.53 747 2052 747H2039C2038.47 747 2037.96 746.789 2037.59 746.414C2037.21 746.039 2037 745.53 2037 745V738L2039 734Z" fill="#2A2C57" stroke-width="2" stroke-linejoin="round" stroke="#F4E3C3"/>
+<path d="M2046 728C2044 720 2036 714 2022 712C2024 724 2032 730 2043 730L2046 728Z" fill="#F4E3C3" stroke-width="1.5" stroke-linejoin="round" stroke="#15142A"/>
+<path d="M2023 713L2045 731" stroke-width="1.5" stroke-linecap="round" stroke="#15142A"/>
+
+</g>
+<defs></defs>
+</svg>
