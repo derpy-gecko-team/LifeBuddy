@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});

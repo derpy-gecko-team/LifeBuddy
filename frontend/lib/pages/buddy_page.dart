@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../buddy/data/buddy_ears.dart';
 import '../buddy/data/buddy_repository.dart';

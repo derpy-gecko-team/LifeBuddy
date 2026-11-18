@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../state/guild_hall_controller.dart';
 import '../theme/guild_theme.dart';

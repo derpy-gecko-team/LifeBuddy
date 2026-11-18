@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'bazaar/state/bazaar_controller.dart';
 import 'buddy/data/mock_buddy_repository.dart';
 import 'buddy/data/models.dart';

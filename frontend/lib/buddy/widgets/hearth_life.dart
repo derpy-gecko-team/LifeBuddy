@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The small things that move around the fire: the embers and the fireflies.
 /// Both are painted from the clock alone, over the still artwork.

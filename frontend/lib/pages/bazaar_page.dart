@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../bazaar/data/bazaar_repository.dart';
 import '../bazaar/data/mock_bazaar_repository.dart';

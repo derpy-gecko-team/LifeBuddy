@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../guildhall/theme/guild_theme.dart';
 import '../../guildhall/widgets/guild_icons.dart';

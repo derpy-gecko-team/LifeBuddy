@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../guildhall/data/mock_quest_repository.dart';
 import '../guildhall/data/quest_repository.dart';
