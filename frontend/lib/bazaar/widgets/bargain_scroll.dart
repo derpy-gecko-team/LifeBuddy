@@ -5,14 +5,14 @@ import '../../guildhall/widgets/guild_feedback.dart';
 import '../../guildhall/widgets/guild_icons.dart';
 import '../../guildhall/widgets/motion.dart';
 import '../../guildhall/widgets/ornaments.dart';
-import '../../guildhall/widgets/pressable.dart';
 import '../data/models.dart';
 import 'bazaar_widgets.dart';
 
 enum BargainChoice { wear, browse }
 
 String wearLabel(Ware ware) => switch (ware.category) {
-      WareCategory.buddy => 'Call it to your side',
+      WareCategory.buddy => 'Make this your guide',
+      WareCategory.creature => 'Call it to your side',
       WareCategory.title => 'Take the title',
       _ => 'Wear it now',
     };
@@ -103,22 +103,22 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
                     Text(
                       'Bargain sealed!',
                       textAlign: TextAlign.center,
-                      style: GuildText.title(GuildType.xxl, color: GuildColors.brick),
+                      style: GuildText.title(GuildTitle.xxl, color: GuildColors.brick),
                     ),
                     const InkUnderline(),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: GuildSpace.lg),
             WareArt(ware.artFor(ware.dye), size: 128),
-            const SizedBox(height: 12),
+            const SizedBox(height: GuildSpace.md),
             Text(
               'The ${ware.name} now waits in your chest.',
               textAlign: TextAlign.center,
               style: GuildText.hand(GuildType.lg),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: GuildSpace.md),
             Semantics(
               label: '${formatAmount(widget.after.of(currency))} ${currency.label} left',
               excludeSemantics: true,
@@ -126,7 +126,7 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CurrencyIcon(currency, size: 22),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: GuildSpace.sm),
                   Text(
                     formatAmount(widget.before.of(currency)),
                     style: GuildText.hand(GuildType.md, color: GuildColors.inkSoft).copyWith(
@@ -145,11 +145,11 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: GuildSpace.lg),
             if (ware.wearable) ...[
               GuildButton(label: wearLabel(ware), onPressed: () => Navigator.pop(context, BargainChoice.wear)),
-              const SizedBox(height: 4),
-              _InkLink(label: 'Keep browsing the stall', onTap: () => Navigator.pop(context, BargainChoice.browse)),
+              const SizedBox(height: GuildSpace.xs),
+              GuildLink(label: 'Keep browsing the stall', onTap: () => Navigator.pop(context, BargainChoice.browse)),
             ] else
               GuildButton(
                 label: 'Keep browsing the stall',
@@ -190,7 +190,7 @@ class _BargainScrollState extends State<_BargainScroll> with SingleTickerProvide
             child: StampIn(
               animate: _animate,
               delay: const Duration(milliseconds: 380),
-              child: const _SealedCheck(),
+              child: const RoundBadge(size: 58, child: GuildIcon(GuildGlyph.check, size: 26)),
             ),
           ),
           for (final (i, star) in const [
@@ -222,64 +222,13 @@ class _Roller extends StatelessWidget {
     return Container(
       height: 28,
       decoration: BoxDecoration(
-        color: const Color(0xFFE2D0AA),
+        color: GuildColors.parchmentDark,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: GuildColors.tan, width: 2),
-        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
+        boxShadow: const [BoxShadow(color: GuildShadow.color, offset: GuildShadow.box)],
       ),
       alignment: const Alignment(0, -0.35),
       child: Container(height: 1.2, margin: const EdgeInsets.symmetric(horizontal: 14), color: GuildColors.tan),
-    );
-  }
-}
-
-class _SealedCheck extends StatelessWidget {
-  const _SealedCheck();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 58,
-      height: 58,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: GuildColors.brick,
-        shape: BoxShape.circle,
-        border: Border.all(color: GuildColors.cream, width: 2.4),
-        boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(2, 3))],
-      ),
-      child: const GuildIcon(GuildGlyph.check, size: 26),
-    );
-  }
-}
-
-class _InkLink extends StatelessWidget {
-  const _InkLink({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48),
-          child: Center(
-            child: Text(
-              label,
-              style: GuildText.body(GuildType.md, color: GuildColors.brickDeep).copyWith(
-                decoration: TextDecoration.underline,
-                decorationColor: GuildColors.brickDeep,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

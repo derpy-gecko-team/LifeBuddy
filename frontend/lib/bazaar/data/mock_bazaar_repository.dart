@@ -74,6 +74,7 @@ class MockBazaarRepository implements BazaarRepository {
     const allDyes = [WareDye.indigo, WareDye.brick, WareDye.moss, WareDye.umber];
     const worn = 'Shows on your avatar, your guild card and next to your quests.';
     const kept = 'Kept in your chest for all to admire.';
+    const creature = 'Keeps you company beside your avatar on your guild card.';
 
     return BazaarData(
       purse: const Purse(gold: 1240, moonstones: 35),
@@ -82,18 +83,50 @@ class MockBazaarRepository implements BazaarRepository {
         Ware(
           id: 'moon-owl',
           name: 'Moon Owl',
-          category: WareCategory.buddy,
+          category: WareCategory.creature,
           kind: 'Companion',
           rarity: Rarity.legendary,
           price: const Price(2400),
-          blurb: 'A wiser buddy who hoots your reminders at dusk.',
+          blurb: 'A watchful owl that keeps you company at dusk.',
           description: 'Raised in the rafters of the old observatory. It keeps watch over your quests '
-              'while you sleep and hoots your reminders at dusk.',
-          perk: 'Takes your Buddy’s place in the Buddy tab and in your letters.',
+              'while you sleep and hoots softly at dusk.',
+          perk: creature,
           asset: BazaarAssets.moonOwl,
-          slot: 'buddy',
+          slot: 'creature',
           sold: 41,
           leavesAt: now.add(const Duration(hours: 6, minutes: 20)),
+        ),
+        const Ware(
+          id: 'old-wizard',
+          name: 'The Old Wizard',
+          category: WareCategory.buddy,
+          kind: 'Guide',
+          rarity: Rarity.common,
+          price: Price(0),
+          blurb: 'Posts your quests and answers your letters.',
+          description: 'He has walked more roads than the guild has maps for. Tell him what you '
+              'mean to do and he will pin it to your board, one honest step at a time.',
+          perk: 'Your guide. He posts your quests and answers your letters.',
+          asset: BazaarAssets.oldWizard,
+          slot: 'buddy',
+          owned: true,
+          worn: true,
+        ),
+        const Ware(
+          id: 'tower-princess',
+          name: 'The Tower Princess',
+          category: WareCategory.buddy,
+          kind: 'Guide',
+          rarity: Rarity.rare,
+          price: Price(600),
+          blurb: 'Sends your quests down from the tower window.',
+          description: 'She has read every book in the tower twice and has opinions about all of '
+              'them. Tell her what you mean to do and she will write it out neatly, then check '
+              'that you did it.',
+          perk: 'Your guide. She posts your quests and answers your letters.',
+          asset: BazaarAssets.towerPrincess,
+          slot: 'buddy',
+          sold: 87,
         ),
         const Ware(
           id: 'wizards-hat',
@@ -131,16 +164,16 @@ class MockBazaarRepository implements BazaarRepository {
         const Ware(
           id: 'dragon-egg',
           name: 'Dragon Egg',
-          category: WareCategory.buddy,
+          category: WareCategory.creature,
           kind: 'Hatchling',
           rarity: Rarity.legendary,
           price: Price(35, Currency.moonstones),
           blurb: 'Warm to the touch, and ticking.',
           description: 'Warm to the touch and faintly ticking. Keep your oaths and something '
               'small and fierce will hatch to keep you company.',
-          perk: 'Takes your Buddy’s place in the Buddy tab and in your letters.',
+          perk: creature,
           asset: BazaarAssets.dragonEgg,
-          slot: 'buddy',
+          slot: 'creature',
           sold: 17,
         ),
         const Ware(

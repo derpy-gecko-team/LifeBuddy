@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'bazaar/state/bazaar_controller.dart';
 import 'buddy/data/mock_buddy_repository.dart';
 import 'buddy/data/models.dart';
 import 'theme/app_colors.dart';
@@ -12,7 +13,9 @@ import 'pages/guild_hall_page.dart';
 import 'pages/map_page.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, this.initialTab});
+  const HomeShell({super.key, this.bazaar, this.initialTab});
+
+  final BazaarController? bazaar;
 
   /// The tab to open on: `map`, `guildhall`, `bazaar` or `buddy`. Anything
   /// else, or nothing, opens on the map.
@@ -65,7 +68,7 @@ class _HomeShellState extends State<HomeShell> {
   late final _pages = <Widget>[
     const MapPage(),
     GuildHallPage(repository: _quests, remote: _guildHall, onOpenBuddy: () => setState(() => _index = _buddyIndex)),
-    const BazaarPage(),
+    BazaarPage(controller: widget.bazaar),
     BuddyPage(
       repository: MockBuddyRepository(quests: _quests),
       onQuestsChanged: _onQuestsChanged,

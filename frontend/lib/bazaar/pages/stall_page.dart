@@ -1,12 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../guildhall/theme/guild_theme.dart';
-import '../../guildhall/widgets/board_header.dart' show HangingTag;
 import '../../guildhall/widgets/guild_feedback.dart';
 import '../../guildhall/widgets/guild_scaffold.dart';
 import '../../guildhall/widgets/painted_wall.dart';
 import '../../guildhall/widgets/pressable.dart';
+import '../../guildhall/widgets/tag_rail.dart';
 import '../data/models.dart';
 import '../state/bazaar_controller.dart';
 import '../widgets/shop_entrance.dart';
@@ -96,7 +95,6 @@ class _StallPageState extends State<StallPage> {
           final category = controller.category;
           final featured = category == null ? data.featured : null;
           final table = controller.table;
-          final railExtent = 62 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 1.6;
 
           return NotificationListener<ScrollNotification>(
             onNotification: _onScroll,
@@ -114,17 +112,33 @@ class _StallPageState extends State<StallPage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         RepaintBoundary(child: ShopEntrance(purse: data.purse, onOpenChest: widget.onOpenChest)),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: GuildSpace.md),
                       ],
                     ),
                   ),
                   SliverPersistentHeader(
                     pinned: true,
-                    delegate: _RailDelegate(controller: controller, extent: railExtent, pinned: _railPinned),
+                    delegate: PinnedTagRail(
+                      tags: [
+                        TagRailItem(
+                          label: 'All wares',
+                          selected: category == null,
+                          onTap: () => controller.setCategory(null),
+                        ),
+                        for (final c in WareCategory.values)
+                          TagRailItem(
+                            label: c.plural,
+                            selected: category == c,
+                            onTap: () => controller.setCategory(c),
+                          ),
+                      ],
+                      extent: PinnedTagRail.extentFor(context),
+                      pinned: _railPinned,
+                    ),
                   ),
                   if (featured != null)
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(18, 26, 24, 0),
+                      padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.xxl, GuildSpace.gutter, 0),
                       sliver: SliverToBoxAdapter(
                         child: RepaintBoundary(
                           child: FeaturedNiche(
@@ -139,7 +153,7 @@ class _StallPageState extends State<StallPage> {
                       ),
                     ),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 8),
+                    padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.xxl, GuildSpace.gutter, GuildSpace.sm),
                     sliver: SliverToBoxAdapter(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -149,29 +163,25 @@ class _StallPageState extends State<StallPage> {
                               header: true,
                               child: Text(
                                 category == null ? 'On the shelves' : category.plural,
-                                style: GuildText.title(GuildType.xl, color: GuildColors.cream),
+                                style: GuildText.title(GuildTitle.xl, color: GuildColors.cream),
                               ),
                             ),
                           ),
-                          Semantics(
-                            button: true,
-                            label: 'Sorted ${controller.sort.label}. Change order.',
-                            excludeSemantics: true,
-                            child: GuildPressable(
-                              onTap: controller.cycleSort,
-                              haptic: true,
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(minHeight: 44),
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  widthFactor: 1,
-                                  child: Text(
-                                    controller.sort.label,
-                                    style: GuildText.aside(GuildType.sm).copyWith(
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: GuildColors.chalkLine,
-                                      decorationStyle: TextDecorationStyle.dashed,
-                                    ),
+                          GuildPressable(
+                            semanticLabel: 'Sorted ${controller.sort.label}. Change order.',
+                            onTap: controller.cycleSort,
+                            haptic: true,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(minHeight: 44),
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                widthFactor: 1,
+                                child: Text(
+                                  controller.sort.label,
+                                  style: GuildText.aside(GuildType.sm).copyWith(
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: GuildColors.chalkLine,
+                                    decorationStyle: TextDecorationStyle.dashed,
                                   ),
                                 ),
                               ),
@@ -182,11 +192,11 @@ class _StallPageState extends State<StallPage> {
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: GuildSpace.lg),
                     sliver: SliverToBoxAdapter(
                       child: table.isEmpty
                           ? Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                              padding: const EdgeInsets.fromLTRB(GuildSpace.xs, GuildSpace.xxl, GuildSpace.xs, 0),
                               child: Center(
                                 child: GuildNote(
                                   title: 'The shelves are bare',
@@ -207,7 +217,19 @@ class _StallPageState extends State<StallPage> {
                             ),
                     ),
                   ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 36)),
+                  if (category != null && table.isNotEmpty && table.every((w) => w.owned))
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.lg, GuildSpace.gutter, 0),
+                        child: Text(
+                          'Everything here is already yours. More ${category.plural.toLowerCase()} '
+                          'will reach the stall in time.',
+                          textAlign: TextAlign.center,
+                          style: GuildText.aside(GuildType.sm),
+                        ),
+                      ),
+                    ),
+                  const SliverToBoxAdapter(child: SizedBox(height: GuildSpace.huge)),
                 ],
               ),
             ),
@@ -216,72 +238,4 @@ class _StallPageState extends State<StallPage> {
       ),
     );
   }
-}
-
-class _RailDelegate extends SliverPersistentHeaderDelegate {
-  _RailDelegate({required this.controller, required this.extent, required this.pinned});
-
-  final BazaarController controller;
-  final double extent;
-  final ValueListenable<bool> pinned;
-
-  @override
-  double get minExtent => extent;
-
-  @override
-  double get maxExtent => extent;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    Widget tag(String label, WareCategory? category) => Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: HangingTag(
-            label: label,
-            selected: controller.category == category,
-            onTap: () => controller.setCategory(category),
-          ),
-        );
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        ValueListenableBuilder<bool>(
-          valueListenable: pinned,
-          builder: (context, isPinned, child) => AnimatedOpacity(
-            opacity: isPinned ? 1 : 0,
-            duration: GuildMotion.quick,
-            child: child,
-          ),
-          child: const DecoratedBox(
-            decoration: BoxDecoration(
-              color: GuildColors.indigo,
-              border: Border(bottom: BorderSide(color: GuildColors.chalkLine, width: 1.5)),
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: Stack(
-            children: [
-              Positioned(left: 0, right: 0, top: 4, child: Container(height: 2, color: GuildColors.chalkLine)),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    tag('All wares', null),
-                    for (final c in WareCategory.values) tag(c.plural, c),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  bool shouldRebuild(_RailDelegate old) => true;
 }

@@ -10,9 +10,11 @@ import '../guildhall/theme/guild_theme.dart';
 import '../guildhall/widgets/notice_route.dart';
 
 class BazaarPage extends StatefulWidget {
-  const BazaarPage({super.key, this.repository});
+  const BazaarPage({super.key, this.repository, this.controller});
 
   final BazaarRepository? repository;
+
+  final BazaarController? controller;
 
   @override
   State<BazaarPage> createState() => _BazaarPageState();
@@ -20,25 +22,44 @@ class BazaarPage extends StatefulWidget {
 
 class _BazaarPageState extends State<BazaarPage> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  late final BazaarController _controller =
-      BazaarController(widget.repository ?? MockBazaarRepository(), beforeFirstLoad: GuildText.preload)..load();
+  late final BazaarController _controller;
+  late final bool _ownsController;
+
+  @override
+  void initState() {
+    super.initState();
+    final shared = widget.controller ?? BazaarScope.maybeOf(context);
+    _ownsController = shared == null;
+    _controller =
+        shared ??
+        (BazaarController(
+          widget.repository ?? MockBazaarRepository(),
+          beforeFirstLoad: GuildText.preload,
+        )..load());
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_ownsController) _controller.dispose();
     super.dispose();
   }
 
   void _openWare(String wareId, {List<String> shelf = const []}) {
-    Navigator.of(context, rootNavigator: true).push(NoticeRoute<void>(
-      builder: (_) => WarePage(controller: _controller, wareId: wareId, shelf: shelf),
-    ));
+    Navigator.of(context, rootNavigator: true).push(
+      NoticeRoute<void>(
+        builder: (_) =>
+            WarePage(controller: _controller, wareId: wareId, shelf: shelf),
+      ),
+    );
   }
 
   void _openChest() {
-    _navigatorKey.currentState!.push(PlaqueRoute<void>(
-      builder: (_) => ChestPage(controller: _controller, onOpenWare: _openWare),
-    ));
+    _navigatorKey.currentState!.push(
+      PlaqueRoute<void>(
+        builder: (_) =>
+            ChestPage(controller: _controller, onOpenWare: _openWare),
+      ),
+    );
   }
 
   @override
@@ -49,10 +70,31 @@ class _BazaarPageState extends State<BazaarPage> {
         key: _navigatorKey,
         onGenerateInitialRoutes: (_, _) => [
           MaterialPageRoute<void>(
-            builder: (_) => StallPage(controller: _controller, onOpenWare: _openWare, onOpenChest: _openChest),
+            builder: (_) => StallPage(
+              controller: _controller,
+              onOpenWare: _openWare,
+              onOpenChest: _openChest,
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+class BazaarScope extends InheritedWidget {
+  const BazaarScope({
+    super.key,
+    required this.controller,
+    required super.child,
+  });
+
+  final BazaarController controller;
+
+  static BazaarController? maybeOf(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<BazaarScope>()?.controller;
+
+  @override
+  bool updateShouldNotify(BazaarScope oldWidget) =>
+      oldWidget.controller != controller;
 }

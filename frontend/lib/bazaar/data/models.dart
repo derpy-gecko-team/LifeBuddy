@@ -4,6 +4,7 @@ enum WareCategory {
   avatar('Avatars', 'Avatar'),
   cosmetic('Cosmetics', 'Cosmetic'),
   buddy('Buddies', 'Buddy'),
+  creature('Menagerie', 'Creature'),
   potion('Potions', 'Potion'),
   trinket('Trinkets', 'Trinket'),
   title('Titles', 'Title');
