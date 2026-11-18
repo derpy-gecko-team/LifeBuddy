@@ -82,6 +82,70 @@ class MockQuestRepository implements QuestRepository {
     return _data;
   }
 
+  // --- The Buddy's side of the board ---------------------------------------
+  //
+  // On the real server these happen inside the conversation with the Buddy
+  // (POST /api/guide/interact): the hero says what they want or what they
+  // did, and quests are created or completed as a result. The app only hears
+  // about it in the answer. Until the app talks to that server, the mock
+  // Buddy calls these directly, so that both tabs show the same quests.
+
+  /// Every quest as it stands now, for the Buddy to recognise one by name.
+  Iterable<Quest> get quests => _data.allQuests;
+
+  int _posted = 0;
+
+  /// Pins a new quest, open for the hero to swear to, at the top of a journey.
+  Quest postFromBuddy({required String title, required String journeyId, required String askedAs}) {
+    final line = _data.journeys.firstWhere(
+      (l) => l.id == journeyId,
+      orElse: () => _data.journeys.last,
+    );
+    final quest = Quest(
+      id: 'buddy-${++_posted}',
+      journeyId: line.id,
+      title: title,
+      flavor: 'You said it. I only wrote it down.',
+      description: 'You told your Buddy: “$askedAs”',
+      iconAsset: switch (line.id) {
+        'iron-body' => GuildAssets.questBoot,
+        'scholar-tower' => GuildAssets.questScroll,
+        _ => GuildAssets.questPotion,
+      },
+      xp: 40,
+      peril: Peril.minor,
+      status: QuestStatus.open,
+      paper: PaperTone.sage,
+      trials: const [Trial(id: 't1', title: 'Make a start'), Trial(id: 't2', title: 'See it through')],
+    );
+    _data = GuildHallData(
+      hero: _data.hero,
+      newToday: _data.newToday + 1,
+      journeys: [
+        for (final l in _data.journeys) l.id == line.id ? l.copyWith(quests: [quest, ...l.quests]) : l,
+      ],
+    );
+    return quest;
+  }
+
+  /// Marks a quest done because the hero told the Buddy they did it: every
+  /// trial ticked, the bounty paid. Null if it was not theirs to finish
+  /// (already fulfilled, or still sealed).
+  Quest? fulfilFromBuddy(String questId) {
+    final quest = _quest(questId);
+    if (quest.status != QuestStatus.open && quest.status != QuestStatus.sworn) return null;
+    final done = quest.copyWith(
+      status: QuestStatus.fulfilled,
+      trials: [for (final t in quest.trials) t.copyWith(done: true)],
+    );
+    _replace(done);
+    _awardXp(quest.xp);
+    _unsealDependentsOf(quest.id);
+    final line = _data.journeys.firstWhere((l) => l.id == quest.journeyId);
+    if (line.isComplete) _awardXp(line.bountyXp);
+    return done;
+  }
+
   Quest _quest(String id) => _data.allQuests.firstWhere(
         (q) => q.id == id,
         orElse: () => throw QuestActionException('Unknown quest $id'),

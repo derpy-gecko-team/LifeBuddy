@@ -9,8 +9,9 @@ import '../theme/guild_theme.dart';
 enum WallVariant {
   board(7),
   journey(23),
-  quest(41),
-  bazaar(59);
+  poster(41),
+  bazaar(59),
+  chest(73);
 
   const WallVariant(this.seed);
   final int seed;
@@ -154,7 +155,8 @@ class _Doodler {
   List<Rect> get _quiet => switch (variant) {
         WallVariant.board => [Rect.fromLTWH(0, 0, size.width * 0.8, 200)],
         WallVariant.journey => [Rect.fromLTWH(0, 0, size.width, 120)],
-        WallVariant.quest => [Rect.fromLTWH(0, 0, size.width, 150)],
+        WallVariant.poster => [Rect.fromLTWH(0, 0, size.width, 150)],
+        WallVariant.chest => [Rect.fromLTWH(0, 0, size.width, 150)],
         WallVariant.bazaar => [Rect.fromLTWH(0, 0, size.width, 215)],
       };
 

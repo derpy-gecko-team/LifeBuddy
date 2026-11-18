@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 
@@ -188,7 +188,7 @@ class StruckText extends StatelessWidget {
           ? Duration.zero
           : struck
               ? const Duration(milliseconds: 460)
-              : const Duration(milliseconds: 160),
+              : GuildMotion.swift,
       curve: struck ? const Interval(0.35, 1, curve: Curves.easeInOutCubic) : Curves.easeOut,
       builder: (context, t, child) => CustomPaint(
         foregroundPainter: _StrikePainter(

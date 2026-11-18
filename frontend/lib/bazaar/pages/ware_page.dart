@@ -8,7 +8,6 @@ import '../../guildhall/widgets/guild_scaffold.dart';
 import '../../guildhall/widgets/ornaments.dart';
 import '../../guildhall/widgets/painted_wall.dart';
 import '../../guildhall/widgets/pressable.dart';
-import '../../guildhall/widgets/quest_cards.dart' show Fastener, FastenerKind;
 import '../../guildhall/widgets/sketch.dart';
 import '../../guildhall/widgets/torn_paper.dart';
 import '../data/bazaar_repository.dart';
@@ -79,7 +78,8 @@ class _WarePageState extends State<WarePage> {
   }
 
   static String _wornToast(Ware ware, bool worn) => switch (ware.category) {
-        WareCategory.buddy => worn ? '${ware.name} is at your side.' : '${ware.name} is resting in your chest.',
+        WareCategory.buddy => worn ? '${ware.name} is now your guide.' : '${ware.name} has stepped back.',
+        WareCategory.creature => worn ? '${ware.name} is at your side.' : '${ware.name} is resting in your chest.',
         WareCategory.title => worn ? 'You now go by ${ware.name.replaceFirst('Title: ', '')}.' : 'Title set aside.',
         _ => worn ? 'You are wearing the ${ware.name}.' : '${ware.name} is back in your chest.',
       };
@@ -90,7 +90,7 @@ class _WarePageState extends State<WarePage> {
     if (MediaQuery.disableAnimationsOf(context)) {
       _pages.jumpToPage(to);
     } else {
-      _pages.animateToPage(to, duration: const Duration(milliseconds: 380), curve: GuildMotion.easeOut);
+      _pages.animateToPage(to, duration: GuildMotion.slide, curve: GuildMotion.easeOut);
     }
   }
 
@@ -111,7 +111,7 @@ class _WarePageState extends State<WarePage> {
         final purse = _controller.data?.purse;
         if (ware == null || purse == null) {
           return GuildScaffold(
-            wall: WallVariant.quest,
+            wall: WallVariant.poster,
             body: Center(
               child: Padding(
                 padding: const EdgeInsets.all(28),
@@ -128,20 +128,14 @@ class _WarePageState extends State<WarePage> {
         final still = MediaQuery.disableAnimationsOf(context);
 
         return GuildScaffold(
-          wall: WallVariant.quest,
+          wall: WallVariant.poster,
           body: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 6, 20, 0),
-                child: Row(
-                  children: [
-                    GuildBackLink(label: 'Bazaar', onTap: () => Navigator.of(context).maybePop()),
-                    const Spacer(),
-                    Text(
-                      _shelf.length > 1 ? '${ware.shelf}  ·  ${_index + 1} of ${_shelf.length}' : ware.shelf,
-                      style: GuildText.label(GuildType.xs, color: GuildColors.cream),
-                    ),
-                  ],
+              GuildTopBar(
+                back: GuildBackLink(label: 'Bazaar', onTap: () => Navigator.of(context).maybePop()),
+                trailing: Text(
+                  _shelf.length > 1 ? '${ware.shelf}  ·  ${_index + 1} of ${_shelf.length}' : ware.shelf,
+                  style: GuildText.label(GuildType.xs, color: GuildColors.cream),
                 ),
               ),
               Expanded(
@@ -158,7 +152,7 @@ class _WarePageState extends State<WarePage> {
                         final w = _controller.wareById(_shelf[i]);
                         if (w == null) return const SizedBox.shrink();
                         final poster = SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(22, 30, 22, 24),
+                          padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.huge, GuildSpace.gutter, GuildSpace.xxl),
                           child: RepaintBoundary(
                             child: _WarePoster(
                               ware: w,
@@ -221,30 +215,26 @@ class _ShelfArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: forward ? 'Next ware' : 'Previous ware',
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onTap,
-        haptic: true,
-        pressedScale: 0.9,
-        child: SizedBox(
-          width: 44,
-          height: 56,
-          child: Center(
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: GuildColors.indigoDeep,
-                shape: BoxShape.circle,
-                border: Border.all(color: GuildColors.chalk, width: 1.8),
-                boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.5), offset: const Offset(1.5, 2.5))],
-              ),
-              child: Center(
-                child: GuildIcon(forward ? GuildGlyph.chevronRight : GuildGlyph.chevronLeft, size: 18),
-              ),
+    return GuildPressable(
+      semanticLabel: forward ? 'Next ware' : 'Previous ware',
+      onTap: onTap,
+      haptic: true,
+      pressedScale: 0.9,
+      child: SizedBox(
+        width: 44,
+        height: 56,
+        child: Center(
+          child: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: GuildColors.indigoDeep,
+              shape: BoxShape.circle,
+              border: Border.all(color: GuildColors.chalk, width: 1.8),
+              boxShadow: const [BoxShadow(color: GuildShadow.color, offset: GuildShadow.small)],
+            ),
+            child: Center(
+              child: GuildIcon(forward ? GuildGlyph.chevronRight : GuildGlyph.chevronLeft, size: 18),
             ),
           ),
         ),
@@ -261,8 +251,10 @@ class _WarePoster extends StatelessWidget {
   final DateTime now;
   final ValueChanged<WareDye>? onDye;
 
+  bool get _isBuddy => ware.category == WareCategory.buddy;
+
   String get _mirrorLabel {
-    if (ware.owned) return ware.worn ? 'In use' : 'In your chest';
+    if (ware.owned) return ware.worn ? (_isBuddy ? 'Your guide' : 'In use') : 'In your chest';
     if (ware.tryOnAsset != null) return 'Trying it on';
     return ware.category == WareCategory.avatar && ware.slot == 'hero' ? 'Your new look' : 'On display';
   }
@@ -271,6 +263,25 @@ class _WarePoster extends StatelessWidget {
   Widget build(BuildContext context) {
     final shown = ware.tryOnFor(dye) ?? ware.artFor(dye);
     final fills = ware.tryOnAsset != null;
+    final art = Semantics(
+      image: true,
+      label: dye == null ? ware.name : '${ware.name}, dyed ${dye!.label}',
+      child: WareHero(
+        ware: ware,
+        dye: dye,
+        child: AnimatedSwitcher(
+          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.quick,
+          child: Image.asset(
+            shown,
+            key: ValueKey(shown),
+            fit: BoxFit.contain,
+            alignment: fills ? Alignment.bottomCenter : Alignment.center,
+            filterQuality: FilterQuality.medium,
+            gaplessPlayback: true,
+          ),
+        ),
+      ),
+    );
     final leaves = ware.leavesAt;
 
     return Stack(
@@ -296,16 +307,16 @@ class _WarePoster extends StatelessWidget {
                           Text(
                             ware.name,
                             textAlign: TextAlign.center,
-                            style: GuildText.title(GuildType.xxl, color: GuildColors.brick),
+                            style: GuildText.title(GuildTitle.xxl, color: GuildColors.brick),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: GuildSpace.hair),
                           const InkUnderline(),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: GuildSpace.md),
                 Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -313,67 +324,62 @@ class _WarePoster extends StatelessWidget {
                   runSpacing: 2,
                   children: [
                     RarityMark(ware.rarity),
-                    Text('·', style: GuildText.hand(GuildType.sm, color: GuildColors.pencil)),
-                    Text('sold ${formatAmount(ware.sold)} times', style: GuildText.hand(GuildType.sm)),
+                    if (ware.sold > 0) ...[
+                      Text('·', style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft)),
+                      Text('sold ${formatAmount(ware.sold)} times', style: GuildText.hand(GuildType.sm)),
+                    ],
                   ],
                 ),
                 if (leaves != null && !ware.owned) ...[
-                  const SizedBox(height: 4),
-                  Text(leavesLabel(leaves, now), style: GuildText.hand(GuildType.sm, color: GuildColors.brick)),
+                  const SizedBox(height: GuildSpace.xs),
+                  Text(leavesLabel(leaves, now), style: GuildText.hand(GuildType.sm, color: GuildColors.brickDeep)),
                 ],
-                const SizedBox(height: 18),
+                const SizedBox(height: GuildSpace.lg),
                 Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.bottomCenter,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(bottom: 14),
-                      child: MirrorFrame(
-                        child: Padding(
-                          padding: fills ? const EdgeInsets.only(top: 10) : const EdgeInsets.all(26),
-                          child: Semantics(
-                            image: true,
-                            label: dye == null ? ware.name : '${ware.name}, dyed ${dye!.label}',
-                            child: WareHero(
-                              ware: ware,
-                              dye: dye,
-                              child: AnimatedSwitcher(
-                                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : GuildMotion.quick,
-                                child: Image.asset(
-                                  shown,
-                                  key: ValueKey(shown),
-                                  fit: BoxFit.contain,
-                                  alignment: fills ? Alignment.bottomCenter : Alignment.center,
-                                  filterQuality: FilterQuality.medium,
-                                  gaplessPlayback: true,
-                                ),
+                      child: _isBuddy
+                          ? SketchBox(
+                              color: GuildColors.indigo,
+                              borderColor: GuildColors.ink,
+                              seed: 61,
+                              child: SizedBox(
+                                width: 196,
+                                height: 214,
+                                child: Padding(padding: const EdgeInsets.all(GuildSpace.md), child: art),
+                              ),
+                            )
+                          : MirrorFrame(
+                              child: Padding(
+                                padding: fills ? const EdgeInsets.only(top: 10) : const EdgeInsets.all(26),
+                                child: art,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
                     ),
                     SketchBox(
                       color: GuildColors.vellum,
                       borderColor: GuildColors.ink,
                       borderWidth: 1.5,
-                      shadow: const Offset(1.5, 2),
+                      shadow: GuildShadow.small,
                       seed: 19,
                       padding: const EdgeInsets.fromLTRB(12, 3, 12, 4),
                       child: Text(_mirrorLabel, style: GuildText.hand(GuildType.sm)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                Text(ware.description, textAlign: TextAlign.center, style: GuildText.hand(GuildType.lg)),
+                const SizedBox(height: GuildSpace.lg),
+                Text(ware.description, textAlign: TextAlign.center, style: GuildText.hand(GuildType.md)),
                 if (ware.dyes.length > 1 && onDye != null) ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: GuildSpace.lg),
                   _DyePicker(dyes: ware.dyes, selected: dye ?? ware.dyes.first, onPick: onDye!),
                 ] else if (ware.owned && dye != null) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: GuildSpace.md),
                   Text('Dyed ${dye!.label.toLowerCase()}', style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft)),
                 ],
-                const SizedBox(height: 14),
+                const SizedBox(height: GuildSpace.lg),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -381,7 +387,7 @@ class _WarePoster extends StatelessWidget {
                       padding: EdgeInsets.only(top: 2),
                       child: GuildIcon(GuildGlyph.check, size: 18, color: GuildColors.brick),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: GuildSpace.sm),
                     Expanded(child: Text(ware.perk, style: GuildText.hand(GuildType.sm))),
                   ],
                 ),
@@ -390,7 +396,6 @@ class _WarePoster extends StatelessWidget {
           ),
         ),
         const Positioned(top: -9, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape))),
-        Positioned(top: -16, right: -8, child: RoundBadge(asset: ware.artFor(dye), size: 62)),
       ],
     );
   }
@@ -409,38 +414,34 @@ class _DyePicker extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text('Dye', style: GuildText.hand(GuildType.sm)),
-        const SizedBox(width: 6),
+        const SizedBox(width: GuildSpace.sm),
         for (final dye in dyes)
-          Semantics(
-            button: true,
+          GuildPressable(
             selected: dye == selected,
-            label: '${dye.label} dye',
-            excludeSemantics: true,
-            child: GuildPressable(
-              onTap: () => onPick(dye),
-              haptic: true,
-              pressedScale: 0.9,
-              child: SizedBox.square(
-                dimension: 46,
-                child: Center(
-                  child: AnimatedContainer(
-                    duration: GuildMotion.press,
-                    width: 38,
-                    height: 38,
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: dye == selected ? GuildColors.brick : Colors.transparent,
-                        width: 2.2,
-                      ),
+            semanticLabel: '${dye.label} dye',
+            onTap: () => onPick(dye),
+            haptic: true,
+            pressedScale: 0.9,
+            child: SizedBox.square(
+              dimension: 46,
+              child: Center(
+                child: AnimatedContainer(
+                  duration: GuildMotion.press,
+                  width: 38,
+                  height: 38,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: dye == selected ? GuildColors.brick : Colors.transparent,
+                      width: 2.2,
                     ),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: dye.color,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: GuildColors.ink, width: 2),
-                      ),
+                  ),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: dye.color,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: GuildColors.ink, width: 2),
                     ),
                   ),
                 ),
@@ -471,7 +472,7 @@ class _BuyBar extends StatelessWidget {
   final VoidCallback onWish;
 
   static String _unwearLabel(Ware ware) => switch (ware.category) {
-        WareCategory.buddy => 'Send it to rest',
+        WareCategory.creature => 'Send it to rest',
         WareCategory.title => 'Set the title aside',
         _ => 'Take it off',
       };
@@ -484,7 +485,10 @@ class _BuyBar extends StatelessWidget {
 
     final Widget action;
     final String caption;
-    if (ware.owned) {
+    if (ware.owned && ware.worn && ware.category == WareCategory.buddy) {
+      caption = '${ware.name} posts your quests. Choose another Buddy to change guides.';
+      action = const GuildButton(label: 'Your guide', glyph: GuildGlyph.check, onPressed: null);
+    } else if (ware.owned) {
       caption = ware.worn ? 'In use. It stays in your chest when you take it off.' : 'Bought, and kept in your chest.';
       action = !ware.wearable
           ? const GuildButton(label: 'In your chest', onPressed: null)
@@ -504,44 +508,17 @@ class _BuyBar extends StatelessWidget {
       action = _BuyButton(price: price, onPressed: affordable && !busy ? onBuy : null);
     }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              if (!ware.owned) ...[
-                Semantics(
-                  button: true,
-                  toggled: ware.wishlisted,
-                  label: 'Wish for ${ware.name}',
-                  excludeSemantics: true,
-                  child: GuildPressable(
-                    onTap: onWish,
-                    haptic: true,
-                    pressedScale: 0.92,
-                    child: SketchBox(
-                      color: GuildColors.indigoDeep,
-                      borderColor: GuildColors.chalk.withValues(alpha: 0.8),
-                      borderWidth: 2,
-                      seed: 71,
-                      child: SizedBox.square(
-                        dimension: 56,
-                        child: Center(child: HeartMark(filled: ware.wishlisted)),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-              Expanded(child: action),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(caption, textAlign: TextAlign.center, style: GuildText.aside(GuildType.sm)),
-        ],
-      ),
+    return GuildActionBar(
+      leading: ware.owned
+          ? null
+          : GuildIconButton(
+              semanticLabel: 'Wish for ${ware.name}',
+              toggled: ware.wishlisted,
+              onTap: onWish,
+              child: HeartMark(filled: ware.wishlisted),
+            ),
+      main: action,
+      below: GuildFootnote(caption),
     );
   }
 }
@@ -555,36 +532,33 @@ class _BuyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onPressed != null;
-    final text = enabled ? GuildColors.cream : GuildColors.cream.withValues(alpha: 0.72);
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: 'Buy for ${formatPrice(price)}',
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onPressed,
-        haptic: true,
-        child: SketchBox(
-          color: enabled ? GuildColors.brick : GuildColors.indigoDeep,
-          borderColor: enabled ? GuildColors.brickDeep : GuildColors.chalkLine,
-          shadow: enabled ? const Offset(2, 3) : null,
-          seed: 47,
-          padding: const EdgeInsets.all(5),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 46),
-            decoration: BoxDecoration(border: Border.all(color: text.withValues(alpha: text.a * 0.8), width: 1.2)),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            alignment: Alignment.center,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Opacity(opacity: enabled ? 1 : 0.6, child: CurrencyIcon(price.currency, size: 24)),
-                  const SizedBox(width: 10),
-                  Text('Buy for ${formatPrice(price)}', style: GuildText.label(GuildType.lg, color: text, spacing: 0.6)),
-                ],
-              ),
+    final text = enabled ? GuildColors.cream : GuildButton.disabledText;
+    return GuildPressable(
+      semanticEnabled: enabled,
+      semanticLabel: 'Buy for ${formatPrice(price)}',
+      onTap: onPressed,
+      haptic: true,
+      child: SketchBox(
+        color: enabled ? GuildColors.brickDeep : GuildButton.disabledFill,
+        borderColor: enabled ? GuildColors.brickShade : GuildColors.chalkLine,
+        shadow: enabled ? GuildShadow.box : null,
+        shading: enabled,
+        seed: 47,
+        padding: const EdgeInsets.all(5),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 46),
+          decoration: BoxDecoration(border: Border.all(color: text.withValues(alpha: text.a * 0.8), width: 1.2)),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          alignment: Alignment.center,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Opacity(opacity: enabled ? 1 : 0.6, child: CurrencyIcon(price.currency, size: 24)),
+                const SizedBox(width: GuildSpace.sm),
+                Text('Buy for ${formatPrice(price)}', style: GuildText.label(GuildType.lg, color: text, spacing: 0.6)),
+              ],
             ),
           ),
         ),

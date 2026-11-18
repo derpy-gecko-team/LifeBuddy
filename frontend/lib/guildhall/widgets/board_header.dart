@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../data/models.dart';
-import '../state/guild_hall_controller.dart';
 import '../theme/guild_assets.dart';
 import '../theme/guild_theme.dart';
 import 'deadline_format.dart';
@@ -12,7 +11,6 @@ import 'pressable.dart';
 import 'sketch.dart';
 import 'torn_paper.dart';
 import 'hanging_slip.dart';
-import 'motion.dart';
 
 String toRoman(int n) {
   const map = {
@@ -60,7 +58,7 @@ class BoardHeader extends StatelessWidget {
               Row(
                 children: [
                   const GuildArt(GuildAssets.crestSword, height: 52),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: GuildSpace.sm),
                   Expanded(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
@@ -69,7 +67,7 @@ class BoardHeader extends StatelessWidget {
                         header: true,
                         child: LetteredTitle(
                           'The Guildhall',
-                          size: GuildType.display,
+                          size: GuildTitle.display,
                           drawIn: drawTitle,
                           onDrawn: onTitleDrawn,
                         ),
@@ -78,7 +76,7 @@ class BoardHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: GuildSpace.sm),
               Text(subtitle, style: GuildText.aside(GuildType.md)),
             ],
           ),
@@ -104,7 +102,7 @@ class RankSign extends StatelessWidget {
             child: Row(
               children: [
                 ExcludeSemantics(child: Image.asset(GuildAssets.rankShield, height: 34)),
-                const SizedBox(width: 12),
+                const SizedBox(width: GuildSpace.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +114,7 @@ class RankSign extends StatelessWidget {
                         children: [
                           Text(
                             '${hero.rankTitle} ${toRoman(hero.level)}',
-                            style: GuildText.title(GuildType.lg),
+                            style: GuildText.title(GuildTitle.lg),
                           ),
                           Text(
                             '${hero.xp} / ${hero.xpToNext} XP',
@@ -124,15 +122,9 @@ class RankSign extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: GuildSpace.sm),
                       ExcludeSemantics(
-                        child: GuildProgressBar(
-                          value: hero.progress,
-                          height: 8,
-                          track: GuildColors.parchmentDark,
-                          fill: GuildColors.brick,
-                          edge: GuildColors.pencil,
-                        ),
+                        child: GuildProgressBar.onPaper(value: hero.progress),
                       ),
                     ],
                   ),
@@ -142,159 +134,32 @@ class RankSign extends StatelessWidget {
           ),
         ),
         if (onOpenBuddy != null) ...[
-          const SizedBox(width: 12),
-          Semantics(
-            button: true,
-            label: 'Talk to your Buddy',
-            excludeSemantics: true,
-            child: GuildPressable(
-              onTap: onOpenBuddy,
-              haptic: true,
-              pressedScale: 0.92,
-              child: const RoundBadge(asset: GuildAssets.buddyEnvelope, size: 60),
+          const SizedBox(width: GuildSpace.md),
+          GuildPressable(
+            semanticLabel: 'Talk to your Buddy',
+            onTap: onOpenBuddy,
+            haptic: true,
+            pressedScale: 0.92,
+            child: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.translationValues(0, 6, 0)..rotateZ(0.035),
+              child: const Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  BuddyPortrait(width: 52),
+                  Positioned(
+                    right: -6,
+                    bottom: -2,
+                    child: RoundBadge(asset: GuildAssets.buddyEnvelope, size: 28),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ],
     );
   }
-}
-
-class QuestTagRail extends StatelessWidget {
-  const QuestTagRail({super.key, required this.controller});
-
-  final GuildHallController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 4,
-          child: Container(height: 2, color: GuildColors.chalkLine),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final f in QuestFilter.values)
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: HangingTag(
-                    label: f.label,
-                    count: f == QuestFilter.all ? null : controller.countFor(f),
-                    selected: controller.filter == f,
-                    onTap: () => controller.setFilter(f),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class HangingTag extends StatelessWidget {
-  const HangingTag({super.key, required this.label, required this.selected, required this.onTap, this.count});
-
-  final String label;
-  final int? count;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final fg = selected ? GuildColors.brickDeep : GuildColors.cream;
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: count == null ? label : '$label, $count',
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onTap,
-        haptic: true,
-        child: HangingSway(
-          nudged: selected,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(width: 2, height: 12, margin: const EdgeInsets.only(top: 6), color: GuildColors.chalkLine),
-              CustomPaint(
-                painter: _TagPainter(selected: selected, seed: stableSeed(label)),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 42),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(label, style: GuildText.label(GuildType.sm, color: fg)),
-                        if (count != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            constraints: const BoxConstraints(minWidth: 22),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: selected ? GuildColors.brickDeep : GuildColors.shadow,
-                              borderRadius: BorderRadius.circular(11),
-                            ),
-                            child: Text(
-                              '$count',
-                              textAlign: TextAlign.center,
-                              style: GuildText.label(GuildType.xs, color: GuildColors.cream, spacing: 0),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TagPainter extends CustomPainter {
-  _TagPainter({required this.selected, required this.seed});
-  final bool selected;
-  final int seed;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const cut = 9.0;
-    final sketch = Sketch.of([
-      const Offset(cut, 0),
-      Offset(size.width - cut, 0),
-      Offset(size.width, cut),
-      Offset(size.width, size.height),
-      Offset(0, size.height),
-      const Offset(0, cut),
-    ], seed);
-    sketch.paintFill(canvas, selected ? GuildColors.parchment : GuildColors.indigoDeep, shadow: const Offset(2, 3));
-    sketch.paintShading(
-      canvas,
-      ink: selected ? GuildColors.pencil : GuildColors.cream,
-      strength: selected ? 1.2 : 0.45,
-    );
-    sketch.paintBorder(canvas, color: selected ? GuildColors.pencil : GuildColors.chalkLine, width: 1.5);
-    canvas.drawCircle(
-      Offset(size.width / 2, 5),
-      2.2,
-      Paint()..color = selected ? GuildColors.indigoDeep : GuildColors.chalk,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_TagPainter old) => old.selected != selected || old.seed != seed;
 }
 
 class JourneyPlaque extends StatelessWidget {
@@ -305,64 +170,60 @@ class JourneyPlaque extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: '${journey.name}, ${journey.fulfilledCount} of '
+    return GuildPressable(
+      semanticLabel: '${journey.name}, ${journey.fulfilledCount} of '
           '${journey.quests.length} quests fulfilled. Open journey.',
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: () => onTap(globalRectOf(context)),
-        pressedScale: 0.98,
-        child: SketchBox(
-          color: GuildColors.indigoDeep,
-          borderColor: GuildColors.chalkLine,
-          borderWidth: 1.6,
-          bevel: 10,
-          shadow: const Offset(2, 4),
-          seed: stableSeed(journey.id),
-          padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Positioned(left: -7, top: -5, child: ChalkStar(seed: 1)),
-              const Positioned(right: -3, top: -5, child: ChalkStar(seed: 2)),
-              const Positioned(left: -7, bottom: -5, child: ChalkStar(seed: 3)),
-              const Positioned(right: -3, bottom: -5, child: ChalkStar(seed: 4)),
-              Row(
-                children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: GuildColors.indigo,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: GuildColors.chalk, width: 1.8),
-                    ),
-                    child: JourneyEmblem(journey: journey, size: 35),
+      onTap: () => onTap(globalRectOf(context)),
+      pressedScale: 0.98,
+      child: SketchBox(
+        color: GuildColors.indigoDeep,
+        borderColor: GuildColors.chalkLine,
+        borderWidth: 1.6,
+        bevel: 10,
+        shadow: GuildShadow.raised,
+        seed: stableSeed(journey.id),
+        padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Positioned(left: -7, top: -5, child: ChalkStar(seed: 1)),
+            const Positioned(right: -3, top: -5, child: ChalkStar(seed: 2)),
+            const Positioned(left: -7, bottom: -5, child: ChalkStar(seed: 3)),
+            const Positioned(right: -3, bottom: -5, child: ChalkStar(seed: 4)),
+            Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: GuildColors.indigo,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: GuildColors.chalk, width: 1.8),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(journey.name, style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${journey.fulfilledCount} of ${journey.quests.length} quests fulfilled',
-                          style: GuildText.aside(GuildType.sm),
-                        ),
-                        const SizedBox(height: 8),
-                        SealProgress(total: journey.quests.length, done: journey.fulfilledCount),
-                      ],
-                    ),
+                  child: JourneyEmblem(journey: journey, size: 35),
+                ),
+                const SizedBox(width: GuildSpace.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(journey.name, style: GuildText.title(GuildTitle.lg, color: GuildColors.cream)),
+                      const SizedBox(height: GuildSpace.hair),
+                      Text(
+                        '${journey.fulfilledCount} of ${journey.quests.length} quests fulfilled',
+                        style: GuildText.aside(GuildType.sm),
+                      ),
+                      const SizedBox(height: GuildSpace.sm),
+                      SealProgress(total: journey.quests.length, done: journey.fulfilledCount),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  const GuildIcon(GuildGlyph.chevronRight, size: 22, color: GuildColors.goldBright),
-                ],
-              ),
-            ],
-          ),
+                ),
+                const SizedBox(width: GuildSpace.sm),
+                const GuildIcon(GuildGlyph.chevronRight, size: 22, color: GuildColors.goldBright),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -390,43 +251,39 @@ class DueTodayStrip extends StatelessWidget {
           Row(
             children: [
               const GuildIcon(GuildGlyph.flame, size: 20, color: GuildColors.brickDeep),
-              const SizedBox(width: 8),
+              const SizedBox(width: GuildSpace.sm),
               Semantics(
                 header: true,
-                child: Text('Due today', style: GuildText.title(GuildType.lg)),
+                child: Text('Due soon', style: GuildText.title(GuildTitle.lg)),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: GuildSpace.xs),
           for (final (i, quest) in quests.indexed) ...[
             if (i > 0) const DashedLine(),
             Builder(
-              builder: (rowContext) => Semantics(
-                button: true,
-                label: '${quest.title}, ${deadlineLabel(quest.deadline!, now)}, ${quest.xp} XP',
-                excludeSemantics: true,
-                child: GuildPressable(
-                  onTap: () => onOpenQuest(quest.id, rowContext),
-                  pressedScale: 0.98,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 48),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            quest.title,
-                            style: GuildText.title(GuildType.md),
-                          ),
+              builder: (rowContext) => GuildPressable(
+                semanticLabel: '${quest.title}, ${deadlineLabel(quest.deadline!, now)}, ${quest.xp} XP',
+                onTap: () => onOpenQuest(quest.id, rowContext),
+                pressedScale: 0.98,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 48),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          quest.title,
+                          style: GuildText.title(GuildTitle.md),
                         ),
-                        const SizedBox(width: 10),
-                        Text(
-                          deadlineLabel(quest.deadline!, now),
-                          style: GuildText.aside(GuildType.sm, color: GuildColors.inkSoft),
-                        ),
-                        const SizedBox(width: 6),
-                        const GuildIcon(GuildGlyph.chevronRight, size: 18, color: GuildColors.ink),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: GuildSpace.sm),
+                      Text(
+                        deadlineLabel(quest.deadline!, now),
+                        style: GuildText.body(GuildType.sm),
+                      ),
+                      const SizedBox(width: GuildSpace.sm),
+                      const GuildIcon(GuildGlyph.chevronRight, size: 18, color: GuildColors.ink),
+                    ],
                   ),
                 ),
               ),

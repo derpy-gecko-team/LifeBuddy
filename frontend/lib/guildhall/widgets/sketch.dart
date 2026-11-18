@@ -111,12 +111,12 @@ Path _edgeHatch(Path source, Random pen) {
   return path;
 }
 
-Path _flecks(Rect bounds, Random pen) {
+Path sketchFlecks(Rect bounds, Random pen, {double area = 5000, int least = 3, int most = 30, double inset = 6}) {
   final path = Path();
-  final count = (bounds.width * bounds.height / 5000).clamp(3, 30).round();
+  final count = (bounds.width * bounds.height / area).clamp(least, most).round();
   for (var i = 0; i < count; i++) {
-    final x = bounds.left + 6 + pen.nextDouble() * max(1.0, bounds.width - 12);
-    final y = bounds.top + 6 + pen.nextDouble() * max(1.0, bounds.height - 12);
+    final x = bounds.left + inset + pen.nextDouble() * max(1.0, bounds.width - inset * 2);
+    final y = bounds.top + inset + pen.nextDouble() * max(1.0, bounds.height - inset * 2);
     final a = pen.nextDouble() * pi;
     final length = 1 + pen.nextDouble() * 2.5;
     path
@@ -150,7 +150,7 @@ class Sketch {
       echo: _roughEdges(points, pen, wobble: 1.8),
       loose: traceByHand(shape, pen, inset: 4, wobble: 1.3, lift: 0.1),
       hatch: _edgeHatch(shape, pen),
-      flecks: _flecks(shape.getBounds(), pen),
+      flecks: sketchFlecks(shape.getBounds(), pen),
     );
   }
 
@@ -217,7 +217,8 @@ class SketchBox extends StatelessWidget {
     this.borderColor = GuildColors.pencil,
     this.borderWidth = 1.8,
     this.bevel = 0,
-    this.shadow = const Offset(2, 3),
+    this.shadow = GuildShadow.box,
+    this.shading = true,
     this.seed = 1,
     this.padding = EdgeInsets.zero,
   });
@@ -228,6 +229,7 @@ class SketchBox extends StatelessWidget {
   final double borderWidth;
   final double bevel;
   final Offset? shadow;
+  final bool shading;
   final int seed;
   final EdgeInsets padding;
 
@@ -240,6 +242,7 @@ class SketchBox extends StatelessWidget {
         borderWidth: borderWidth,
         bevel: bevel,
         shadow: shadow,
+        shading: shading,
         seed: seed,
       ),
       child: Padding(padding: padding, child: child),
@@ -254,6 +257,7 @@ class _SketchBoxPainter extends CustomPainter {
     required this.borderWidth,
     required this.bevel,
     required this.shadow,
+    required this.shading,
     required this.seed,
   });
 
@@ -262,6 +266,7 @@ class _SketchBoxPainter extends CustomPainter {
   final double borderWidth;
   final double bevel;
   final Offset? shadow;
+  final bool shading;
   final int seed;
 
   @override
@@ -269,11 +274,13 @@ class _SketchBoxPainter extends CustomPainter {
     final sketch = Sketch.of(Sketch.box(size, inset: borderWidth / 2, bevel: bevel), seed);
     final dark = Sketch.isDark(color);
     sketch.paintFill(canvas, color, shadow: shadow);
-    sketch.paintShading(
-      canvas,
-      ink: dark ? GuildColors.cream : GuildColors.ink,
-      strength: dark ? 0.55 : 1,
-    );
+    if (shading) {
+      sketch.paintShading(
+        canvas,
+        ink: dark ? GuildColors.cream : GuildColors.ink,
+        strength: dark ? 0.55 : 1,
+      );
+    }
     sketch.paintBorder(canvas, color: borderColor, width: borderWidth);
   }
 
@@ -284,5 +291,6 @@ class _SketchBoxPainter extends CustomPainter {
       old.borderWidth != borderWidth ||
       old.bevel != bevel ||
       old.shadow != shadow ||
+      old.shading != shading ||
       old.seed != seed;
 }

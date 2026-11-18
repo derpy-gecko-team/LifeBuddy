@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../data/models.dart';
@@ -10,6 +9,7 @@ import '../widgets/guild_scaffold.dart';
 import '../widgets/notice_route.dart';
 import '../widgets/ornaments.dart';
 import '../widgets/quest_cards.dart';
+import '../widgets/tag_rail.dart';
 
 int compareForBoard(Quest a, Quest b) {
   int rank(QuestStatus s) => switch (s) {
@@ -123,8 +123,6 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                 ..sort(compareByDeadline))
               : const <Quest>[];
 
-          final railExtent = 62 + (MediaQuery.textScalerOf(context).scale(14) - 14) * 1.6;
-
           return Stack(
             clipBehavior: Clip.none,
             children: [
@@ -151,7 +149,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                       SliverToBoxAdapter(
                         child: Padding(
                           key: _topKey,
-                          padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                          padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.md, GuildSpace.gutter, GuildSpace.sm),
                           child: Column(
                             children: [
                               RepaintBoundary(
@@ -161,7 +159,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                                   onTitleDrawn: () => _titleDrawn = true,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: GuildSpace.md),
                               RepaintBoundary(
                                 child: RankSign(hero: data.hero, onOpenBuddy: widget.onOpenBuddy),
                               ),
@@ -171,15 +169,23 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                       ),
                       SliverPersistentHeader(
                         pinned: true,
-                        delegate: _TagRailDelegate(
-                          controller: controller,
-                          extent: railExtent,
+                        delegate: PinnedTagRail(
+                          tags: [
+                            for (final f in QuestFilter.values)
+                              TagRailItem(
+                                label: f.label,
+                                count: f == QuestFilter.all ? null : controller.countFor(f),
+                                selected: controller.filter == f,
+                                onTap: () => controller.setFilter(f),
+                              ),
+                          ],
+                          extent: PinnedTagRail.extentFor(context),
                           pinned: _railPinned,
                         ),
                       ),
                       if (dueToday.isNotEmpty)
                         SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                          padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.md, GuildSpace.gutter, 0),
                           sliver: SliverToBoxAdapter(
                             child: RepaintBoundary(
                               child: DueTodayStrip(
@@ -205,7 +211,7 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
                               onOpenQuest: widget.onOpenQuest,
                             ),
                           ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                      const SliverToBoxAdapter(child: SizedBox(height: GuildSpace.huge)),
                     ],
                   ),
                 ),
@@ -216,51 +222,6 @@ class _GuildBoardPageState extends State<GuildBoardPage> {
       ),
     );
   }
-}
-
-class _TagRailDelegate extends SliverPersistentHeaderDelegate {
-  _TagRailDelegate({
-    required this.controller,
-    required this.extent,
-    required this.pinned,
-  });
-
-  final GuildHallController controller;
-  final double extent;
-  final ValueListenable<bool> pinned;
-
-  @override
-  double get minExtent => extent;
-
-  @override
-  double get maxExtent => extent;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        ValueListenableBuilder<bool>(
-          valueListenable: pinned,
-          builder: (context, isPinned, child) => AnimatedOpacity(
-            opacity: isPinned ? 1 : 0,
-            duration: GuildMotion.quick,
-            child: child,
-          ),
-          child: const DecoratedBox(
-            decoration: BoxDecoration(
-              color: GuildColors.indigo,
-              border: Border(bottom: BorderSide(color: GuildColors.chalkLine, width: 1.5)),
-            ),
-          ),
-        ),
-        Align(alignment: Alignment.topCenter, child: QuestTagRail(controller: controller)),
-      ],
-    );
-  }
-
-  @override
-  bool shouldRebuild(_TagRailDelegate old) => true;
 }
 
 class _JourneySection extends StatelessWidget {
@@ -283,23 +244,23 @@ class _JourneySection extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
+          padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.xxl, GuildSpace.gutter, 0),
           child: RepaintBoundary(
             child: JourneyPlaque(journey: journey, onTap: onOpenJourney),
           ),
         ),
         SizedBox(
-          height: QuestCard.heightFor(context) + 56,
+          height: QuestCard.heightFor(context) + GuildSpace.huge + GuildSpace.xl,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
-            padding: const EdgeInsets.fromLTRB(26, 34, 26, 18),
+            padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.huge, GuildSpace.gutter, GuildSpace.lg),
             itemCount: quests.length,
             findItemIndexCallback: (key) {
               final index = quests.indexWhere((q) => ValueKey(q.id) == key);
               return index < 0 ? null : index;
             },
-            separatorBuilder: (_, _) => const SizedBox(width: 22),
+            separatorBuilder: (_, _) => const SizedBox(width: GuildSpace.xl),
             itemBuilder: (context, i) => QuestCard(
               key: ValueKey(quests[i].id),
               quest: quests[i],
@@ -337,7 +298,7 @@ class _EmptyBoard extends StatelessWidget {
             onPressed: () => controller.setFilter(QuestFilter.all),
           );
     return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 40, 28, 0),
+      padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.huge, GuildSpace.gutter, 0),
       child: Center(child: GuildNote(title: title, message: message, action: action)),
     );
   }

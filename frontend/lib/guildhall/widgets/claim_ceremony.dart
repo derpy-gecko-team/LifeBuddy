@@ -228,13 +228,13 @@ class _SignContent extends StatelessWidget {
             child: Text(
               'Rank up!',
               textAlign: TextAlign.center,
-              style: GuildText.title(GuildType.xl),
+              style: GuildText.title(GuildTitle.xl),
             ),
           ),
         Row(
           children: [
             Image.asset(GuildAssets.rankShield, height: 32),
-            const SizedBox(width: 12),
+            const SizedBox(width: GuildSpace.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,14 +244,14 @@ class _SignContent extends StatelessWidget {
                       Expanded(
                         child: Text(
                           '${hero.rankTitle} ${toRoman(hero.level)}',
-                          style: GuildText.title(GuildType.lg),
+                          style: GuildText.title(GuildTitle.lg),
                         ),
                       ),
                       Text('+$xpGained XP', style: GuildText.label(GuildType.md, color: GuildColors.bronze)),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  _Bar(value: bar),
+                  const SizedBox(height: GuildSpace.sm),
+                  GuildProgressBar.onPaper(value: bar, animate: false),
                 ],
               ),
             ),
@@ -263,34 +263,10 @@ class _SignContent extends StatelessWidget {
             child: Text(
               'Title earned: “$titleEarned”',
               textAlign: TextAlign.center,
-              style: GuildText.aside(GuildType.md, color: GuildColors.inkSoft),
+              style: GuildText.body(GuildType.md),
             ),
           ),
       ],
-    );
-  }
-}
-
-class _Bar extends StatelessWidget {
-  const _Bar({required this.value});
-  final double value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 9,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: GuildColors.parchmentDark,
-        border: Border.all(color: GuildColors.pencil),
-        borderRadius: BorderRadius.circular(4.5),
-      ),
-      child: FractionallySizedBox(
-        alignment: Alignment.centerLeft,
-        widthFactor: value.clamp(0, 1),
-        heightFactor: 1,
-        child: const ColoredBox(color: GuildColors.brick),
-      ),
     );
   }
 }

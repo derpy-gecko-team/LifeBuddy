@@ -11,7 +11,7 @@ abstract final class GuildColors {
   static const cream = Color(0xFFEFE0BC);
   static const chalk = Color(0xFFDEC99E);
   static const chalkLine = Color(0xB8DEC99E);
-  static const dangerText = Color(0xFFF4BDB2);
+  static const dangerText = Color(0xFFF6C6BC);
 
   static const parchment = Color(0xFFE9D4B5);
   static const parchmentDark = Color(0xFFD9C19C);
@@ -26,28 +26,62 @@ abstract final class GuildColors {
   static const inkSoft = Color(0xFF4F517C);
 
   static const brick = Color(0xFFB95A54);
-  static const brickDeep = Color(0xFF9E423C);
+  static const brickDeep = Color(0xFF993F39);
+  static const brickShade = Color(0xFF722C28);
 
   static const gold = Color(0xFFDDB96E);
   static const goldBright = Color(0xFFEBD197);
-  static const bronze = Color(0xFF7D5A1C);
+  static const bronze = Color(0xFF735219);
+
+  static const rare = Color(0xFF8D93C9);
 }
 
 abstract final class GuildType {
-  static const double xs = 12;
-  static const double sm = 14;
-  static const double md = 16;
-  static const double lg = 20;
+  static const double xs = 13;
+  static const double sm = 16;
+  static const double md = 18;
+  static const double lg = 22;
   static const double xl = 26;
-  static const double xxl = 36;
-  static const double display = 44;
+}
+
+abstract final class GuildTitle {
+  static const double xs = 12;
+  static const double md = 14;
+  static const double lg = 18;
+  static const double xl = 24;
+  static const double xxl = 32;
+  static const double display = 40;
+}
+
+abstract final class GuildSpace {
+  static const double hair = 2;
+  static const double xs = 4;
+  static const double sm = 8;
+  static const double md = 12;
+  static const double lg = 16;
+  static const double xl = 20;
+  static const double xxl = 24;
+  static const double huge = 32;
+
+  static const double gutter = xl;
+}
+
+abstract final class GuildShadow {
+  static const color = Color(0x80272B55);
+
+  static const small = Offset(1.5, 2);
+  static const box = Offset(2, 3);
+  static const raised = Offset(2, 4);
+  static const paper = Offset(3, 4);
 }
 
 abstract final class GuildMotion {
   static const press = Duration(milliseconds: 120);
+  static const swift = Duration(milliseconds: 160);
   static const quick = Duration(milliseconds: 220);
   static const page = Duration(milliseconds: 340);
   static const pageBack = Duration(milliseconds: 240);
+  static const slide = Duration(milliseconds: 380);
   static const easeOut = Cubic(0.23, 1, 0.32, 1);
 }
 
@@ -63,23 +97,18 @@ abstract final class GuildText {
     } catch (_) {}
   }
 
-  static double _optical(double size) => size < GuildType.xl ? size * 1.12 : size;
-
-  static double _wordGap(double size) => size * 0.14;
-
   static TextStyle _style(double size, Color color, {double height = 1.25, double spacing = 0.2}) {
-    final fontSize = _optical(size);
     return _hand.copyWith(
-      fontSize: fontSize,
+      fontSize: size,
       color: color,
       height: height,
       letterSpacing: spacing,
-      wordSpacing: _wordGap(fontSize),
+      wordSpacing: size * 0.14,
     );
   }
 
   static TextStyle title(double size, {Color color = GuildColors.brickDeep}) => _lettering.copyWith(
-        fontSize: size * 0.9,
+        fontSize: size,
         color: color,
         height: 1.12,
         letterSpacing: 0.2,

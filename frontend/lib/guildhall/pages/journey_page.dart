@@ -63,7 +63,7 @@ class _JourneyPageState extends State<JourneyPage> {
                 builder: (context, collapsed, _) => AnimatedContainer(
                   duration: GuildMotion.quick,
                   curve: Curves.easeOut,
-                  margin: EdgeInsets.fromLTRB(collapsed ? 12 : 0, 4, collapsed ? 12 : 0, 0),
+                  margin: EdgeInsets.fromLTRB(collapsed ? GuildSpace.md : 0, GuildSpace.hair, collapsed ? GuildSpace.md : 0, 0),
                   child: Stack(
                     children: [
                       Positioned.fill(
@@ -71,14 +71,14 @@ class _JourneyPageState extends State<JourneyPage> {
                           opacity: collapsed ? 1 : 0,
                           duration: GuildMotion.quick,
                           child: SketchBox(
-                            color: GuildColors.brick,
-                            borderColor: GuildColors.brickDeep,
+                            color: GuildColors.brickDeep,
+                            borderColor: GuildColors.brickShade,
                             seed: stableSeed(line.id),
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(2.5, 2.5, 16.5, 2.5),
+                        padding: const EdgeInsets.fromLTRB(GuildSpace.xs, GuildSpace.hair, GuildSpace.lg, GuildSpace.hair),
                         child: Row(
                           children: [
                             GuildBackLink(
@@ -92,10 +92,10 @@ class _JourneyPageState extends State<JourneyPage> {
                                   line.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: GuildText.title(GuildType.lg, color: GuildColors.cream),
+                                  style: GuildText.title(GuildTitle.lg, color: GuildColors.cream),
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: GuildSpace.sm),
                               SealProgress(total: line.quests.length, done: line.fulfilledCount, size: 16),
                             ] else
                               const Spacer(),
@@ -121,7 +121,7 @@ class _JourneyPageState extends State<JourneyPage> {
                         ),
                       ),
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(22, 22, 22, 0),
+                        padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.xxl, GuildSpace.gutter, 0),
                         sliver: SliverToBoxAdapter(
                           child: Wrap(
                             alignment: WrapAlignment.spaceBetween,
@@ -130,7 +130,7 @@ class _JourneyPageState extends State<JourneyPage> {
                             children: [
                               Semantics(
                                 header: true,
-                                child: Text('Quests', style: GuildText.title(GuildType.lg, color: GuildColors.cream)),
+                                child: Text('Quests', style: GuildText.title(GuildTitle.lg, color: GuildColors.cream)),
                               ),
                               Text('Open quests first, soonest deadline on top', style: GuildText.aside(GuildType.sm)),
                             ],
@@ -145,11 +145,11 @@ class _JourneyPageState extends State<JourneyPage> {
                         },
                         itemBuilder: (context, i) => Padding(
                           key: ValueKey(quests[i].id),
-                          padding: const EdgeInsets.fromLTRB(16, 28, 16, 0),
+                          padding: const EdgeInsets.fromLTRB(GuildSpace.gutter, GuildSpace.xxl, GuildSpace.gutter, 0),
                           child: QuestRow(quest: quests[i], now: now, onOpen: widget.onOpenQuest),
                         ),
                       ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                      const SliverToBoxAdapter(child: SizedBox(height: GuildSpace.huge)),
                     ],
                   ),
                 ),

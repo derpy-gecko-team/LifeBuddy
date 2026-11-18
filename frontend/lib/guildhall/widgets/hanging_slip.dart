@@ -50,7 +50,7 @@ class _HangingSlipPainter extends CustomPainter {
     canvas.save();
     canvas.translate(0, top);
     final slip = Sketch.of(Sketch.box(rect.size, inset: 0.75), 5);
-    slip.paintFill(canvas, GuildColors.parchment, shadow: const Offset(2, 3));
+    slip.paintFill(canvas, GuildColors.parchment, shadow: GuildShadow.box);
     slip.paintBorder(canvas, color: GuildColors.pencil, width: 1.3);
     canvas.restore();
 

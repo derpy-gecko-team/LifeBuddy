@@ -50,7 +50,7 @@ class _DeadlineOrPeril extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ExcludeSemantics(child: Image.asset(GuildAssets.iconHourglass, height: 16)),
-        const SizedBox(width: 5),
+        const SizedBox(width: GuildSpace.xs),
         Text(deadlineLabel(deadline, now), style: GuildText.body(GuildType.sm, color: color)),
       ],
     );
@@ -116,14 +116,14 @@ class _QuestCardState extends State<QuestCard> {
           ExcludeSemantics(
             child: Image.asset(quest.iconAsset, height: quest.isBoss ? 84 : 58, fit: BoxFit.contain),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: GuildSpace.md),
           Text(
             quest.title,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: GuildText.title(GuildType.lg),
+            style: GuildText.title(GuildTitle.lg),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: GuildSpace.sm),
           Expanded(
             child: Text(
               quest.flavor,
@@ -132,8 +132,8 @@ class _QuestCardState extends State<QuestCard> {
               style: GuildText.body(GuildType.sm),
             ),
           ),
-          if (sealed) const SizedBox(height: 15) else const DashedLine(),
-          const SizedBox(height: 8),
+          if (sealed) const SizedBox(height: GuildSpace.lg) else const DashedLine(),
+          const SizedBox(height: GuildSpace.sm),
           Row(
             children: [
               Expanded(
@@ -142,7 +142,7 @@ class _QuestCardState extends State<QuestCard> {
                   child: FittedBox(fit: BoxFit.scaleDown, child: _DeadlineOrPeril(quest: quest, now: now)),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: GuildSpace.sm),
               Text('+${quest.xp} XP', style: GuildText.label(GuildType.sm, color: GuildColors.bronze)),
             ],
           ),
@@ -150,48 +150,44 @@ class _QuestCardState extends State<QuestCard> {
       ),
     );
 
-    return Semantics(
-      button: true,
-      label: _semanticsFor(quest, now),
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: _open,
-        pressedScale: 1.04,
-        haptic: true,
-        builder: (context, pressed) => PinnedSwing(
-          rest: tilt,
-          held: pressed,
-          nudges: _pinnedBack,
-          child: SizedBox(
-            width: QuestCard.widthFor(context, quest),
-            height: QuestCard.heightFor(context),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned.fill(child: paper),
-                SealBreak(
-                  sealed: sealed,
-                  builder: (breaking) => [
-                    Positioned(left: 2, right: 2, bottom: 50, child: PartingRibbon(breaking: breaking)),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 35,
-                      child: Center(child: FallingSeal(breaking: breaking, size: 44)),
-                    ),
-                  ],
-                ),
-                if (quest.status == QuestStatus.fulfilled)
-                  const Positioned(top: 22, right: 8, child: InkStamp('Fulfilled')),
-                Positioned(
-                  top: -9,
-                  left: 0,
-                  right: 0,
-                  child: Center(child: Fastener(kind: FastenerKind.values[seed % FastenerKind.values.length])),
-                ),
-                if (badge != null) Positioned(top: -12, right: -10, child: RoundBadge(asset: badge, size: 48)),
-              ],
-            ),
+    return GuildPressable(
+      semanticLabel: _semanticsFor(quest, now),
+      onTap: _open,
+      pressedScale: 1.04,
+      haptic: true,
+      builder: (context, pressed) => PinnedSwing(
+        rest: tilt,
+        held: pressed,
+        nudges: _pinnedBack,
+        child: SizedBox(
+          width: QuestCard.widthFor(context, quest),
+          height: QuestCard.heightFor(context),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(child: paper),
+              SealBreak(
+                sealed: sealed,
+                builder: (breaking) => [
+                  Positioned(left: 2, right: 2, bottom: 50, child: PartingRibbon(breaking: breaking)),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 35,
+                    child: Center(child: FallingSeal(breaking: breaking, size: 44)),
+                  ),
+                ],
+              ),
+              if (quest.status == QuestStatus.fulfilled)
+                const Positioned(top: 22, right: 8, child: InkStamp('Fulfilled')),
+              Positioned(
+                top: -9,
+                left: 0,
+                right: 0,
+                child: Center(child: Fastener(kind: FastenerKind.values[seed % FastenerKind.values.length])),
+              ),
+              if (badge != null) Positioned(top: -12, right: -10, child: RoundBadge(asset: badge, size: 48)),
+            ],
           ),
         ),
       ),
@@ -233,34 +229,34 @@ class QuestRow extends StatelessWidget {
                 child: ExcludeSemantics(child: Image.asset(quest.iconAsset, fit: BoxFit.contain)),
               ),
             ),
-          const SizedBox(width: 14),
+          const SizedBox(width: GuildSpace.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(quest.title, style: GuildText.title(GuildType.lg)),
-                const SizedBox(height: 3),
+                Text(quest.title, style: GuildText.title(GuildTitle.lg)),
+                const SizedBox(height: GuildSpace.xs),
                 Text(quest.flavor, style: GuildText.body(GuildType.sm)),
                 if (sealed && quest.sealedReason != null) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: GuildSpace.xs),
                   Text(quest.sealedReason!, style: GuildText.aside(GuildType.sm, color: GuildColors.indigoDeep)),
                 ],
                 if (quest.status == QuestStatus.sworn) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: GuildSpace.xs),
                   Text(
                     'Sworn, ${quest.trialsDone} of ${quest.trials.length} trials done',
-                    style: GuildText.aside(GuildType.sm, color: GuildColors.inkSoft),
+                    style: GuildText.body(GuildType.sm),
                   ),
                 ],
               ],
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: GuildSpace.sm),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('+${quest.xp} XP', style: GuildText.label(GuildType.sm, color: GuildColors.bronze)),
-              const SizedBox(height: 8),
+              const SizedBox(height: GuildSpace.sm),
               if (fulfilled) const InkStamp('Fulfilled') else _DeadlineOrPeril(quest: quest, now: now),
             ],
           ),
@@ -268,96 +264,37 @@ class QuestRow extends StatelessWidget {
       ),
     );
 
-    return Semantics(
-      button: true,
-      label: _semanticsFor(quest, now),
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: () => onOpen(quest.id, origin: globalRectOf(context)),
-        pressedScale: 0.98,
-        haptic: true,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            paper,
-            SealBreak(
-              sealed: sealed,
-              builder: (breaking) => [
-                Positioned(
-                  left: 18 + _medallion / 2 - 7,
-                  top: 4,
-                  bottom: 12,
-                  child: PartingRibbon(breaking: breaking, axis: Axis.vertical),
-                ),
-                Positioned(
-                  left: 18 + (_medallion - 52) / 2,
-                  top: 0,
-                  bottom: 6,
-                  child: Center(child: FallingSeal(breaking: breaking, size: 52)),
-                ),
-              ],
-            ),
-            if (badge != null) Positioned(top: -20, left: 70, child: RoundBadge(asset: badge, size: 44)),
-            if (quest.paper == PaperTone.sage && !sealed)
-              const Positioned(top: 10, left: 12, child: Fastener(kind: FastenerKind.pin)),
-          ],
-        ),
+    return GuildPressable(
+      semanticLabel: _semanticsFor(quest, now),
+      onTap: () => onOpen(quest.id, origin: globalRectOf(context)),
+      pressedScale: 0.98,
+      haptic: true,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          paper,
+          SealBreak(
+            sealed: sealed,
+            builder: (breaking) => [
+              Positioned(
+                left: 18 + _medallion / 2 - 7,
+                top: 4,
+                bottom: 12,
+                child: PartingRibbon(breaking: breaking, axis: Axis.vertical),
+              ),
+              Positioned(
+                left: 18 + (_medallion - 52) / 2,
+                top: 0,
+                bottom: 6,
+                child: Center(child: FallingSeal(breaking: breaking, size: 52)),
+              ),
+            ],
+          ),
+          if (badge != null) Positioned(top: -14, right: -8, child: RoundBadge(asset: badge, size: 44)),
+          if (quest.paper == PaperTone.sage && !sealed)
+            const Positioned(top: 10, left: 12, child: Fastener(kind: FastenerKind.pin)),
+        ],
       ),
     );
-  }
-}
-
-enum FastenerKind { tape, pin, nail }
-
-class Fastener extends StatelessWidget {
-  const Fastener({super.key, required this.kind});
-
-  final FastenerKind kind;
-
-  @override
-  Widget build(BuildContext context) {
-    switch (kind) {
-      case FastenerKind.tape:
-        return Transform.rotate(
-          angle: -0.06,
-          child: Container(
-            width: 62,
-            height: 18,
-            decoration: BoxDecoration(
-              color: GuildColors.chalk.withValues(alpha: 0.82),
-              border: Border.all(color: GuildColors.tan, width: 1),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        );
-      case FastenerKind.pin:
-        return Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: GuildColors.brick,
-            border: Border.all(color: GuildColors.brickDeep, width: 1),
-            boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.45), offset: const Offset(1, 2))],
-          ),
-          alignment: const Alignment(-0.3, -0.3),
-          child: Container(
-            width: 4,
-            height: 4,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white54),
-          ),
-        );
-      case FastenerKind.nail:
-        return Container(
-          width: 15,
-          height: 15,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: GuildColors.gold,
-            border: Border.all(color: GuildColors.bronze, width: 1),
-            boxShadow: [BoxShadow(color: GuildColors.shadow.withValues(alpha: 0.45), offset: const Offset(1, 2))],
-          ),
-        );
-    }
   }
 }

@@ -6,15 +6,20 @@ import '../guildhall/pages/guild_board_page.dart';
 import '../guildhall/pages/quest_detail_page.dart';
 import '../guildhall/pages/journey_page.dart';
 import '../guildhall/state/guild_hall_controller.dart';
+import '../guildhall/state/guild_hall_remote.dart';
 import '../guildhall/theme/guild_theme.dart';
 import '../guildhall/widgets/notice_route.dart';
 
 class GuildHallPage extends StatefulWidget {
-  const GuildHallPage({super.key, this.onOpenBuddy, this.repository});
+  const GuildHallPage({super.key, this.onOpenBuddy, this.repository, this.remote});
 
   final VoidCallback? onOpenBuddy;
 
   final QuestRepository? repository;
+
+  /// Lets the rest of the app tell the hall its quests changed, or ask it
+  /// to open one (the Buddy does both).
+  final GuildHallRemote? remote;
 
   @override
   State<GuildHallPage> createState() => _GuildHallPageState();
@@ -30,10 +35,24 @@ class _GuildHallPageState extends State<GuildHallPage> {
         ..load();
 
   @override
+  void initState() {
+    super.initState();
+    widget.remote?.addListener(_onRemote);
+  }
+
+  @override
   void dispose() {
+    widget.remote?.removeListener(_onRemote);
     _heroController.dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _onRemote() async {
+    final questId = widget.remote!.takeQuestToOpen();
+    await _controller.load();
+    if (!mounted || questId == null || _controller.questById(questId) == null) return;
+    await _openQuest(questId);
   }
 
   void _openJourney(String journeyId, {Rect? origin}) {

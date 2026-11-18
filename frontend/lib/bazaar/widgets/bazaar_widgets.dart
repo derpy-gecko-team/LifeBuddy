@@ -5,7 +5,6 @@ import 'package:material_ui/material_ui.dart';
 import '../../guildhall/theme/guild_theme.dart';
 import '../../guildhall/widgets/ornaments.dart';
 import '../../guildhall/widgets/pressable.dart';
-import '../../guildhall/widgets/quest_cards.dart' show Fastener, FastenerKind;
 import '../../guildhall/widgets/sketch.dart';
 import '../../guildhall/widgets/torn_paper.dart';
 import '../data/models.dart';
@@ -80,7 +79,7 @@ class RarityMark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox.square(dimension: size * 0.9, child: CustomPaint(painter: _DiamondPainter(rarity, color))),
+        SizedBox.square(dimension: size * 0.8, child: CustomPaint(painter: _DiamondPainter(rarity, color))),
         SizedBox(width: size * 0.4),
         Flexible(child: Text(rarity.label, style: GuildText.hand(size, color: color))),
       ],
@@ -105,7 +104,7 @@ class _DiamondPainter extends CustomPainter {
       ..close();
     final fill = switch (rarity) {
       Rarity.common => null,
-      Rarity.rare => const Color(0xFF8D93C9),
+      Rarity.rare => GuildColors.rare,
       Rarity.legendary => GuildColors.gold,
     };
     if (fill != null) canvas.drawPath(path, Paint()..color = fill.withValues(alpha: ink.a));
@@ -117,7 +116,7 @@ class _DiamondPainter extends CustomPainter {
 }
 
 class PriceTag extends StatelessWidget {
-  const PriceTag(this.price, {super.key, this.size = GuildType.md});
+  const PriceTag(this.price, {super.key, this.size = 16});
 
   final Price price;
   final double size;
@@ -133,7 +132,7 @@ class PriceTag extends StatelessWidget {
           children: [
             CurrencyIcon(price.currency, size: size * 1.2),
             SizedBox(width: size * 0.4),
-            Text(formatAmount(price.amount), style: GuildText.title(size * 1.15, color: GuildColors.ink)),
+            Text(formatAmount(price.amount), style: GuildText.title(size, color: GuildColors.ink)),
           ],
         ),
       ),
@@ -155,7 +154,7 @@ class _PriceTagPainter extends CustomPainter {
       Offset(size.width, size.height),
       Offset(point, size.height),
     ], seed);
-    sketch.paintFill(canvas, GuildColors.vellum, shadow: const Offset(1.5, 2));
+    sketch.paintFill(canvas, GuildColors.vellum, shadow: GuildShadow.small);
     sketch.paintBorder(canvas, color: GuildColors.ink, width: 1.7);
     canvas.drawCircle(Offset(point + 2, size.height / 2), 2.8, Paint()..color = GuildColors.indigoDeep);
   }
@@ -176,42 +175,20 @@ class OwnedStamp extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          border: Border.all(color: GuildColors.brick, width: 2),
+          border: Border.all(color: GuildColors.brickDeep, width: 2),
           borderRadius: BorderRadius.circular(3),
         ),
         child: Container(
           padding: const EdgeInsets.fromLTRB(8, 1, 6, 1),
           decoration: BoxDecoration(
-            border: Border.all(color: GuildColors.brick.withValues(alpha: 0.6), width: 1),
+            border: Border.all(color: GuildColors.brickDeep.withValues(alpha: 0.6), width: 1),
             borderRadius: BorderRadius.circular(2),
           ),
           child: Text(
             label,
-            style: GuildText.title(GuildType.md, color: GuildColors.brick).copyWith(letterSpacing: 2.4),
+            style: GuildText.title(GuildTitle.md, color: GuildColors.brickDeep).copyWith(letterSpacing: 2.4),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class RuledFrame extends StatelessWidget {
-  const RuledFrame({super.key, required this.child, this.padding = const EdgeInsets.all(12), this.color});
-
-  final Widget child;
-  final EdgeInsets padding;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final line = color ?? GuildColors.tan;
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(border: Border.all(color: line, width: 1.6)),
-      child: Container(
-        padding: padding,
-        decoration: BoxDecoration(border: Border.all(color: line.withValues(alpha: line.a * 0.7), width: 1)),
-        child: child,
       ),
     );
   }
@@ -293,65 +270,60 @@ class WareNote extends StatelessWidget {
     final seed = stableSeed(ware.id);
     final taped = seed % 3 != 0;
     final owned = ware.owned && markOwned;
-    final quiet = owned ? 0.55 : 1.0;
 
-    return Semantics(
-      button: true,
-      label: wareSemantics(ware),
-      excludeSemantics: true,
-      child: GuildPressable(
-        onTap: onOpen,
-        pressedScale: 0.97,
-        haptic: true,
-        child: Transform.rotate(
-          angle: tilt,
-          child: Stack(
-            clipBehavior: Clip.none,
-            fit: StackFit.passthrough,
-            children: [
-              TornPaper(
-                seed: seed % 97 + 2,
-                tear: 4,
-                tearBottom: 9,
-                padding: const EdgeInsets.fromLTRB(13, 20, 11, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Opacity(opacity: owned ? 0.7 : 1, child: _RingedArt(ware: ware, size: 70)),
-                    const SizedBox(height: 8),
+    return GuildPressable(
+      semanticLabel: wareSemantics(ware),
+      onTap: onOpen,
+      pressedScale: 0.97,
+      haptic: true,
+      child: Transform.rotate(
+        angle: tilt,
+        child: Stack(
+          clipBehavior: Clip.none,
+          fit: StackFit.passthrough,
+          children: [
+            TornPaper(
+              seed: seed % 97 + 2,
+              tear: 4,
+              tearBottom: 9,
+              padding: const EdgeInsets.fromLTRB(13, 20, 11, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Opacity(opacity: owned ? 0.7 : 1, child: _RingedArt(ware: ware, size: 70)),
+                  const SizedBox(height: GuildSpace.sm),
+                  Text(
+                    ware.shelf,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GuildText.label(GuildType.xs, color: GuildColors.inkSoft, spacing: 0.4),
+                  ),
+                  const SizedBox(height: GuildSpace.hair),
+                  Text(
+                    ware.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GuildText.title(GuildTitle.lg, color: GuildColors.brickDeep),
+                  ),
+                  const SizedBox(height: GuildSpace.xs),
+                  RarityMark(ware.rarity),
+                  const SizedBox(height: GuildSpace.sm),
+                  if (ware.owned)
                     Text(
-                      ware.shelf,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GuildText.label(GuildType.xs, color: GuildColors.pencil.withValues(alpha: quiet), spacing: 0.4),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      ware.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GuildText.title(GuildType.lg, color: GuildColors.brick.withValues(alpha: owned ? 0.65 : 1)),
-                    ),
-                    const SizedBox(height: 4),
-                    RarityMark(ware.rarity, color: GuildColors.ink.withValues(alpha: owned ? 0.6 : 1)),
-                    const SizedBox(height: 8),
-                    if (ware.owned)
-                      Text(
-                        ware.worn ? 'In use' : 'In your chest',
-                        style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft),
-                      )
-                    else
-                      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: PriceTag(ware.price, size: 14)),
-                  ],
-                ),
+                      ware.worn ? (ware.category == WareCategory.buddy ? 'Your guide' : 'In use') : 'In your chest',
+                      style: GuildText.hand(GuildType.sm, color: GuildColors.inkSoft),
+                    )
+                  else
+                    FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: PriceTag(ware.price, size: 14)),
+                ],
               ),
-              if (taped)
-                const Positioned(top: -8, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape)))
-              else
-                const Positioned(top: 6, right: 30, child: Fastener(kind: FastenerKind.pin)),
-              if (owned) const Positioned(top: 24, right: -5, child: OwnedStamp()),
-            ],
-          ),
+            ),
+            if (taped)
+              const Positioned(top: -8, left: 0, right: 0, child: Center(child: Fastener(kind: FastenerKind.tape)))
+            else
+              const Positioned(top: 6, right: 30, child: Fastener(kind: FastenerKind.pin)),
+            if (owned) const Positioned(top: 24, right: -5, child: OwnedStamp()),
+          ],
         ),
       ),
     );
@@ -484,7 +456,7 @@ class WareTable extends StatelessWidget {
       color: GuildColors.indigoDeep,
       borderColor: GuildColors.chalk.withValues(alpha: 0.8),
       borderWidth: 2,
-      shadow: const Offset(2, 4),
+      shadow: GuildShadow.raised,
       seed: 83,
       padding: const EdgeInsets.all(6),
       child: Container(
@@ -500,7 +472,7 @@ class WareTable extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Expanded(child: note(i)),
-                      const SizedBox(width: 18),
+                      const SizedBox(width: GuildSpace.lg),
                       Expanded(child: i + 1 < wares.length ? note(i + 1) : const SizedBox.shrink()),
                     ],
                   ),

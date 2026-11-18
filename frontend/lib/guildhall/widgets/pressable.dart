@@ -11,6 +11,11 @@ class GuildPressable extends StatefulWidget {
     this.builder,
     this.pressedScale = 0.96,
     this.haptic = false,
+    this.semanticLabel,
+    this.semanticEnabled,
+    this.selected,
+    this.toggled,
+    this.checked,
   }) : assert(child != null || builder != null);
 
   final VoidCallback? onTap;
@@ -19,6 +24,12 @@ class GuildPressable extends StatefulWidget {
   final Widget Function(BuildContext context, bool pressed)? builder;
   final double pressedScale;
   final bool haptic;
+
+  final String? semanticLabel;
+  final bool? semanticEnabled;
+  final bool? selected;
+  final bool? toggled;
+  final bool? checked;
 
   @override
   State<GuildPressable> createState() => _GuildPressableState();
@@ -42,8 +53,10 @@ class _GuildPressableState extends State<GuildPressable> {
   Widget build(BuildContext context) {
     final enabled = widget.onTap != null;
     final pressed = enabled && _pressed;
-    return GestureDetector(
+    final label = widget.semanticLabel;
+    final Widget detector = GestureDetector(
       behavior: HitTestBehavior.opaque,
+      excludeFromSemantics: label != null,
       onTapDown: enabled ? (_) => _set(true) : null,
       onTapCancel: enabled ? () => _set(false) : null,
       onTap: enabled ? _handleTap : null,
@@ -53,6 +66,18 @@ class _GuildPressableState extends State<GuildPressable> {
         curve: Curves.easeOut,
         child: widget.builder?.call(context, pressed) ?? widget.child,
       ),
+    );
+    if (label == null) return detector;
+    return Semantics(
+      button: widget.checked == null,
+      enabled: widget.semanticEnabled,
+      selected: widget.selected,
+      toggled: widget.toggled,
+      checked: widget.checked,
+      label: label,
+      onTap: enabled ? _handleTap : null,
+      excludeSemantics: true,
+      child: detector,
     );
   }
 }

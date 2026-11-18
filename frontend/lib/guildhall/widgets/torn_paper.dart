@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../data/models.dart';
 import '../theme/guild_theme.dart';
+import 'sketch.dart';
 
 Color paperColor(PaperTone tone) => switch (tone) {
       PaperTone.parchment => GuildColors.parchment,
@@ -102,7 +103,7 @@ class _TearShape {
       loose: _looseLine(points, s, pen),
       hatch: _hatching(s, pen),
       smudge: _smudges(s, pen),
-      flecks: _flecks(s, pen),
+      flecks: sketchFlecks(Offset.zero & s, pen, area: 4500, least: 6, most: 40, inset: 8),
     );
   }
 
@@ -199,21 +200,6 @@ class _TearShape {
     return path;
   }
 
-  Path _flecks(Size s, Random pen) {
-    final path = Path();
-    final count = (s.width * s.height / 4500).clamp(6, 40).round();
-    for (var i = 0; i < count; i++) {
-      final x = 8 + pen.nextDouble() * (s.width - 16);
-      final y = 8 + pen.nextDouble() * (s.height - 16);
-      final a = pen.nextDouble() * pi;
-      final length = 1 + pen.nextDouble() * 2.5;
-      path
-        ..moveTo(x, y)
-        ..lineTo(x + cos(a) * length, y + sin(a) * length);
-    }
-    return path;
-  }
-
   @override
   bool operator ==(Object other) =>
       other is _TearShape &&
@@ -251,8 +237,8 @@ class _TornPaperPainter extends CustomPainter {
     final outline = sheet.outline;
 
     canvas.drawPath(
-      outline.shift(const Offset(3, 4)),
-      Paint()..color = GuildColors.shadow.withValues(alpha: 0.5),
+      outline.shift(GuildShadow.paper),
+      Paint()..color = GuildShadow.color,
     );
     canvas.drawPath(outline, Paint()..color = color);
 
