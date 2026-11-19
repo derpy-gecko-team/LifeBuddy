@@ -6,5 +6,6 @@ public record AiProcessRequest(String userText,
                                String intent,
                                UserContext userContext,
                                List<ActiveQuest> activeQuests,
-                               List<String> availableTileTypes) {
+                               List<String> availableTileTypes,
+                               List<ActiveJourney> activeJourneys) {
 }

@@ -57,6 +57,7 @@ public class GuideService {
                     check.intent(),
                     loadUserContext(userId),
                     List.of(),
+                    List.of(),
                     List.of()));
 
             // Quests and map tiles are wired in once the quest and map services exist.
