@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../guildhall/data/api_quest_repository.dart';
 import '../guildhall/data/mock_quest_repository.dart';
 import '../guildhall/data/quest_repository.dart';
 import '../guildhall/pages/guild_board_page.dart';
@@ -26,7 +27,9 @@ class _GuildHallPageState extends State<GuildHallPage> {
     createRectTween: (begin, end) => MaterialRectArcTween(begin: begin, end: end),
   );
   late final GuildHallController _controller =
-      GuildHallController(widget.repository ?? MockQuestRepository(), beforeFirstLoad: GuildText.preload)
+      GuildHallController(
+        widget.repository ?? ApiQuestRepository(fallback: MockQuestRepository()),
+        beforeFirstLoad: GuildText.preload)
         ..load();
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../state/guild_hall_controller.dart';
 import '../theme/guild_theme.dart';
+import '../widgets/guild_feedback.dart';
 import '../widgets/guild_scaffold.dart';
 import '../widgets/notice_route.dart';
 import '../widgets/ornaments.dart';
@@ -32,6 +33,12 @@ class _JourneyPageState extends State<JourneyPage> {
   final _bannerKey = GlobalKey();
 
   @override
+  void initState() {
+    super.initState();
+    widget.controller.loadJourney(widget.journeyId);
+  }
+
+  @override
   void dispose() {
     _collapsed.dispose();
     super.dispose();
@@ -51,8 +58,25 @@ class _JourneyPageState extends State<JourneyPage> {
       body: ListenableBuilder(
         listenable: widget.controller,
         builder: (context, _) {
-          final line = widget.controller.journeyById(widget.journeyId);
-          if (line == null) return const SizedBox.shrink();
+          final controller = widget.controller;
+          final line = controller.journeyById(widget.journeyId);
+          if (line == null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(28),
+                child: controller.journeyError(widget.journeyId) != null
+                    ? GuildNote(
+                        title: 'The journey did not arrive',
+                        message: 'This journey could not be loaded. Check your connection and try again.',
+                        action: GuildButton(
+                          label: 'Try again',
+                          onPressed: () => controller.loadJourney(widget.journeyId),
+                        ),
+                      )
+                    : const GuildNote(title: 'Unrolling the journey', busy: true),
+              ),
+            );
+          }
           final now = DateTime.now();
           final quests = [...line.quests]..sort(compareForJourney);
 

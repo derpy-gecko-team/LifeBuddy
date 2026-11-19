@@ -21,6 +21,15 @@ class MockQuestRepository implements QuestRepository {
   }
 
   @override
+  Future<Journey> fetchJourney(String journeyId) async {
+    await Future<void>.delayed(_latency);
+    return _data.journeys.firstWhere(
+      (j) => j.id == journeyId,
+      orElse: () => throw QuestActionException('Unknown journey $journeyId'),
+    );
+  }
+
+  @override
   Future<GuildHallData> swearOath(String questId) async {
     final quest = _quest(questId);
     if (quest.status != QuestStatus.open) {

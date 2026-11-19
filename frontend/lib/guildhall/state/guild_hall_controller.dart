@@ -42,6 +42,12 @@ class GuildHallController extends ChangeNotifier {
 
   bool _busy = false;
 
+  final Set<String> _loadingJourneys = {};
+  final Map<String, Object> _journeyErrors = {};
+
+  bool isJourneyLoading(String journeyId) => _loadingJourneys.contains(journeyId);
+  Object? journeyError(String journeyId) => _journeyErrors[journeyId];
+
   Future<void> load() async {
     _loading = true;
     _error = null;
@@ -58,6 +64,32 @@ class GuildHallController extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  /// Refreshes one journey from the repository and merges it into [data].
+  /// On failure, any journey already on the board stays as it was.
+  Future<void> loadJourney(String journeyId) async {
+    if (!_loadingJourneys.add(journeyId)) return;
+    _journeyErrors.remove(journeyId);
+    notifyListeners();
+    try {
+      final fresh = await _repository.fetchJourney(journeyId);
+      final data = _data;
+      if (data != null) _data = data.copyWith(journeys: _mergeJourney(data.journeys, fresh));
+    } catch (e) {
+      _journeyErrors[journeyId] = e;
+    } finally {
+      _loadingJourneys.remove(journeyId);
+      notifyListeners();
+    }
+  }
+
+  static List<Journey> _mergeJourney(List<Journey> journeys, Journey fresh) {
+    final index = journeys.indexWhere((j) => j.id == fresh.id);
+    if (index < 0) return [...journeys, fresh];
+    // Keep board-side decoration (emblem, quote, bounty) the API does not send.
+    final merged = journeys[index].copyWith(name: fresh.name, quests: fresh.quests);
+    return [...journeys]..[index] = merged;
   }
 
   void setFilter(QuestFilter filter) {

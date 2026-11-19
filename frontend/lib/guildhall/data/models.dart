@@ -49,6 +49,9 @@ class Quest {
     this.sealedReason,
     this.prerequisiteId,
     this.paper = PaperTone.parchment,
+    this.startedAt,
+    this.completedAt,
+    this.durationMinutes,
   });
 
   final String id;
@@ -72,6 +75,10 @@ class Quest {
 
   final String? prerequisiteId;
   final PaperTone paper;
+
+  final DateTime? startedAt;
+  final DateTime? completedAt;
+  final int? durationMinutes;
 
   int get trialsDone => trials.where((t) => t.done).length;
 
@@ -104,6 +111,9 @@ class Quest {
             clearSealedReason ? null : (sealedReason ?? this.sealedReason),
         prerequisiteId: prerequisiteId,
         paper: paper,
+        startedAt: startedAt,
+        completedAt: completedAt,
+        durationMinutes: durationMinutes,
       );
 }
 
@@ -134,9 +144,9 @@ class Journey {
 
   bool get isComplete => quests.isNotEmpty && fulfilledCount == quests.length;
 
-  Journey copyWith({List<Quest>? quests}) => Journey(
+  Journey copyWith({String? name, List<Quest>? quests}) => Journey(
         id: id,
-        name: name,
+        name: name ?? this.name,
         emblemAsset: emblemAsset,
         quote: quote,
         bountyXp: bountyXp,
@@ -184,4 +194,10 @@ class GuildHallData {
   final int newToday;
 
   Iterable<Quest> get allQuests => journeys.expand((l) => l.quests);
+
+  GuildHallData copyWith({List<Journey>? journeys}) => GuildHallData(
+        hero: hero,
+        journeys: journeys ?? this.journeys,
+        newToday: newToday,
+      );
 }

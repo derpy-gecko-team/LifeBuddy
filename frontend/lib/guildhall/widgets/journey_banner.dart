@@ -53,8 +53,10 @@ class JourneyBanner extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: GuildSpace.md),
-                  Text(journey.quote, style: GuildText.aside(GuildType.md)),
+                  if (journey.quote.isNotEmpty) ...[
+                    const SizedBox(height: GuildSpace.md),
+                    Text(journey.quote, style: GuildText.aside(GuildType.md)),
+                  ],
                   const SizedBox(height: GuildSpace.lg),
                   Row(
                     children: [
@@ -68,18 +70,20 @@ class JourneyBanner extends StatelessWidget {
                       SealProgress(total: journey.quests.length, done: journey.fulfilledCount, size: 20),
                     ],
                   ),
-                  const SizedBox(height: GuildSpace.lg),
-                  DashedBorder(
-                    color: GuildColors.cream.withValues(alpha: 0.8),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    child: Row(
-                      children: [
-                        ExcludeSemantics(child: Image.asset(GuildAssets.coinPouch, height: 26)),
-                        const SizedBox(width: GuildSpace.sm),
-                        Expanded(child: Text(bounty, style: GuildText.aside(GuildType.md))),
-                      ],
+                  if (journey.bountyXp > 0 || journey.bountyTitle != null) ...[
+                    const SizedBox(height: GuildSpace.lg),
+                    DashedBorder(
+                      color: GuildColors.cream.withValues(alpha: 0.8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      child: Row(
+                        children: [
+                          ExcludeSemantics(child: Image.asset(GuildAssets.coinPouch, height: 26)),
+                          const SizedBox(width: GuildSpace.sm),
+                          Expanded(child: Text(bounty, style: GuildText.aside(GuildType.md))),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
