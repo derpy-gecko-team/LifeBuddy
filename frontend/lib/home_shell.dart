@@ -5,6 +5,7 @@ import 'bazaar/state/bazaar_controller.dart';
 import 'buddy/data/mock_buddy_repository.dart';
 import 'buddy/data/models.dart';
 import 'theme/app_colors.dart';
+import 'guildhall/data/api_quest_repository.dart';
 import 'guildhall/data/mock_quest_repository.dart';
 import 'guildhall/state/guild_hall_remote.dart';
 import 'pages/bazaar_page.dart';
@@ -67,7 +68,7 @@ class _HomeShellState extends State<HomeShell> {
 
   late final _pages = <Widget>[
     const MapPage(),
-    GuildHallPage(repository: _quests, remote: _guildHall, onOpenBuddy: () => setState(() => _index = _buddyIndex)),
+    GuildHallPage(repository: ApiQuestRepository(fallback: _quests), remote: _guildHall, onOpenBuddy: () => setState(() => _index = _buddyIndex)),
     BazaarPage(controller: widget.bazaar),
     BuddyPage(
       repository: MockBuddyRepository(quests: _quests),
